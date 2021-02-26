@@ -10,7 +10,7 @@ contract Ownership is IERC173 {
     address private _owner;
 
     modifier onlyOwner() {
-        require(_owner == msg.sender, "Authority/Not-Authorized");
+        require(_owner == msg.sender, "Ownership/Not-Authorized");
         _;
     }
 

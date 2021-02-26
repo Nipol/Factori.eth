@@ -1,1 +1,1 @@
-# Contract Template
+# Token Factori.eth
