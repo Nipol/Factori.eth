@@ -31,8 +31,4 @@ contract Ownership is IERC173 {
         _owner = newOwner;
         emit OwnershipTransferred(msg.sender, newOwner);
     }
-
-    function supportsInterface(bytes4 interfaceID) external pure override returns (bool) {
-        return interfaceID == type(IERC173).interfaceId; // ERC173;
-    }
 }

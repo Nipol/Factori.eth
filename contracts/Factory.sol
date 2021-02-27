@@ -10,7 +10,6 @@ import "./Library/Deployer.sol";
 import "./IFactory.sol";
 
 contract Factory is Ownership, IFactory {
-
     struct Entity {
         bytes32 _key;
         Template _value;
@@ -19,15 +18,15 @@ contract Factory is Ownership, IFactory {
     Entity[] public entities;
     mapping(bytes32 => uint256) public indexes;
 
-    event NewToken(address token, address owner);
-    event NewTemplate(bytes32 indexed key, address indexed template, uint256 price);
-    event UpdatedTemplate(bytes32 indexed key, address indexed template, uint256 price);
-
     constructor() {
         Ownership.initialize(msg.sender);
     }
 
-    function newToken(bytes32 templateId, bytes memory initializationCallData) external payable returns (address tokenAddr) {
+    function newToken(bytes32 templateId, bytes memory initializationCallData)
+        external
+        payable
+        returns (address tokenAddr)
+    {
         Template memory tmp = _get(templateId);
         require(tmp.price == msg.value, "Factory/Not-Enough");
         tokenAddr = Deployer.deploy(tmp.template, initializationCallData);
@@ -36,10 +35,17 @@ contract Factory is Ownership, IFactory {
         emit NewToken(tokenAddr, msg.sender);
     }
 
-    function addTemplate(address templateAddr, uint256 price) external onlyOwner returns (bool success) {
+    function addTemplate(address templateAddr, uint256 price)
+        external
+        onlyOwner
+        returns (bool success)
+    {
         Entity[] memory _entities = entities;
-        for(uint256 i = 0; i < entities.length; i++) {
-            require(_entities[i]._value.template != templateAddr, "Factory/Exist-Template");
+        for (uint256 i = 0; i < entities.length; i++) {
+            require(
+                _entities[i]._value.template != templateAddr,
+                "Factory/Exist-Template"
+            );
         }
         bytes32 key = keccak256(abi.encode(templateAddr, _entities.length));
         Template memory tmp = Template({template: templateAddr, price: price});
@@ -49,12 +55,16 @@ contract Factory is Ownership, IFactory {
         emit NewTemplate(key, templateAddr, price);
     }
 
-    function updateTemplate(bytes32 key, address templateAddr, uint256 price) external onlyOwner returns (bool success) {
+    function updateTemplate(
+        bytes32 key,
+        address templateAddr,
+        uint256 price
+    ) external onlyOwner returns (bool success) {
         Template memory tmp = _get(key);
-        if(templateAddr != address(0) && templateAddr != tmp.template) {
+        if (templateAddr != address(0) && templateAddr != tmp.template) {
             tmp.template = templateAddr;
         }
-        if(price != 0 && price != tmp.price) {
+        if (price != 0 && price != tmp.price) {
             tmp.price = price;
         }
 
@@ -63,7 +73,35 @@ contract Factory is Ownership, IFactory {
         emit UpdatedTemplate(key, tmp.template, tmp.price);
     }
 
-    function removeTemplate(bytes32 key) external onlyOwner returns (bool success) {
+    function removeTemplate(bytes32 key)
+        external
+        onlyOwner
+        returns (bool success)
+    {
+        require(
+            (success = _remove(key)) && success,
+            "Factory/None-Exist-Template"
+        );
+    }
+
+    function _set(bytes32 key, Template memory tmp) internal {
+        uint256 keyIndex = indexes[key];
+
+        if (keyIndex == 0) {
+            entities.push(Entity({_key: key, _value: tmp}));
+            indexes[key] = entities.length;
+        } else {
+            entities[keyIndex - 1]._value = tmp;
+        }
+    }
+
+    function _get(bytes32 key) private view returns (Template memory) {
+        uint256 keyIndex = indexes[key];
+        require(keyIndex != 0, "Factory/None-Exist"); // Equivalent to contains(map, key)
+        return entities[keyIndex - 1]._value; // All indexes are 1-based
+    }
+
+    function _remove(bytes32 key) private returns (bool success) {
         uint256 keyIndex = indexes[key];
 
         if (keyIndex != 0) {
@@ -82,26 +120,5 @@ contract Factory is Ownership, IFactory {
         } else {
             success = false;
         }
-    }
-
-    function _set(bytes32 key, Template memory tmp) internal {
-        uint256 keyIndex = indexes[key];
-
-        if (keyIndex == 0) {
-            entities.push(Entity({_key: key, _value: tmp}));
-            indexes[key] = entities.length;
-        } else {
-            entities[keyIndex - 1]._value = tmp;
-        }
-    }
-
-    function _get(bytes32 key)
-        private
-        view
-        returns (Template memory)
-    {
-        uint256 keyIndex = indexes[key];
-        require(keyIndex != 0, "Factory/None-Exist"); // Equivalent to contains(map, key)
-        return entities[keyIndex - 1]._value; // All indexes are 1-based
     }
 }

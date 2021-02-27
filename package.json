@@ -26,6 +26,7 @@
     "@types/chai": "^4.2.15",
     "@types/mocha": "^7.0.2",
     "@types/node": "^14.14.31",
+    "babel-eslint": "^10.1.0",
     "buidler-ethers-v5": "^0.2.3",
     "buidler-gas-reporter": "^0.1.4",
     "chai": "^4.3.0",
