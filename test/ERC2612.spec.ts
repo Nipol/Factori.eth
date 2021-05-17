@@ -2,7 +2,6 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { Contract, BigNumber, constants, Signer } from 'ethers';
 import { splitSignature, arrayify, joinSignature, SigningKey } from 'ethers/lib/utils';
-
 import { getApprovalDigest } from './util';
 
 describe('StandardToken/ERC2612', () => {

@@ -11,8 +11,14 @@ import "./Interface/IERC20.sol";
 import "./Interface/IERC165.sol";
 import "./Interface/IERC2612.sol";
 
-contract StandardToken is IERC2612, IERC165, IERC20, ERC2612, Ownership, Initializer {
-
+contract StandardToken is
+    IERC2612,
+    IERC165,
+    IERC20,
+    ERC2612,
+    Ownership,
+    Initializer
+{
     string public override name;
     string public override symbol;
     uint8 public override decimals;
@@ -21,12 +27,18 @@ contract StandardToken is IERC2612, IERC165, IERC20, ERC2612, Ownership, Initial
     mapping(address => uint256) public override balanceOf;
     mapping(address => mapping(address => uint256)) public override allowance;
 
-    function initialize(string memory contractVersion, string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals) external initializer {
+    function initialize(
+        string memory contractVersion,
+        string memory tokenName,
+        string memory tokenSymbol,
+        uint8 tokenDecimals
+    ) external initializer {
         Ownership.initialize(msg.sender);
         ERC2612._initDomainSeparator(contractVersion, tokenName);
         name = tokenName;
         symbol = tokenSymbol;
         decimals = tokenDecimals;
+        balanceOf[address(this)] = type(uint256).max;
     }
 
     function approve(address spender, uint256 value)
@@ -105,7 +117,11 @@ contract StandardToken is IERC2612, IERC165, IERC20, ERC2612, Ownership, Initial
         return true;
     }
 
-    function burnFrom(address from, uint256 value) external onlyOwner returns (bool) {
+    function burnFrom(address from, uint256 value)
+        external
+        onlyOwner
+        returns (bool)
+    {
         allowance[from][msg.sender] = allowance[from][msg.sender] - value;
         balanceOf[from] = balanceOf[from] - value;
         totalSupply = totalSupply - value;
@@ -131,7 +147,6 @@ contract StandardToken is IERC2612, IERC165, IERC20, ERC2612, Ownership, Initial
         address to,
         uint256 value
     ) internal override {
-        require(to != address(this), "ERC20/Impossible-Transfer-to-Self");
         balanceOf[from] = balanceOf[from] - value;
         balanceOf[to] = balanceOf[to] + value;
         emit Transfer(from, to, value);

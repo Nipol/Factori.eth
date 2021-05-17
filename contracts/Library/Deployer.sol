@@ -71,6 +71,19 @@ library Deployer {
         }
     }
 
+    function calculateAddress(
+        address template,
+        bytes memory initializationCalldata
+    ) internal view returns (address addr) {
+        bytes memory createCode =
+            abi.encodePacked(
+                type(Create2Maker).creationCode,
+                abi.encode(address(template), initializationCalldata)
+            );
+
+        (, addr) = getSaltAndTarget(createCode);
+    }
+
     function getSaltAndTarget(bytes memory initCode)
         internal
         view

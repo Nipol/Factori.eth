@@ -8,8 +8,9 @@ import "./Interface/IERC173.sol";
 import "./Library/Ownership.sol";
 import "./Library/Deployer.sol";
 import "./IFactory.sol";
+import "./IAllowlist.sol";
 
-contract Factory is Ownership, IFactory {
+contract FactoryV1 is Ownership, IFactory {
     struct Entity {
         bytes32 _key;
         Template _value;
@@ -18,21 +19,79 @@ contract Factory is Ownership, IFactory {
     Entity[] public entities;
     mapping(bytes32 => uint256) public indexes;
 
-    constructor() {
+    IAllowlist private immutable allowlist;
+
+    constructor(address allowContract) {
         Ownership.initialize(msg.sender);
+        allowlist = IAllowlist(allowContract);
     }
 
-    function newToken(bytes32 templateId, bytes memory initializationCallData)
+    function deploy(bytes32 templateId, bytes memory initializationCallData)
         external
         payable
-        returns (address tokenAddr)
+        returns (address deployed)
     {
         Template memory tmp = _get(templateId);
-        require(tmp.price == msg.value, "Factory/Not-Enough");
-        tokenAddr = Deployer.deploy(tmp.template, initializationCallData);
-        IERC173(tokenAddr).transferOwnership(msg.sender);
+        require(
+            tmp.price == msg.value || allowlist.allowance(msg.sender),
+            "Factory/Incorrect-amounts"
+        );
+        deployed = Deployer.deploy(tmp.template, initializationCallData);
+        IERC173(deployed).transferOwnership(msg.sender);
         payable(this.owner()).transfer(msg.value);
-        emit NewToken(tokenAddr, msg.sender);
+        emit Deployed(deployed, msg.sender);
+    }
+
+    function deployWithCall(
+        bytes32 templateId,
+        bytes memory initializationCallData,
+        bytes memory callData
+    ) external payable returns (address deployed) {
+        Template memory tmp = _get(templateId);
+        require(
+            tmp.price == msg.value || allowlist.allowance(msg.sender),
+            "Factory/Incorrect-amounts"
+        );
+        deployed = Deployer.deploy(tmp.template, initializationCallData);
+
+        (bool success, ) = deployed.call(callData);
+        require(success, "Factory/Fail-to-deploy");
+
+        IERC173(deployed).transferOwnership(msg.sender);
+        payable(this.owner()).transfer(msg.value);
+        emit Deployed(deployed, msg.sender);
+    }
+
+    function deployWithCalls(
+        bytes32 templateId,
+        bytes memory initializationCallData,
+        bytes[] memory callDatas
+    ) external payable returns (address deployed) {
+        Template memory tmp = _get(templateId);
+        require(
+            tmp.price == msg.value || allowlist.allowance(msg.sender),
+            "Factory/Incorrect-amounts"
+        );
+        deployed = Deployer.deploy(tmp.template, initializationCallData);
+        for (uint256 i = 0; i < callDatas.length; i++) {
+            (bool success, ) = deployed.call(callDatas[i]);
+            require(success, "Factory/Fail-to-deploy");
+        }
+
+        IERC173(deployed).transferOwnership(msg.sender);
+        payable(this.owner()).transfer(msg.value);
+        emit Deployed(deployed, msg.sender);
+    }
+
+    function calculateDeployableAddress(
+        bytes32 templateId,
+        bytes memory initializationCallData
+    ) external view returns (address deployable) {
+        Template memory tmp = _get(templateId);
+        deployable = Deployer.calculateAddress(
+            tmp.template,
+            initializationCallData
+        );
     }
 
     function addTemplate(address templateAddr, uint256 price)
@@ -40,6 +99,7 @@ contract Factory is Ownership, IFactory {
         onlyOwner
         returns (bool success)
     {
+        require(templateAddr != address(0), "Factory/Template-Address-is-Zero");
         Entity[] memory _entities = entities;
         for (uint256 i = 0; i < entities.length; i++) {
             require(

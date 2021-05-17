@@ -106,6 +106,11 @@ describe('StandardToken/ERC20', () => {
       await expect(StandardToken.transfer(walletAddress, value)).to.be.revertedWith('');
     });
 
+    it('should be reverted, to token contract transfer', async () => {
+      const value = initialToken.add('1');
+      await expect(StandardToken.transfer(StandardToken.address, value)).to.be.revertedWith('');
+    });
+
     it('should be successfully Transfer', async () => {
       const value = BigNumber.from('1000000000000000000');
       const walletAddress = await wallet.getAddress();
@@ -153,6 +158,23 @@ describe('StandardToken/ERC20', () => {
 
       const newValue = initialToken.add('1');
       await expect(StandardToken.transferFrom(walletAddress, DummyAddress, newValue)).to.be.revertedWith('');
+    });
+
+    it('should be reverted, to token contract transfer', async () => {
+      const value = BigNumber.from('5000000000000000000');
+      const walletAddress = await wallet.getAddress();
+      const walletToAddress = await walletTo.getAddress();
+      const DummyAddress = await Dummy.getAddress();
+
+      await expect(StandardToken.approve(walletToAddress, value))
+        .to.emit(StandardToken, 'Approval')
+        .withArgs(walletAddress, walletToAddress, value);
+      expect(await StandardToken.allowance(walletAddress, walletToAddress)).to.be.equal(value);
+
+      await StandardToken.connect(walletTo);
+
+      const newValue = value.add('1');
+      await expect(StandardToken.transferFrom(walletAddress, StandardToken.address, newValue)).to.be.revertedWith('');
     });
 
     it('should be success, over transfer value', async () => {

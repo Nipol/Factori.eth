@@ -48,11 +48,11 @@ export default {
   networks: {
     hardhat: {
       gas: 9000000,
-      blockGasLimit: 12000000,
-      accounts
+      blockGasLimit: 15000000,
+      accounts,
     },
     coverage: {
-      url: 'http://localhost:8555'
+      url: 'http://localhost:8555',
     },
     // ropsten: {
     //   url: `https://${process.env.RIVET_KEY}.ropsten.rpc.rivet.cloud/`,
@@ -68,7 +68,7 @@ export default {
     // }
   },
   solidity: {
-    version: '0.8.1',
+    version: '0.8.4',
     settings: {
       optimizer: {
         enabled: true,
