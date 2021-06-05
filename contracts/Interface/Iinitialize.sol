@@ -9,6 +9,7 @@ interface Iinitialize {
         string calldata contractVersion,
         string calldata tokenName,
         string calldata tokenSymbol,
-        uint8 tokenDecimals
+        uint8 tokenDecimals,
+        address tokenOwner
     ) external;
 }

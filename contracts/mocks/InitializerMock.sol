@@ -4,7 +4,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../abstract/Initializer.sol";
+import "../Library/Initializer.sol";
 
 contract InitializerMock is Initializer {
     function initialize() external initializer returns (bool) {

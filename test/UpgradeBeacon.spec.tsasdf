@@ -1,0 +1,90 @@
+import { expect } from 'chai';
+import { ethers } from 'hardhat';
+import { Contract, BigNumber, constants, Signer, ContractFactory, UnsignedTransaction } from 'ethers';
+import { keccak256, defaultAbiCoder, parseEther, Interface } from 'ethers/lib/utils';
+
+describe('UpgradeBeacon', () => {
+  let UpgradeBeacon: Contract;
+  let UpgradeBeaconDeployer: ContractFactory;
+
+  let wallet: Signer;
+  let Dummy: Signer;
+
+  beforeEach(async () => {
+    const accounts = await ethers.getSigners();
+    [wallet, Dummy] = accounts;
+
+    UpgradeBeaconDeployer = await ethers.getContractFactory('contracts/UpgradeBeacon.sol:UpgradeBeacon', wallet);
+    // UpgradeBeacon = await UpgradeBeaconDeployer.deploy(constants.AddressZero);
+
+    // await UpgradeBeacon.deployed();
+  });
+
+  describe('fallback()', () => {
+    let Factory: Contract;
+    let StandardToken: Contract;
+    let StandardTokenTemplate: ContractFactory;
+
+    beforeEach(async () => {
+      const FactoryDeployer = await ethers.getContractFactory('contracts/Factory.sol:Factory', wallet);
+      Factory = await FactoryDeployer.deploy(constants.AddressZero);
+
+      await Factory.deployed();
+
+      StandardTokenTemplate = await ethers.getContractFactory('contracts/StandardToken.sol:StandardToken', wallet);
+      StandardToken = await StandardTokenTemplate.deploy();
+      const contractVersion = '1';
+      const tokenName = 'template';
+      const tokenSymbol = 'TEMP';
+      const tokenDecimals = BigNumber.from('18');
+      await StandardToken.deployed();
+      await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
+
+      UpgradeBeacon = await UpgradeBeaconDeployer.deploy();
+
+      const tx: UnsignedTransaction = {
+        to: UpgradeBeacon.address,
+        data: `0x${'0'.repeat(24)}${StandardToken.address.substr(2, 40)}`,
+      };
+
+      expect(await wallet.sendTransaction(tx))
+        .to.emit(UpgradeBeacon, 'Upgraded')
+        .withArgs(StandardToken.address);
+
+      await Factory.addTemplate(UpgradeBeacon.address, parseEther('0.001'));
+    });
+
+    it('should be success with minimal proxy', async () => {
+      const ABI = [
+        'function initialize(string memory contractVersion, string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
+      ];
+      const interfaces = new Interface(ABI);
+
+      const contractVersion = '1';
+      const tokenName = 'SAMPLE';
+      const tokenSymbol = 'SAM';
+      const tokenDecimals = BigNumber.from('18');
+
+      const data = interfaces.encodeFunctionData('initialize', [
+        contractVersion,
+        tokenName,
+        tokenSymbol,
+        tokenDecimals,
+      ]);
+
+      const key = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [UpgradeBeacon.address, '0']));
+
+      const calculatedAddress = await Factory.calculateDeployableAddress(key, data);
+
+      expect(await Factory.deploy(key, data, { value: parseEther('0.001') }))
+        .to.emit(Factory, 'Deployed')
+        .withArgs(calculatedAddress, await wallet.getAddress());
+
+      const DeployedToken = await StandardTokenTemplate.attach(calculatedAddress);
+
+      expect(await DeployedToken.symbol()).to.equal(tokenSymbol);
+      expect(await DeployedToken.name()).to.equal(tokenName);
+      expect(await DeployedToken.decimals()).to.equal(tokenDecimals);
+    });
+  });
+});

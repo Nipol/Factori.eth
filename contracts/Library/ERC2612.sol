@@ -4,7 +4,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../Library/EIP712.sol";
+import "./EIP712.sol";
 import {ERC20} from "./ERC20.sol";
 
 /**

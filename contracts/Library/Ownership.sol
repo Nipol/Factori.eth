@@ -10,7 +10,7 @@ contract Ownership is IERC173 {
     address private _owner;
 
     modifier onlyOwner() {
-        require(_owner == msg.sender, "Authority/Not-Authorized");
+        require(_owner == msg.sender, "Ownership/Not-Authorized");
         _;
     }
 
@@ -30,9 +30,5 @@ contract Ownership is IERC173 {
     {
         _owner = newOwner;
         emit OwnershipTransferred(msg.sender, newOwner);
-    }
-
-    function supportsInterface(bytes4 interfaceID) external pure override returns (bool) {
-        return interfaceID == type(IERC173).interfaceId; // ERC173;
     }
 }

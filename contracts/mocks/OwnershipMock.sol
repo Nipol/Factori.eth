@@ -6,13 +6,8 @@ pragma solidity ^0.8.0;
 
 import "../Library/Ownership.sol";
 import "../Interface/IERC173.sol";
-import "../Interface/IERC165.sol";
 
-contract OwnershipMock is 
-    IERC165,
-    IERC173,
-    Ownership
-{
+contract OwnershipMock is IERC173, Ownership {
     constructor() {
         Ownership.initialize(msg.sender);
     }
