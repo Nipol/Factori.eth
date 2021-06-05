@@ -36,29 +36,9 @@ contract FactoryV1 is Ownership, IFactory {
             tmp.price == msg.value || allowlist.allowance(msg.sender),
             "Factory/Incorrect-amounts"
         );
+        payable(this.owner()).transfer(msg.value);
         deployed = Deployer.deploy(tmp.template, initializationCallData);
         IERC173(deployed).transferOwnership(msg.sender);
-        payable(this.owner()).transfer(msg.value);
-        emit Deployed(deployed, msg.sender);
-    }
-
-    function deployWithCall(
-        bytes32 templateId,
-        bytes memory initializationCallData,
-        bytes memory callData
-    ) external payable returns (address deployed) {
-        Template memory tmp = _get(templateId);
-        require(
-            tmp.price == msg.value || allowlist.allowance(msg.sender),
-            "Factory/Incorrect-amounts"
-        );
-        deployed = Deployer.deploy(tmp.template, initializationCallData);
-
-        (bool success, ) = deployed.call(callData);
-        require(success, "Factory/Fail-to-deploy");
-
-        IERC173(deployed).transferOwnership(msg.sender);
-        payable(this.owner()).transfer(msg.value);
         emit Deployed(deployed, msg.sender);
     }
 
@@ -72,6 +52,7 @@ contract FactoryV1 is Ownership, IFactory {
             tmp.price == msg.value || allowlist.allowance(msg.sender),
             "Factory/Incorrect-amounts"
         );
+        payable(this.owner()).transfer(msg.value);
         deployed = Deployer.deploy(tmp.template, initializationCallData);
         for (uint256 i = 0; i < callDatas.length; i++) {
             (bool success, ) = deployed.call(callDatas[i]);
@@ -79,7 +60,6 @@ contract FactoryV1 is Ownership, IFactory {
         }
 
         IERC173(deployed).transferOwnership(msg.sender);
-        payable(this.owner()).transfer(msg.value);
         emit Deployed(deployed, msg.sender);
     }
 

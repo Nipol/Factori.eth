@@ -97,6 +97,15 @@ describe('StandardToken/ERC20', () => {
         .withArgs(walletAddress, walletToAddress, value);
       expect(await StandardToken.allowance(walletAddress, walletToAddress)).to.be.equal(value);
     });
+
+    it('should be revert approve to token address', async () => {
+      const value = constants.MaxUint256;
+      const contractAddress = StandardToken.address;
+
+      await expect(StandardToken.approve(contractAddress, value)).to.be.revertedWith(
+        'ERC20/Impossible-Approve-to-Self',
+      );
+    });
   });
 
   describe('#transfer()', () => {

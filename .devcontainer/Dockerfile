@@ -6,9 +6,8 @@
 # To fully customize the contents of this image, use the following Dockerfile instead:
 # https://github.com/microsoft/vscode-dev-containers/tree/v0.106.0/containers/typescript-node-12/.devcontainer/Dockerfile
 ARG VARIANT=14
+ARG SOLC_VERSION=0.8.4
 FROM mcr.microsoft.com/vscode/devcontainers/typescript-node:${VARIANT}
-ARG SOLC_VERSION=0.8.1
-
 # ** [Optional] Uncomment this section to install additional packages. **
 #
 ENV DEBIAN_FRONTEND=noninteractive
@@ -20,21 +19,16 @@ RUN apt-get update \
     && locale-gen \
     # timezone
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
-    #
-    # install solc-select
+    # install solc
     && pip3 install solc-select \
     && solc-select install ${SOLC_VERSION} \
-    #
+    && sudo npm i -g solhint \
+    && sudo npm i -g lerna \
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/* \
-    #
-    # Install solhint
-    && npm i -g solhint \
-    #
-    # Install Lerna
-    && npm i -g lerna 
+    && rm -rf /var/lib/apt/lists/*
+
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8

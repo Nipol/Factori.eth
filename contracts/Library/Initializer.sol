@@ -4,7 +4,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../Library/Address.sol";
+import "./Address.sol";
 
 abstract contract Initializer {
     using Address for address;

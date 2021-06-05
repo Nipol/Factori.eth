@@ -4,18 +4,22 @@
 
 pragma solidity ^0.8.0;
 
-import "./abstract/Initializer.sol";
-import "./abstract/ERC2612.sol";
+import "./Library/Initializer.sol";
 import "./Library/Ownership.sol";
+import "./Library/Multicall.sol";
+import "./Library/ERC2612.sol";
 import "./Interface/IERC20.sol";
 import "./Interface/IERC165.sol";
 import "./Interface/IERC2612.sol";
+import "./Interface/ITemplateV1.sol";
 
 contract StandardToken is
+    ITemplateV1,
     IERC2612,
     IERC165,
     IERC20,
     ERC2612,
+    Multicall,
     Ownership,
     Initializer
 {
@@ -92,8 +96,8 @@ contract StandardToken is
     }
 
     function mint(uint256 value) external onlyOwner returns (bool) {
-        totalSupply = totalSupply + value;
         balanceOf[msg.sender] = balanceOf[msg.sender] + value;
+        totalSupply = totalSupply + value;
         emit Transfer(address(0), msg.sender, value);
         return true;
     }
@@ -104,8 +108,8 @@ contract StandardToken is
         returns (bool)
     {
         require(to != address(this), "ERC20/Not-Allowed-Transfer");
-        totalSupply = totalSupply + value;
         balanceOf[to] = balanceOf[to] + value;
+        totalSupply = totalSupply + value;
         emit Transfer(address(0), to, value);
         return true;
     }

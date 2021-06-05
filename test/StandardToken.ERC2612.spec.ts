@@ -53,8 +53,6 @@ describe('StandardToken/ERC2612', () => {
       const sig = joinSignature(
         new SigningKey('0x7c299dda7c704f9d474b6ca5d7fee0b490c8decca493b5764541fe5ec6b65114').signDigest(hash),
       );
-      //console.log(walletAddress);
-      //console.log(recoverAddress(hash, sig));
       const { v, r, s } = splitSignature(sig);
 
       StandardToken = StandardToken.connect(walletTo);
@@ -65,145 +63,95 @@ describe('StandardToken/ERC2612', () => {
       expect(await StandardToken.allowance(walletAddress, walletToAddress)).to.be.equal(value);
     });
 
-    //   it('should be success for Identity', async () => {
-    //     let Identity = await deployContract(wallet, IdentityMock);
-    //     const value = constants.MaxUint256;
-    //     const chainId = 1;
-    //     const deadline = constants.MaxUint256;
-    //     const nonce = await StandardToken.nonces(Identity.address);
+    it('should be reverted when expired deadline', async () => {
+      const walletAddress = await wallet.getAddress();
+      const walletToAddress = await walletTo.getAddress();
+      const value = constants.MaxUint256;
+      const chainId = 1;
+      const deadline = BigNumber.from('1');
+      const nonce = await StandardToken.nonces(walletAddress);
 
-    //     const digest = await getApprovalDigest(
-    //       chainId,
-    //       StandardToken,
-    //       { owner: Identity.address, spender: walletTo.address, value },
-    //       nonce,
-    //       deadline,
-    //     );
+      const digest = await getApprovalDigest(
+        chainId,
+        StandardToken,
+        { owner: walletAddress, spender: walletToAddress, value },
+        nonce,
+        deadline,
+      );
 
-    //     const hash = arrayify(digest);
+      const hash = arrayify(digest);
 
-    //     const sig = joinSignature(new SigningKey(wallet.privateKey).signDigest(hash));
-    //     const { r, s, v } = splitSignature(sig);
+      const sig = joinSignature(
+        new SigningKey('0x7c299dda7c704f9d474b6ca5d7fee0b490c8decca493b5764541fe5ec6b65114').signDigest(hash),
+      );
+      const { r, s, v } = splitSignature(sig);
 
-    //     expect(await Identity.isValidSignature(hash, sig)).to.equal('0x20c13b0b');
+      StandardToken = StandardToken.connect(walletTo);
 
-    //     StandardToken = StandardToken.connect(walletTo);
+      await expect(StandardToken.permit(walletAddress, walletToAddress, value, deadline, v, r, s)).to.be.revertedWith(
+        'ERC2612/Expired-time',
+      );
+    });
 
-    //     await expect(StandardToken.permit(Identity.address, walletTo.address, value, deadline, v, r, s))
-    //       .to.emit(StandardToken, 'Approval')
-    //       .withArgs(Identity.address, walletTo.address, value);
-    //     expect(await StandardToken.allowance(Identity.address, walletTo.address)).to.be.equal(value);
-    //   });
+    it('should be reverted when owner for zero address', async () => {
+      const walletAddress = await wallet.getAddress();
+      const walletToAddress = await walletTo.getAddress();
+      const value = constants.MaxUint256;
+      const chainId = 1;
+      const deadline = constants.MaxUint256;
+      const nonce = await StandardToken.nonces(walletAddress);
 
-    //   it('should be reverted when expired deadline', async () => {
-    //     const value = constants.MaxUint256;
-    //     const chainId = 1;
-    //     const deadline = BigNumber.from('1');
-    //     const nonce = await StandardToken.nonces(wallet.address);
+      const digest = await getApprovalDigest(
+        chainId,
+        StandardToken,
+        { owner: walletAddress, spender: walletToAddress, value },
+        nonce,
+        deadline,
+      );
 
-    //     const digest = await getApprovalDigest(
-    //       chainId,
-    //       StandardToken,
-    //       { owner: wallet.address, spender: walletTo.address, value },
-    //       nonce,
-    //       deadline,
-    //     );
+      const hash = arrayify(digest);
 
-    //     const hash = arrayify(digest);
+      const sig = joinSignature(
+        new SigningKey('0x7c299dda7c704f9d474b6ca5d7fee0b490c8decca493b5764541fe5ec6b65114').signDigest(hash),
+      );
+      const { r, s, v } = splitSignature(sig);
 
-    //     const sig = joinSignature(new SigningKey(wallet.privateKey).signDigest(hash));
-    //     const { r, s, v } = splitSignature(sig);
+      StandardToken = StandardToken.connect(walletTo);
 
-    //     StandardToken = StandardToken.connect(walletTo);
+      await expect(
+        StandardToken.permit(constants.AddressZero, walletToAddress, value, deadline, v, r, s),
+      ).to.be.revertedWith('ERC2612/Invalid-address-0');
+    });
 
-    //     await expect(StandardToken.permit(wallet.address, walletTo.address, value, deadline, v, r, s)).to.be.revertedWith(
-    //       'ERC2612/Expired-time',
-    //     );
-    //   });
+    it('should be reverted with invalid signature', async () => {
+      const walletAddress = await wallet.getAddress();
+      const walletToAddress = await walletTo.getAddress();
+      const value = constants.MaxUint256;
+      const chainId = 1;
+      const deadline = constants.MaxUint256;
+      const nonce = await StandardToken.nonces(walletAddress);
 
-    //   it('should be reverted when owner for zero address', async () => {
-    //     const value = constants.MaxUint256;
-    //     const chainId = 1;
-    //     const deadline = constants.MaxUint256;
-    //     const nonce = await StandardToken.nonces(wallet.address);
+      const digest = await getApprovalDigest(
+        chainId,
+        StandardToken,
+        { owner: walletAddress, spender: walletToAddress, value },
+        nonce,
+        deadline,
+      );
 
-    //     const digest = await getApprovalDigest(
-    //       chainId,
-    //       StandardToken,
-    //       { owner: wallet.address, spender: walletTo.address, value },
-    //       nonce,
-    //       deadline,
-    //     );
+      const hash = arrayify(digest);
 
-    //     const hash = arrayify(digest);
+      const sig = joinSignature(
+        new SigningKey('0x7c299dda7c704f9d474b6ca5d7fee0b490c8decca493b5764541fe5ec6b65114').signDigest(hash),
+      );
+      const { r, s, v } = splitSignature(sig);
+      const fakeR = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
-    //     const sig = joinSignature(new SigningKey(wallet.privateKey).signDigest(hash));
-    //     const { r, s, v } = splitSignature(sig);
+      StandardToken = StandardToken.connect(walletTo);
 
-    //     StandardToken = StandardToken.connect(walletTo);
-
-    //     await expect(
-    //       StandardToken.permit(constants.AddressZero, walletTo.address, value, deadline, v, r, s),
-    //     ).to.be.revertedWith('ERC2612/Invalid-address-0');
-    //   });
-
-    //   it('should be reverted with invalid signature', async () => {
-    //     const value = constants.MaxUint256;
-    //     const chainId = 1;
-    //     const deadline = constants.MaxUint256;
-    //     const nonce = await StandardToken.nonces(wallet.address);
-
-    //     const digest = await getApprovalDigest(
-    //       chainId,
-    //       StandardToken,
-    //       { owner: wallet.address, spender: walletTo.address, value },
-    //       nonce,
-    //       deadline,
-    //     );
-
-    //     const hash = arrayify(digest);
-
-    //     const sig = joinSignature(new SigningKey(wallet.privateKey).signDigest(hash));
-    //     const { r, s, v } = splitSignature(sig);
-    //     const fakeR = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-
-    //     StandardToken = StandardToken.connect(walletTo);
-
-    //     await expect(
-    //       StandardToken.permit(wallet.address, walletTo.address, value, deadline, v, fakeR, s),
-    //     ).to.be.revertedWith('ERC2612/Invalid-Signature');
-    //   });
-
-    //   it('should be reverted with invalid signature for Identity', async () => {
-    //     let Identity = await deployContract(wallet, IdentityMock);
-    //     const value = constants.MaxUint256;
-    //     const chainId = 1;
-    //     const deadline = constants.MaxUint256;
-    //     const nonce = await StandardToken.nonces(Identity.address);
-
-    //     const digest = await getApprovalDigest(
-    //       chainId,
-    //       StandardToken,
-    //       { owner: Identity.address, spender: walletTo.address, value },
-    //       nonce,
-    //       deadline,
-    //     );
-
-    //     const hash = arrayify(digest);
-
-    //     const sig = joinSignature(new SigningKey(wallet.privateKey).signDigest(hash));
-    //     const { r, v } = splitSignature(sig);
-    //     const fakeS = '0x1112111111111111fdcfa906bf28eb5d442e7645901e5d97847a5170ff811111';
-
-    //     const newSig = joinSignature({ r, s: fakeS, v });
-
-    //     expect(await Identity.isValidSignature(hash, newSig)).to.equal('0xffffffff');
-
-    //     StandardToken = StandardToken.connect(walletTo);
-
-    //     await expect(
-    //       StandardToken.permit(Identity.address, walletTo.address, value, deadline, v, r, fakeS),
-    //     ).to.be.revertedWith('ERC2612/Invalid-Signature');
-    //   });
+      await expect(
+        StandardToken.permit(walletAddress, walletToAddress, value, deadline, v, fakeR, s),
+      ).to.be.revertedWith('ERC2612/Invalid-Signature');
+    });
   });
 });
