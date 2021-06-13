@@ -29,6 +29,7 @@ contract FactoryV1 is Ownership, IFactory {
     function deploy(bytes32 templateId, bytes memory initializationCallData)
         external
         payable
+        override
         returns (address deployed)
     {
         Template memory tmp = _get(templateId);
@@ -46,7 +47,7 @@ contract FactoryV1 is Ownership, IFactory {
         bytes32 templateId,
         bytes memory initializationCallData,
         bytes[] memory callDatas
-    ) external payable returns (address deployed) {
+    ) external payable override returns (address deployed) {
         Template memory tmp = _get(templateId);
         require(
             tmp.price == msg.value || allowlist.allowance(msg.sender),
@@ -66,12 +67,22 @@ contract FactoryV1 is Ownership, IFactory {
     function calculateDeployableAddress(
         bytes32 templateId,
         bytes memory initializationCallData
-    ) external view returns (address deployable) {
+    ) external view override returns (address deployable) {
         Template memory tmp = _get(templateId);
         deployable = Deployer.calculateAddress(
             tmp.template,
             initializationCallData
         );
+    }
+
+    function getPrice(bytes32 templateId)
+        external
+        view
+        override
+        returns (uint256 price)
+    {
+        Template memory tmp = _get(templateId);
+        price = tmp.price;
     }
 
     function addTemplate(address templateAddr, uint256 price)
