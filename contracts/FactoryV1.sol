@@ -73,7 +73,7 @@ contract FactoryV1 is Ownership, IFactory {
         // 해당 함수를 호출할 때 수수료가 담긴 경우에 수수료를 컨트랙트 소유자에게 전송하고 기존 수수료에서 일정 비율 만큼 수수료를 상승 시킴
         if (msg.value > 0) {
             payable(this.owner()).transfer(msg.value);
-            tmp.price = ((tmp.price / 10000) * FEE_RATE);
+            tmp.price = tmp.price + ((tmp.price / 10000) * FEE_RATE);
             _set(templateId, tmp);
         }
         // 이벤트 호출
