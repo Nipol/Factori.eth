@@ -35,7 +35,7 @@ describe('FactoryV1', () => {
 
       const key = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, '0']));
 
-      expect(await Factory.addTemplate(StandardToken.address, parseEther('0.001')))
+      expect(await Factory.addTemplate(StandardToken.address, constants.AddressZero, parseEther('0.001')))
         .to.emit(Factory, 'NewTemplate')
         .withArgs(key, StandardToken.address, parseEther('0.001'));
     });
@@ -55,13 +55,13 @@ describe('FactoryV1', () => {
 
       const key = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, '0']));
 
-      expect(await Factory.addTemplate(StandardToken.address, parseEther('0.001')))
+      expect(await Factory.addTemplate(StandardToken.address, constants.AddressZero, parseEther('0.001')))
         .to.emit(Factory, 'NewTemplate')
         .withArgs(key, StandardToken.address, parseEther('0.001'));
 
-      await expect(Factory.addTemplate(StandardToken.address, parseEther('0.001'))).to.be.revertedWith(
-        'Factory/Exist-Template',
-      );
+      await expect(
+        Factory.addTemplate(StandardToken.address, constants.AddressZero, parseEther('0.001')),
+      ).to.be.revertedWith('Factory/Exist-Template');
     });
   });
 
@@ -81,7 +81,7 @@ describe('FactoryV1', () => {
 
       const key = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, '0']));
 
-      await Factory.addTemplate(StandardToken.address, parseEther('0.001'));
+      await Factory.addTemplate(StandardToken.address, constants.AddressZero, parseEther('0.001'));
     });
 
     it('should be success making new token contract', async () => {
@@ -106,7 +106,7 @@ describe('FactoryV1', () => {
 
       const calculatedAddress = await Factory.calculateDeployableAddress(key, data);
 
-      expect(await Factory.deploy(key, data, { value: parseEther('0.001') }))
+      expect(await Factory.deploy(key, data, [], { value: parseEther('0.001') }))
         .to.emit(Factory, 'Deployed')
         .withArgs(calculatedAddress, await wallet.getAddress());
 
@@ -115,26 +115,6 @@ describe('FactoryV1', () => {
       expect(await DeployedToken.symbol()).to.equal(tokenSymbol);
       expect(await DeployedToken.name()).to.equal(tokenName);
       expect(await DeployedToken.decimals()).to.equal(tokenDecimals);
-    });
-  });
-
-  describe('#deployWithCalls()', () => {
-    let StandardToken: Contract;
-    let StandardTokenTemplate: ContractFactory;
-
-    beforeEach(async () => {
-      StandardTokenTemplate = await ethers.getContractFactory('contracts/StandardToken.sol:StandardToken', wallet);
-      StandardToken = await StandardTokenTemplate.deploy();
-      const contractVersion = '1';
-      const tokenName = 'template';
-      const tokenSymbol = 'TEMP';
-      const tokenDecimals = BigNumber.from('18');
-      await StandardToken.deployed();
-      await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
-
-      const key = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, '0']));
-
-      await Factory.addTemplate(StandardToken.address, parseEther('0.001'));
     });
 
     it('should be success making new token contract with call', async () => {
@@ -164,7 +144,7 @@ describe('FactoryV1', () => {
 
       const calculatedAddress = await Factory.calculateDeployableAddress(key, data);
 
-      expect(await Factory.deployWithCalls(key, data, [callData], { value: parseEther('0.001') }))
+      expect(await Factory.deploy(key, data, [callData], { value: parseEther('0.001') }))
         .to.emit(Factory, 'Deployed')
         .withArgs(calculatedAddress, await wallet.getAddress());
       // .to.emit(StandardToken, 'Transfer')
@@ -178,4 +158,24 @@ describe('FactoryV1', () => {
       expect(await DeployedToken.balanceOf(await wallet.getAddress())).to.equal(initialToken);
     });
   });
+
+  // describe('#deployWithCalls()', () => {
+  //   let StandardToken: Contract;
+  //   let StandardTokenTemplate: ContractFactory;
+
+  //   beforeEach(async () => {
+  //     StandardTokenTemplate = await ethers.getContractFactory('contracts/StandardToken.sol:StandardToken', wallet);
+  //     StandardToken = await StandardTokenTemplate.deploy();
+  //     const contractVersion = '1';
+  //     const tokenName = 'template';
+  //     const tokenSymbol = 'TEMP';
+  //     const tokenDecimals = BigNumber.from('18');
+  //     await StandardToken.deployed();
+  //     await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
+
+  //     const key = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, '0']));
+
+  //     await Factory.addTemplate(StandardToken.address, parseEther('0.001'));
+  //   });
+  // });
 });

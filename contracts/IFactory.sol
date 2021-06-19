@@ -7,18 +7,14 @@ pragma solidity ^0.8.0;
 interface IFactory {
     struct Template {
         address template;
+        address owner;
         uint256 price;
     }
 
-    function deploy(bytes32 templateId, bytes memory initializationCallData)
-        external
-        payable
-        returns (address deployed);
-
-    function deployWithCalls(
+    function deploy(
         bytes32 templateId,
         bytes memory initializationCallData,
-        bytes[] memory callDatas
+        bytes[] memory calls
     ) external payable returns (address deployed);
 
     function calculateDeployableAddress(
