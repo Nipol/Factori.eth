@@ -11,7 +11,7 @@ import "./Library/ERC2612.sol";
 import "./Interface/IERC20.sol";
 import "./Interface/IERC165.sol";
 import "./Interface/IERC2612.sol";
-import "./Interface/ITemplateV1.sol";
+import "./ITemplateV1.sol";
 
 contract StandardToken is
     ITemplateV1,
