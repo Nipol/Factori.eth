@@ -68,7 +68,7 @@ contract StandardToken is
         address to,
         uint256 value
     ) external override returns (bool) {
-        allowance[from][msg.sender] = allowance[from][msg.sender] - value;
+        allowance[from][msg.sender] -= value;
         _transfer(from, to, value);
         return true;
     }
@@ -96,8 +96,8 @@ contract StandardToken is
     }
 
     function mint(uint256 value) external onlyOwner returns (bool) {
-        balanceOf[msg.sender] = balanceOf[msg.sender] + value;
-        totalSupply = totalSupply + value;
+        balanceOf[msg.sender] += value;
+        totalSupply += value;
         emit Transfer(address(0), msg.sender, value);
         return true;
     }
@@ -108,15 +108,15 @@ contract StandardToken is
         returns (bool)
     {
         require(to != address(this), "ERC20/Not-Allowed-Transfer");
-        balanceOf[to] = balanceOf[to] + value;
-        totalSupply = totalSupply + value;
+        balanceOf[to] += value;
+        totalSupply += value;
         emit Transfer(address(0), to, value);
         return true;
     }
 
     function burn(uint256 value) external onlyOwner returns (bool) {
-        balanceOf[msg.sender] = balanceOf[msg.sender] - value;
-        totalSupply = totalSupply - value;
+        balanceOf[msg.sender] -= value;
+        totalSupply -= value;
         emit Transfer(msg.sender, address(0), value);
         return true;
     }
@@ -126,8 +126,8 @@ contract StandardToken is
         onlyOwner
         returns (bool)
     {
-        allowance[from][msg.sender] = allowance[from][msg.sender] - value;
-        balanceOf[from] = balanceOf[from] - value;
+        allowance[from][msg.sender] -= value;
+        balanceOf[from] -= value;
         totalSupply = totalSupply - value;
         emit Transfer(msg.sender, address(0), value);
         return true;
@@ -151,8 +151,8 @@ contract StandardToken is
         address to,
         uint256 value
     ) internal override {
-        balanceOf[from] = balanceOf[from] - value;
-        balanceOf[to] = balanceOf[to] + value;
+        balanceOf[from] -= value;
+        balanceOf[to] += value;
         emit Transfer(from, to, value);
     }
 
