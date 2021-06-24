@@ -46,6 +46,7 @@ contract FactoryV1 is Ownership, IFactory {
 
     /**
      * @notice template id를 통해서 해당 컨트랙트를 배포하는 함수, 여기에는 initialize 함수를 한 번 호출할 수 있도록 call data가 필요함.
+     * @dev deploy에서 기본적으로 오너십을 체크하지는 않기 때문에, 오너십 관리가 필요한 경우 multicall을 통해서 필수적으로 호출해 주어야 함.
      * @param templateId bytes32 형태의 template id가 필요
      * @param initializationCallData 템플릿에 적합한 initialize 함수를 호출하는 함수 데이터
      * @param calls 컨트랙트가 배포된 이후에, 부수적으로 초기화 할 함수들이 있을 때 사용 가능함.
@@ -68,8 +69,6 @@ contract FactoryV1 is Ownership, IFactory {
         deployed = Deployer.deploy(tmp.template, initializationCallData);
         // 부수적으로 호출할 데이터가 있다면, 배포된 컨트랙트에 추가적인 call을 할 수 있음.
         if (calls.length > 0) IMulticall(deployed).multicall(calls);
-        // 모든 호출이 끝나면, 배포된 컨트랙트의 소유권을 호출자로 이관함.
-        IERC173(deployed).transferOwnership(msg.sender);
         // 해당 함수를 호출할 때 수수료가 담긴 경우에 수수료를 컨트랙트 소유자에게 전송하고 기존 수수료에서 일정 비율 만큼 수수료를 상승 시킴
         if (msg.value > 0) {
             payable(this.owner()).transfer(msg.value);
@@ -130,8 +129,11 @@ contract FactoryV1 is Ownership, IFactory {
             );
         }
         bytes32 key = keccak256(abi.encode(templateAddr, _entities.length));
-        Template memory tmp =
-            Template({template: templateAddr, owner: ownerAddr, price: price});
+        Template memory tmp = Template({
+            template: templateAddr,
+            owner: ownerAddr,
+            price: price
+        });
 
         _set(key, tmp);
         success = true;
@@ -150,8 +152,10 @@ contract FactoryV1 is Ownership, IFactory {
         returns (bool success)
     {
         Template memory tmp = _get(key);
-        (address templateAddr, address ownerAddr, uint256 price) =
-            abi.decode(updateCode, (address, address, uint256));
+        (address templateAddr, address ownerAddr, uint256 price) = abi.decode(
+            updateCode,
+            (address, address, uint256)
+        );
         tmp.template = (templateAddr != address(0) &&
             templateAddr != tmp.template)
             ? templateAddr
