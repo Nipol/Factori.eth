@@ -121,6 +121,7 @@ describe('FactoryV1', () => {
       const ABI = [
         'function initialize(string memory contractVersion, string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
         'function mintTo(address to, uint256 value)',
+        'function transferOwnership(address newOwner)',
       ];
       const interfaces = new Interface(ABI);
 
@@ -138,13 +139,14 @@ describe('FactoryV1', () => {
 
       const initialToken = BigNumber.from('100000000000000000000');
 
-      const callData = interfaces.encodeFunctionData('mintTo', [await wallet.getAddress(), initialToken]);
+      const mintCallData = interfaces.encodeFunctionData('mintTo', [await wallet.getAddress(), initialToken]);
+      const ownerCallData = interfaces.encodeFunctionData('transferOwnership', [await wallet.getAddress()]);
 
       const key = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, '0']));
 
       const calculatedAddress = await Factory.calculateDeployableAddress(key, data);
 
-      expect(await Factory.deploy(key, data, [callData], { value: parseEther('0.001') }))
+      expect(await Factory.deploy(key, data, [mintCallData, ownerCallData], { value: parseEther('0.001') }))
         .to.emit(Factory, 'Deployed')
         .withArgs(calculatedAddress, await wallet.getAddress());
       // .to.emit(StandardToken, 'Transfer')
@@ -156,6 +158,7 @@ describe('FactoryV1', () => {
       expect(await DeployedToken.name()).to.equal(tokenName);
       expect(await DeployedToken.decimals()).to.equal(tokenDecimals);
       expect(await DeployedToken.balanceOf(await wallet.getAddress())).to.equal(initialToken);
+      expect(await DeployedToken.owner()).to.equal(await wallet.getAddress());
     });
 
     it('should be accumulated price after deployed token', async () => {

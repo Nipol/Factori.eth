@@ -3,7 +3,6 @@
  */
 pragma solidity ^0.8.0;
 
-import "./Interface/IERC173.sol";
 import "./Interface/IMulticall.sol";
 
-interface ITemplateV1 is IERC173, IMulticall {}
+interface ITemplateV1 is IMulticall {}
