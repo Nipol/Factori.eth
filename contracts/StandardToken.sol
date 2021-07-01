@@ -4,13 +4,13 @@
 
 pragma solidity ^0.8.0;
 
-import "./Library/Initializer.sol";
-import "./Library/Ownership.sol";
-import "./Library/Multicall.sol";
-import "./Library/ERC2612.sol";
-import "./Interface/IERC20.sol";
-import "./Interface/IERC165.sol";
-import "./Interface/IERC2612.sol";
+import "@beandao/contracts/library/Initializer.sol";
+import "@beandao/contracts/library/Ownership.sol";
+import "@beandao/contracts/library/Multicall.sol";
+import "@beandao/contracts/library/ERC2612.sol";
+import "@beandao/contracts/interfaces/IERC20.sol";
+import "@beandao/contracts/interfaces/IERC165.sol";
+import "@beandao/contracts/interfaces/IERC2612.sol";
 import "./ITemplateV1.sol";
 
 contract StandardToken is

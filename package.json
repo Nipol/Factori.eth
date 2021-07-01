@@ -1,7 +1,7 @@
 {
-  "name": "shallwecoffee",
+  "name": "factorieth",
   "version": "1.0.0",
-  "description": "coffee",
+  "description": "Smart Contract Maker",
   "main": "index.js",
   "scripts": {
     "build": "npx hardhat compile",
@@ -20,12 +20,13 @@
   "author": "yoonsung",
   "license": "ISC",
   "devDependencies": {
+    "@beandao/contracts": "^0.1.0",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-solhint": "^2.0.0",
     "@nomiclabs/hardhat-waffle": "^2.0.0",
     "@types/chai": "^4.2.19",
     "@types/mocha": "^7.0.2",
-    "@types/node": "^14.17.3",
+    "@types/node": "^14.17.4",
     "babel-eslint": "^10.1.0",
     "buidler-ethers-v5": "^0.2.3",
     "buidler-gas-reporter": "^0.1.4",
@@ -35,7 +36,7 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eth-gas-reporter": "^0.2.22",
     "ethereum-waffle": "^3.4.0",
-    "ethers": "^5.3.1",
+    "ethers": "^5.4.0",
     "hardhat": "^2.4.1",
     "hardhat-gas-reporter": "^1.0.4",
     "http-server": "^0.12.3",
