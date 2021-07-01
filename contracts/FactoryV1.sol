@@ -3,12 +3,12 @@
  */
 pragma solidity ^0.8.0;
 
-import "./Interface/IERC173.sol";
-import "./Interface/IMulticall.sol";
-import "./Library/Ownership.sol";
-import "./Library/Deployer.sol";
+import "@beandao/contracts/interfaces/IERC173.sol";
+import "@beandao/contracts/interfaces/IMulticall.sol";
+import "@beandao/contracts/interfaces/IAllowlist.sol";
+import "@beandao/contracts/library/Ownership.sol";
+import "@beandao/contracts/library/Deployer.sol";
 import "./IFactory.sol";
-import "./IAllowlist.sol";
 
 /**
  * @title Factory V1

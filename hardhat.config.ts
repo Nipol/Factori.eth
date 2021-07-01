@@ -87,6 +87,6 @@ export default {
   },
   gasReporter: {
     currency: 'USD',
-    gasPrice: 40,
+    gasPrice: 10,
   },
 };
