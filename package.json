@@ -18,7 +18,7 @@
     "deploy:goerli": "npx hardhat run --network goerli scripts/deploy.js"
   },
   "author": "yoonsung",
-  "license": "ISC",
+  "license": "LGPL-3.0-or-later",
   "devDependencies": {
     "@beandao/contracts": "^0.1.0",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
