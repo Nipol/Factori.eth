@@ -57,15 +57,13 @@ export default {
     // ropsten: {
     //   url: `https://${process.env.RIVET_KEY}.ropsten.rpc.rivet.cloud/`,
     //   accounts: [`${process.env.DEPLOYER_PK}`],
-    //   gasPrice: 8000000000,
-    //   timeout: 500000
+    //   timeout: 500000,
     // },
     // goerli: {
     //   url: `https://${process.env.RIVET_KEY}.goerli.rpc.rivet.cloud/`,
     //   accounts: [`${process.env.DEPLOYER_PK}`],
-    //   gasPrice: 8000000000,
-    //   timeout: 500000
-    // }
+    //   timeout: 500000,
+    // },
   },
   solidity: {
     version: '0.8.6',

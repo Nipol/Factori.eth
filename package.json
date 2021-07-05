@@ -15,12 +15,13 @@
     "prettier": "prettier --config .prettierrc --write '**/*.{js,sol,ts}'",
     "vertigo": "scripts/vertigo.sh",
     "analyze": "slither ./contracts",
-    "deploy:goerli": "npx hardhat run --network goerli scripts/deploy.js"
+    "deploy:goerli": "npx hardhat run --network goerli ",
+    "deploy:ropsten": "npx hardhat run --network ropsten "
   },
   "author": "yoonsung",
   "license": "LGPL-3.0-or-later",
   "devDependencies": {
-    "@beandao/contracts": "^0.1.0",
+    "@beandao/contracts": "^0.1.2",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-solhint": "^2.0.0",
     "@nomiclabs/hardhat-waffle": "^2.0.0",
@@ -36,7 +37,7 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eth-gas-reporter": "^0.2.22",
     "ethereum-waffle": "^3.4.0",
-    "ethers": "^5.4.0",
+    "ethers": "^5.4.1",
     "hardhat": "^2.4.1",
     "hardhat-gas-reporter": "^1.0.4",
     "http-server": "^0.12.3",

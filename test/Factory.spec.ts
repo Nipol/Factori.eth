@@ -22,7 +22,7 @@ describe('FactoryV1', () => {
   describe('#addTemplate()', () => {
     it('should be success add Template', async () => {
       const StandardTokenTemplate = await ethers.getContractFactory(
-        'contracts/StandardToken.sol:StandardToken',
+        'contracts/templates/StandardToken.sol:StandardToken',
         wallet,
       );
       const StandardToken = await StandardTokenTemplate.deploy();
@@ -42,7 +42,7 @@ describe('FactoryV1', () => {
 
     it('should be revert already exist template added.', async () => {
       const StandardTokenTemplate = await ethers.getContractFactory(
-        'contracts/StandardToken.sol:StandardToken',
+        'contracts/templates/StandardToken.sol:StandardToken',
         wallet,
       );
       const StandardToken = await StandardTokenTemplate.deploy();
@@ -70,7 +70,10 @@ describe('FactoryV1', () => {
     let StandardTokenTemplate: ContractFactory;
 
     beforeEach(async () => {
-      StandardTokenTemplate = await ethers.getContractFactory('contracts/StandardToken.sol:StandardToken', wallet);
+      StandardTokenTemplate = await ethers.getContractFactory(
+        'contracts/templates/StandardToken.sol:StandardToken',
+        wallet,
+      );
       StandardToken = await StandardTokenTemplate.deploy();
       const contractVersion = '1';
       const tokenName = 'template';
