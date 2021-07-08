@@ -34,13 +34,15 @@ const initialToken = ethers.BigNumber.from('100000000000000000000');
 // 토큰을 배포하면서 초기화 할 때 필요한 데이터를 직렬화 합니다.
 const initdata = interfaces.encodeFunctionData('initialize', [contractVersion, tokenName, tokenSymbol, tokenDecimals]);
 
-// 토큰을 배포할 때 토큰을 생성하도록 합니다.
+// 토큰 컨트랙트를 배포할 때 토큰을 수령하도록 합니다.
+// 해당 작업으로, 토큰 수량이 결정되고 총 공급량이 업데이트 됩니다.
 const mintCallData = interfaces.encodeFunctionData('mintTo', [
     '토큰 수령인의 이더리움 주소',
     initialToken,
 ]);
 
 // 배포된 토큰 컨트랙트의 소유권 이전(이 작업이 없다면, 토큰 컨트랙트의 소유권은 factory가 가지고 있습니다)
+// 토큰 컨트랙트의 소유권이 있다면 추후에 토큰을 생성하거나 소각할 수 있습니다.
 const ownerCallData = interfaces.encodeFunctionData('transferOwnership', [
     '토큰 컨트랙트의 소유권을 가질 이더리움 주소',
 ]);
