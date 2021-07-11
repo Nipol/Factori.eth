@@ -11,10 +11,14 @@ import "@beandao/contracts/library/ERC2612.sol";
 import "@beandao/contracts/interfaces/IERC20.sol";
 import "@beandao/contracts/interfaces/IERC165.sol";
 import "@beandao/contracts/interfaces/IERC2612.sol";
+import "@beandao/contracts/interfaces/IMint.sol";
+import "@beandao/contracts/interfaces/IBurn.sol";
 import "./ITemplateV1.sol";
 
 contract StandardToken is
     ITemplateV1,
+    IMint,
+    IBurn,
     IERC2612,
     IERC165,
     IERC20,
@@ -95,7 +99,7 @@ contract StandardToken is
         _permit(_owner, spender, value, deadline, v, r, s);
     }
 
-    function mint(uint256 value) external onlyOwner returns (bool) {
+    function mint(uint256 value) external override onlyOwner returns (bool) {
         balanceOf[msg.sender] += value;
         totalSupply += value;
         emit Transfer(address(0), msg.sender, value);
@@ -104,6 +108,7 @@ contract StandardToken is
 
     function mintTo(address to, uint256 value)
         external
+        override
         onlyOwner
         returns (bool)
     {
@@ -114,7 +119,7 @@ contract StandardToken is
         return true;
     }
 
-    function burn(uint256 value) external onlyOwner returns (bool) {
+    function burn(uint256 value) external override onlyOwner returns (bool) {
         balanceOf[msg.sender] -= value;
         totalSupply -= value;
         emit Transfer(msg.sender, address(0), value);
@@ -123,6 +128,7 @@ contract StandardToken is
 
     function burnFrom(address from, uint256 value)
         external
+        override
         onlyOwner
         returns (bool)
     {
