@@ -3,8 +3,11 @@ import { ethers } from 'hardhat';
 import { Contract, BigNumber, constants, Signer, ContractFactory } from 'ethers';
 import { keccak256, defaultAbiCoder, parseEther, Interface } from 'ethers/lib/utils';
 
+const AllowlistJson = require('@beandao/contracts/build/contracts/Allowlist.json');
+
 describe('FactoryV1', () => {
   let Factory: Contract;
+  let Allowlist: Contract;
 
   let wallet: Signer;
   let Dummy: Signer;
@@ -13,8 +16,11 @@ describe('FactoryV1', () => {
     const accounts = await ethers.getSigners();
     [wallet, Dummy] = accounts;
 
+    const AllowlistDeployer = new ethers.ContractFactory(AllowlistJson.abi, AllowlistJson.bytecode, wallet);
+    Allowlist = await AllowlistDeployer.deploy();
+
     const FactoryDeployer = await ethers.getContractFactory('contracts/FactoryV1.sol:FactoryV1', wallet);
-    Factory = await FactoryDeployer.deploy(constants.AddressZero);
+    Factory = await FactoryDeployer.deploy(Allowlist.address);
 
     await Factory.deployed();
   });
@@ -197,6 +203,62 @@ describe('FactoryV1', () => {
             .div('10000')
             .mul('30'),
         ),
+      );
+    });
+
+    it.only('should be success with integrated smart contract', async () => {
+      const StandardTokenTemplate = await ethers.getContractFactory(
+        'contracts/templates/StandardToken.sol:StandardToken',
+        wallet,
+      );
+      const StandardToken = await StandardTokenTemplate.deploy();
+      const contractVersion = '1';
+      const tokenName = 'template';
+      const tokenSymbol = 'TEMP';
+      const tokenDecimals = BigNumber.from('18');
+      await StandardToken.deployed();
+      await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
+      const key = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, '1']));
+
+      expect(await Factory.addTemplate(StandardToken.address, constants.AddressZero, parseEther('0.001')))
+        .to.emit(Factory, 'NewTemplate')
+        .withArgs(key, StandardToken.address, parseEther('0.001'));
+
+      const IntegrationDeployer = await ethers.getContractFactory(
+        'contracts/mocks/IntegrationMock.sol:IntegrationMock',
+        wallet,
+      );
+      const Integration = await IntegrationDeployer.deploy(Factory.address, key);
+
+      const ABI = [
+        'function initialize(string memory contractVersion, string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
+      ];
+      const interfaces = new Interface(ABI);
+      // const data = interfaces.encodeFunctionData('initialize', ['1', 'Sample', 'SAM', BigNumber.from('18')]);
+      const calculatedAddr = await Integration.calculateAddress('Sample', 'SAM');
+
+      const price = Factory.getPrice(key);
+      expect(
+        await Integration.deployToken(
+          'Sample',
+          'SAM',
+          BigNumber.from('100')
+            .mul('10')
+            .mul('18'),
+          { value: price },
+        ),
+      )
+        .to.emit(Integration, 'Sample')
+        .withArgs(calculatedAddr);
+
+      const deployedToken = await StandardTokenTemplate.attach(calculatedAddr);
+
+      expect(await deployedToken.name()).to.equal('Sample');
+      expect(await deployedToken.symbol()).to.equal('SAM');
+      expect(await deployedToken.balanceOf(await wallet.getAddress())).to.equal(
+        BigNumber.from('100')
+          .mul('10')
+          .mul('18'),
       );
     });
   });
