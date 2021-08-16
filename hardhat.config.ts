@@ -47,7 +47,7 @@ export default {
   defaultNetwork: 'hardhat',
   networks: {
     hardhat: {
-      gas: 9000000,
+      baseFeePerGas: 875000000,
       blockGasLimit: 15000000,
       accounts,
     },
@@ -66,11 +66,11 @@ export default {
     // },
   },
   solidity: {
-    version: '0.8.6',
+    version: '0.8.7',
     settings: {
       optimizer: {
         enabled: true,
-        runs: 9999999,
+        runs: 999999999,
         details: {
           yul: true,
         },

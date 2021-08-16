@@ -5,28 +5,48 @@
   "build": {
     "dockerfile": "Dockerfile",
     // Update 'VARIANT' to pick a Node version: 10, 12, 14
-    "args": { "VARIANT": "14", "SOLC_VERSION": "0.8.6" }
+    "args": {
+      "VARIANT": "14",
+      "SOLC_VERSION": "0.8.7"
+    }
   },
-
   // Set *default* container specific settings.json values on container create.
   "settings": {
-    "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.profiles.linux": {
+      "zsh (login)": {
+        "path": "zsh",
+        "args": ["-l"]
+      }
+    },
+    "terminal.integrated.defaultProfile.linux": "zsh (login)",
     "solidity.packageDefaultDependenciesContractsDirectory": "",
     "solidity.packageDefaultDependenciesDirectory": "node_modules",
     "solidity.linter": "solhint",
+    "solidity.formatter": "prettier",
     "solidity.compileUsingRemoteVersion": "latest",
     "solidity.enableLocalNodeCompiler": false,
-    "workbench.colorCustomizations": {},
-    "editor.defaultFormatter": null,
+    "git.ignoreLimitWarning": true,
+    "editor.rulers": [
+      120
+    ],
+    "workbench.colorCustomizations": {
+      "editorRuler.foreground": "#ff408042",
+    },
     "editor.formatOnSave": true,
     "[javascript]": {
-      "editor.formatOnSave": true
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[typescript]": {
-      "editor.formatOnSave": true
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[json]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[jsonc]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[solidity]": {
-      "editor.formatOnSave": true
+      "editor.defaultFormatter": "JuanBlanco.solidity"
     },
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": true
@@ -43,13 +63,10 @@
     "ms-vscode.vscode-typescript-tslint-plugin",
     "github.vscode-pull-request-github"
   ],
-
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
-
   // Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
   "remoteUser": "node",
-
   // Use 'postCreateCommand' to run commands after the container is created.
   "postCreateCommand": "sudo mkdir -p /home/node/.ssh && sudo cp -r /home/node/.ssh-localhost/* /home/node/.ssh && sudo chmod 707 /home/node/.ssh && sudo chmod 606 /home/node/.ssh/* && npm install",
   "runArgs": ["-v", "${env:HOME}${env:USERPROFILE}/.ssh:/home/node/.ssh-localhost:ro"]

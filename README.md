@@ -4,11 +4,12 @@
 
 ## Deployed
 
-### Ropsten
-* StandardToken: 0xcAc012377C7C470C64EFD0c8776C788f774f5A88
-    * template key: 0x7a215e0493b6f77cc3450eb1693d035a56f9cefea78454efef7eddf34488c323
-* Allowlist: 0xFF0894145309ba3D8D32c73Fc514CB0e370a0F69
-* FactoryV1: 0x8Bf346384ae2232077ccB596C48b8b934aa4177a
+### Goerli
+* StandardToken: 0x6403f288483cA9DA7409515967577042070628FE
+    * Template key: 0x254a2c8cf5790bce7b67ebee0b9248872894f42c48f15178f58ed5fd9df1b244
+    * Beacon key: 0x4a11e43cfddd716c15df4ee2923729a06a73946b6910e2b2afaba3ac715a0ff1
+* Allowlist: 0xdFa76fDF338B1d7518A83392ec3989Ed26DE3b1C
+* FactoryV1: 0xd91b593eeeada81dc7f6a20e4d8140ef5adf598a
 
 FactoryV1을 통해서 토큰을 배포하기 위해서는 다음과 같은 작업을 필요로 합니다.
 

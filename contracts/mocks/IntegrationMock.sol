@@ -26,15 +26,8 @@ contract IntegrationMock {
         uint256 amount
     ) external payable returns (address deployed) {
         bytes[] memory callData = new bytes[](2);
-        callData[0] = abi.encodeWithSelector(
-            IMint.mintTo.selector,
-            msg.sender,
-            amount
-        );
-        callData[1] = abi.encodeWithSelector(
-            IERC173.transferOwnership.selector,
-            msg.sender
-        );
+        callData[0] = abi.encodeWithSelector(IMint.mintTo.selector, msg.sender, amount);
+        callData[1] = abi.encodeWithSelector(IERC173.transferOwnership.selector, msg.sender);
 
         bytes memory init = abi.encodeWithSelector(
             bytes4(keccak256("initialize(string,string,string,uint8)")),
@@ -48,11 +41,7 @@ contract IntegrationMock {
         emit Sample(deployed);
     }
 
-    function calculateAddress(string calldata name, string calldata symbol)
-        external
-        view
-        returns (address calculated)
-    {
+    function calculateAddress(string calldata name, string calldata symbol) external view returns (address calculated) {
         bytes memory init = abi.encodeWithSelector(
             bytes4(keccak256("initialize(string,string,string,uint8)")),
             "1",
