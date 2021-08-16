@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { Contract, BigNumber, constants, Signer } from 'ethers';
+import { Interface } from 'ethers/lib/utils';
 
 describe('StandardToken/ERC20', () => {
   let StandardToken: Contract;
@@ -208,6 +209,169 @@ describe('StandardToken/ERC20', () => {
       expect(await StandardToken.balanceOf(walletAddress)).to.be.equal(initialToken.sub(value));
       expect(await StandardToken.balanceOf(walletToAddress)).to.be.equal('0');
       expect(await StandardToken.balanceOf(DummyAddress)).to.be.equal(value);
+    });
+  });
+
+  describe('#mint', () => {
+    it('should be success minting token', async () => {
+      const walletAddress = await wallet.getAddress();
+      expect(await StandardToken.mint(initialToken))
+        .to.emit(StandardToken, 'Transfer')
+        .withArgs(constants.AddressZero, walletAddress, initialToken);
+      expect(await StandardToken.balanceOf(walletAddress)).to.equal(initialToken.mul('2'));
+      expect(await StandardToken.totalSupply()).to.equal(initialToken.mul('2'));
+    });
+
+    it('should be revert minting maximum amount uint256', async () => {
+      await expect(StandardToken.mint(constants.MaxUint256)).to.revertedWith('');
+    });
+
+    it('should be revert from not owner call', async () => {
+      await expect(StandardToken.connect(Dummy).mint(constants.MaxUint256)).to.revertedWith('Ownership/Not-Authorized');
+    });
+  });
+
+  describe('#mintTo', () => {
+    it('should be success minting token for dummy', async () => {
+      const DummyAddress = await Dummy.getAddress();
+      expect(await StandardToken.mintTo(DummyAddress, initialToken))
+        .to.emit(StandardToken, 'Transfer')
+        .withArgs(constants.AddressZero, DummyAddress, initialToken);
+      expect(await StandardToken.balanceOf(DummyAddress)).to.equal(initialToken);
+      expect(await StandardToken.totalSupply()).to.equal(initialToken.mul('2'));
+    });
+
+    it('should be revert minting token for self', async () => {
+      const TokenAddress = StandardToken.address;
+      await expect(StandardToken.mintTo(TokenAddress, initialToken)).to.revertedWith('');
+    });
+
+    it('should be revert minting maximum amount uint256', async () => {
+      const DummyAddress = await Dummy.getAddress();
+      await expect(StandardToken.mintTo(DummyAddress, constants.MaxUint256)).to.revertedWith('');
+    });
+
+    it('should be revert from not owner call', async () => {
+      const DummyAddress = await Dummy.getAddress();
+      await expect(StandardToken.connect(Dummy).mintTo(DummyAddress, constants.MaxUint256)).to.revertedWith(
+        'Ownership/Not-Authorized',
+      );
+    });
+  });
+
+  describe('#burn', () => {
+    it('should be success self burn', async () => {
+      const walletAddress = await wallet.getAddress();
+      expect(await StandardToken.burn(initialToken))
+        .to.emit(StandardToken, 'Transfer')
+        .withArgs(walletAddress, constants.AddressZero, initialToken);
+      expect(await StandardToken.balanceOf(walletAddress)).to.equal('0');
+      expect(await StandardToken.totalSupply()).to.equal('0');
+    });
+
+    it('should be revert at balance zero', async () => {
+      const walletAddress = await wallet.getAddress();
+      expect(await StandardToken.burn(initialToken))
+        .to.emit(StandardToken, 'Transfer')
+        .withArgs(walletAddress, constants.AddressZero, initialToken);
+      await expect(StandardToken.burn(initialToken)).to.revertedWith('');
+    });
+
+    it('shoule be revert from not owner call', async () => {
+      await expect(StandardToken.connect(Dummy).burn(initialToken)).revertedWith('Ownership/Not-Authorized');
+    });
+  });
+
+  describe('#burnFrom', () => {
+    it('should be success burn another account balance', async () => {
+      const walletAddress = await wallet.getAddress();
+      const DummyAddress = await Dummy.getAddress();
+
+      await StandardToken.transfer(DummyAddress, initialToken);
+
+      await StandardToken.connect(Dummy).approve(walletAddress, constants.MaxUint256);
+
+      expect(await StandardToken.burnFrom(DummyAddress, initialToken))
+        .to.emit(StandardToken, 'Transfer')
+        .withArgs(DummyAddress, constants.AddressZero, initialToken);
+
+      expect(await StandardToken.balanceOf(walletAddress)).to.equal('0');
+      expect(await StandardToken.balanceOf(DummyAddress)).to.equal('0');
+      expect(await StandardToken.totalSupply()).to.equal('0');
+    });
+
+    it('should be revert at balance zero', async () => {
+      const walletAddress = await wallet.getAddress();
+      const DummyAddress = await Dummy.getAddress();
+
+      await StandardToken.connect(Dummy).approve(walletAddress, constants.MaxUint256);
+
+      await expect(StandardToken.burnFrom(DummyAddress, initialToken)).revertedWith('');
+    });
+
+    it('should be revert at not approved', async () => {
+      const DummyAddress = await Dummy.getAddress();
+      await StandardToken.transfer(DummyAddress, initialToken);
+      await expect(StandardToken.burnFrom(DummyAddress, initialToken)).revertedWith('');
+    });
+
+    it('shoule be revert from not owner call', async () => {
+      const DummyAddress = await Dummy.getAddress();
+      await expect(StandardToken.connect(Dummy).burnFrom(DummyAddress, initialToken)).revertedWith(
+        'Ownership/Not-Authorized',
+      );
+    });
+  });
+
+  describe('#supportsInterface', () => {
+    it('should be corrected return value from invalid interface', async () => {
+      const iface = new Interface([
+        // ERC20
+        'function name()',
+        'function symbol()',
+        'function decimals()',
+        'function totalSupply()',
+        'function transfer(address to, uint256 value)',
+        'function transferFrom(address from,address to,uint256 value)',
+        'function approve(address spender, uint256 value)',
+        'function balanceOf(address target)',
+        'function allowance(address owner, address spender)',
+        // ERC2612
+        'function permit(address owner,address spender,uint256 value,uint256 deadline,uint8 v,bytes32 r,bytes32 s)',
+        // Multicall
+        'function multicall(bytes[] calldata callData)',
+        // ERC173
+        'function owner()',
+        'function transferOwnership(address newOwner)',
+        // ERC165
+        'function supportsInterface(bytes4 interfaceID) external view returns (bool)',
+        // IMint
+        'function mint(uint256 value) external returns (bool)',
+        'function mintTo(address to, uint256 value) external returns (bool)',
+        // IBurn
+        'function burn(uint256 value) external returns (bool)',
+        'function burnFrom(address from, uint256 value) external returns (bool)',
+      ]);
+
+      expect(await StandardToken.supportsInterface('0x00000001')).to.equal(false);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('permit'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('name'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('symbol'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('decimals'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('totalSupply'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('transfer'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('transferFrom'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('approve'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('balanceOf'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('allowance'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('multicall'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('supportsInterface'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('owner'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('transferOwnership'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('mint'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('mintTo'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('burn'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('burnFrom'))).to.equal(true);
     });
   });
 });

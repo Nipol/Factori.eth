@@ -1,30 +1,30 @@
 {
-    "name": "@beandao/factorieth",
-    "description": "Factorieth Smart Contract Integration Library",
-    "version": "0.1.3",
-    "files": [
-      "**/*.sol",
-      "/build/contracts/*.json",
-      "!/mocks/**/*"
-    ],
-    "scripts": {
-      "prepare": "bash ../scripts/prepare-contracts-package.sh"
-    },
-    "repository": {
-      "type": "git",
-      "url": "https://github.com/Nipol/factori.eth/.git"
-    },
-    "keywords": [
-      "solidity",
-      "ethereum",
-      "smart",
-      "contracts",
-      "security",
-      "zeppelin"
-    ],
-    "author": "yoonsung.eth",
-    "license": "LGPL-3.0",
-    "bugs": {
-      "url": "https://github.com/Nipol/factori.eth/issues"
-    }
+  "name": "@beandao/factorieth",
+  "description": "Factorieth Smart Contract Integration Library",
+  "version": "0.2.0",
+  "files": [
+    "**/*.sol",
+    "/build/contracts/*.json",
+    "!/mocks/**/*"
+  ],
+  "scripts": {
+    "prepare": "bash ../scripts/prepare-contracts-package.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Nipol/factori.eth/.git"
+  },
+  "keywords": [
+    "solidity",
+    "ethereum",
+    "smart",
+    "contracts",
+    "security",
+    "zeppelin"
+  ],
+  "author": "yoonsung.eth",
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Nipol/factori.eth/issues"
+  }
 }

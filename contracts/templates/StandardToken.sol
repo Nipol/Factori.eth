@@ -8,25 +8,14 @@ import "@beandao/contracts/library/Initializer.sol";
 import "@beandao/contracts/library/Ownership.sol";
 import "@beandao/contracts/library/Multicall.sol";
 import "@beandao/contracts/library/ERC2612.sol";
-import "@beandao/contracts/interfaces/IERC20.sol";
-import "@beandao/contracts/interfaces/IERC165.sol";
-import "@beandao/contracts/interfaces/IERC2612.sol";
 import "@beandao/contracts/interfaces/IMint.sol";
 import "@beandao/contracts/interfaces/IBurn.sol";
+import "@beandao/contracts/interfaces/IERC2612.sol";
+import "@beandao/contracts/interfaces/IERC20.sol";
 import "./ITemplateV1.sol";
+import "hardhat/console.sol";
 
-contract StandardToken is
-    ITemplateV1,
-    IMint,
-    IBurn,
-    IERC2612,
-    IERC165,
-    IERC20,
-    ERC2612,
-    Multicall,
-    Ownership,
-    Initializer
-{
+contract StandardToken is IERC20, IERC2612, IBurn, IMint, ITemplateV1, ERC2612, Multicall, Ownership, Initializer {
     string public override name;
     string public override symbol;
     uint8 public override decimals;
@@ -49,20 +38,12 @@ contract StandardToken is
         balanceOf[address(this)] = type(uint256).max;
     }
 
-    function approve(address spender, uint256 value)
-        external
-        override
-        returns (bool)
-    {
+    function approve(address spender, uint256 value) external override returns (bool) {
         _approve(msg.sender, spender, value);
         return true;
     }
 
-    function transfer(address to, uint256 value)
-        external
-        override
-        returns (bool)
-    {
+    function transfer(address to, uint256 value) external override returns (bool) {
         _transfer(msg.sender, to, value);
         return true;
     }
@@ -106,13 +87,7 @@ contract StandardToken is
         return true;
     }
 
-    function mintTo(address to, uint256 value)
-        external
-        override
-        onlyOwner
-        returns (bool)
-    {
-        require(to != address(this), "ERC20/Not-Allowed-Transfer");
+    function mintTo(address to, uint256 value) external override onlyOwner returns (bool) {
         balanceOf[to] += value;
         totalSupply += value;
         emit Transfer(address(0), to, value);
@@ -126,30 +101,21 @@ contract StandardToken is
         return true;
     }
 
-    function burnFrom(address from, uint256 value)
-        external
-        override
-        onlyOwner
-        returns (bool)
-    {
+    function burnFrom(address from, uint256 value) external override onlyOwner returns (bool) {
         allowance[from][msg.sender] -= value;
         balanceOf[from] -= value;
         totalSupply = totalSupply - value;
-        emit Transfer(msg.sender, address(0), value);
+        emit Transfer(from, address(0), value);
         return true;
     }
 
-    function supportsInterface(bytes4 interfaceID)
-        external
-        pure
-        override
-        returns (bool)
-    {
+    function supportsInterface(bytes4 interfaceId) external pure override returns (bool) {
         return
-            interfaceID == type(IERC20).interfaceId || // ERC20
-            interfaceID == type(IERC165).interfaceId || // ERC165
-            interfaceID == type(IERC173).interfaceId || // ERC173
-            interfaceID == type(IERC2612).interfaceId; // ERC2612
+            interfaceId == type(ITemplateV1).interfaceId || // ITemplateV1
+            interfaceId == type(IMint).interfaceId || // IMint
+            interfaceId == type(IBurn).interfaceId || // IBurn
+            interfaceId == type(IERC2612).interfaceId || // ERC2612
+            interfaceId == type(IERC20).interfaceId; // ERC20
     }
 
     function _transfer(
