@@ -10,12 +10,12 @@ interface IFactory {
     struct Template {
         // 20
         address template;
+        // 1
+        bool isBeacon;
         // 20
         address owner;
         // 32
         uint256 price;
-        // 1
-        bool isBeacon;
     }
 
     function deploy(
@@ -28,6 +28,19 @@ interface IFactory {
         external
         view
         returns (address deployable);
+
+    function deploy(
+        string memory seed,
+        bytes32 templateId,
+        bytes memory initializationCallData,
+        bytes[] memory calls
+    ) external payable returns (address deployed);
+
+    function calculateDeployableAddress(
+        string memory seed,
+        bytes32 templateId,
+        bytes memory initializationCallData
+    ) external view returns (address deployable);
 
     function getPrice(bytes32 templateId) external view returns (uint256 price);
 
