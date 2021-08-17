@@ -44,9 +44,6 @@ contract FactoryV1 is Ownership, IFactory {
      */
     IAllowlist private immutable allowlist;
 
-    // 30 / 10000 = 0.3 %
-    uint256 public constant FEE_RATE = 30;
-
     /**
      * @notice 허용 목록 컨트랙트가 미리 배포되어 주입 되어야 한다.
      * @param allowContract IAllowlist를 구현한 컨트랙트 주소
@@ -78,13 +75,50 @@ contract FactoryV1 is Ownership, IFactory {
         );
         // 해당 함수를 호출할 때 수수료가 담긴 경우에 수수료를 컨트랙트 소유자에게 전송하고 기존 수수료에서 일정 비율 만큼 수수료를 상승 시킴
         if (msg.value > 0) {
-            tmp.price += ((tmp.price / 10000) * FEE_RATE);
+            tmp.price += ((tmp.price / 10000) * 30);
             templates[templateId] = tmp;
             payable(this.owner()).transfer(msg.value);
         }
         deployed = tmp.isBeacon
             ? BeaconProxyDeployer.deploy(tmp.template, initializationCallData)
             : MinimalProxyDeployer.deploy(tmp.template, initializationCallData);
+        // 부수적으로 호출할 데이터가 있다면, 배포된 컨트랙트에 추가적인 call을 할 수 있음.
+        if (calls.length > 0) IMulticall(deployed).multicall(calls);
+        // 이벤트 호출
+        emit Deployed(deployed, msg.sender);
+    }
+
+    /**
+     * @notice template id와 고정된 Seed를 통해서 해당 컨트랙트를 배포하는 함수,
+     * 여기에는 initialize 함수를 한 번 호출할 수 있도록 call data가 필요함.
+     * @dev deploy에서 기본적으로 오너십을 체크하지는 않기 때문에, 오너십 관리가 필요한 경우 multicall을 통해서 필수적으로 호출해 주어야 함.
+     * @param seed 컨트랙트를 배포할 때 사용할 seed 문자열.
+     * @param templateId bytes32 형태의 template id가 필요
+     * @param initializationCallData 템플릿에 적합한 initialize 함수를 호출하는 함수 데이터
+     * @param calls 컨트랙트가 배포된 이후에 컨트랙트에 호출할 데이터, 부수적으로 초기화 할 함수들이 있을 때 사용 가능함.
+     */
+    function deploy(
+        string memory seed,
+        bytes32 templateId,
+        bytes memory initializationCallData,
+        bytes[] memory calls
+    ) external payable override returns (address deployed) {
+        // 배포할 템플릿의 정보
+        Template memory tmp = templates[templateId];
+        // 템플릿을 배포하기 위한 수수료가 적정 수준인지, 템플릿 오너가 호출한 것인지 또는 호출자가 허용된 목록에 있는지 확인.
+        require(
+            tmp.price == msg.value || tmp.owner == msg.sender || allowlist.allowance(msg.sender),
+            "Factory/Incorrect-amounts"
+        );
+        // 해당 함수를 호출할 때 수수료가 담긴 경우에 수수료를 컨트랙트 소유자에게 전송하고 기존 수수료에서 일정 비율 만큼 수수료를 상승 시킴
+        if (msg.value > 0) {
+            tmp.price += ((tmp.price / 10000) * 30);
+            templates[templateId] = tmp;
+            payable(this.owner()).transfer(msg.value);
+        }
+        deployed = tmp.isBeacon
+            ? BeaconProxyDeployer.deploy(seed, tmp.template, initializationCallData)
+            : MinimalProxyDeployer.deploy(seed, tmp.template, initializationCallData);
         // 부수적으로 호출할 데이터가 있다면, 배포된 컨트랙트에 추가적인 call을 할 수 있음.
         if (calls.length > 0) IMulticall(deployed).multicall(calls);
         // 이벤트 호출
@@ -107,6 +141,24 @@ contract FactoryV1 is Ownership, IFactory {
         deployable = tmp.isBeacon
             ? BeaconProxyDeployer.calculateAddress(tmp.template, initializationCallData)
             : MinimalProxyDeployer.calculateAddress(tmp.template, initializationCallData);
+    }
+
+    /**
+     * @notice template id와 Seed 문자열, 초기화 데이터 통해서 컨트랙트를 배포할 주소를 미리 파악하는 함수
+     * @dev 연결된 지갑 주소에 따라 생성될 지갑 주소가 변경되므로, 연결되어 있는 주소를 필수로 확인하여야 합니다.
+     * @param seed 컨트랙트에 사용할 seed 문자열
+     * @param templateId bytes32 형태의 template id가 필요
+     * @param initializationCallData 템플릿에 적합한 initialize 함수를 호출하는 함수 데이터
+     */
+    function calculateDeployableAddress(
+        string memory seed,
+        bytes32 templateId,
+        bytes memory initializationCallData
+    ) external view override returns (address deployable) {
+        Template memory tmp = templates[templateId];
+        deployable = tmp.isBeacon
+            ? BeaconProxyDeployer.calculateAddress(seed, tmp.template, initializationCallData)
+            : MinimalProxyDeployer.calculateAddress(seed, tmp.template, initializationCallData);
     }
 
     /**
