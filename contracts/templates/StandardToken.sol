@@ -111,11 +111,31 @@ contract StandardToken is IERC20, IERC2612, IBurn, IMint, ITemplateV1, ERC2612, 
 
     function supportsInterface(bytes4 interfaceId) external pure override returns (bool) {
         return
-            interfaceId == type(ITemplateV1).interfaceId || // ITemplateV1
-            interfaceId == type(IMint).interfaceId || // IMint
-            interfaceId == type(IBurn).interfaceId || // IBurn
-            interfaceId == type(IERC2612).interfaceId || // ERC2612
-            interfaceId == type(IERC20).interfaceId; // ERC20
+            // ERC165
+            interfaceId == this.supportsInterface.selector ||
+            // ERC20
+            interfaceId == this.name.selector ||
+            interfaceId == this.symbol.selector ||
+            interfaceId == this.decimals.selector ||
+            interfaceId == this.totalSupply.selector ||
+            interfaceId == this.transfer.selector ||
+            interfaceId == this.transferFrom.selector ||
+            interfaceId == this.approve.selector ||
+            interfaceId == this.balanceOf.selector ||
+            interfaceId == this.allowance.selector ||
+            // ERC173
+            interfaceId == this.owner.selector ||
+            interfaceId == this.transferOwnership.selector ||
+            // IMint
+            interfaceId == this.mint.selector ||
+            interfaceId == this.mintTo.selector ||
+            // IBurn
+            interfaceId == this.burn.selector ||
+            interfaceId == this.burnFrom.selector ||
+            // ERC2612
+            interfaceId == this.permit.selector ||
+            // Multicall
+            interfaceId == this.multicall.selector;
     }
 
     function _transfer(
