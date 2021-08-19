@@ -8,14 +8,28 @@ import "@beandao/contracts/library/Initializer.sol";
 import "@beandao/contracts/library/Ownership.sol";
 import "@beandao/contracts/library/Multicall.sol";
 import "@beandao/contracts/library/ERC2612.sol";
+import "@beandao/contracts/interfaces/IMulticall.sol";
 import "@beandao/contracts/interfaces/IMint.sol";
 import "@beandao/contracts/interfaces/IBurn.sol";
 import "@beandao/contracts/interfaces/IERC2612.sol";
+import "@beandao/contracts/interfaces/IERC165.sol";
+import "@beandao/contracts/interfaces/IERC173.sol";
 import "@beandao/contracts/interfaces/IERC20.sol";
-import "./ITemplateV1.sol";
 import "hardhat/console.sol";
 
-contract StandardToken is IERC20, IERC2612, IBurn, IMint, ITemplateV1, ERC2612, Multicall, Ownership, Initializer {
+contract StandardToken is
+    IERC20,
+    IERC2612,
+    IBurn,
+    IMint,
+    IERC165,
+    IERC173,
+    IMulticall,
+    ERC2612,
+    Multicall,
+    Ownership,
+    Initializer
+{
     string public override name;
     string public override symbol;
     uint8 public override decimals;
@@ -111,31 +125,16 @@ contract StandardToken is IERC20, IERC2612, IBurn, IMint, ITemplateV1, ERC2612, 
 
     function supportsInterface(bytes4 interfaceId) external pure override returns (bool) {
         return
-            // ERC165
-            interfaceId == this.supportsInterface.selector ||
             // ERC20
-            interfaceId == this.name.selector ||
-            interfaceId == this.symbol.selector ||
-            interfaceId == this.decimals.selector ||
-            interfaceId == this.totalSupply.selector ||
-            interfaceId == this.transfer.selector ||
-            interfaceId == this.transferFrom.selector ||
-            interfaceId == this.approve.selector ||
-            interfaceId == this.balanceOf.selector ||
-            interfaceId == this.allowance.selector ||
-            // ERC173
-            interfaceId == this.owner.selector ||
-            interfaceId == this.transferOwnership.selector ||
-            // IMint
-            interfaceId == this.mint.selector ||
-            interfaceId == this.mintTo.selector ||
-            // IBurn
-            interfaceId == this.burn.selector ||
-            interfaceId == this.burnFrom.selector ||
+            interfaceId == type(IERC20).interfaceId ||
+            interfaceId == type(IMint).interfaceId ||
+            interfaceId == type(IBurn).interfaceId ||
             // ERC2612
-            interfaceId == this.permit.selector ||
-            // Multicall
-            interfaceId == this.multicall.selector;
+            interfaceId == type(IERC2612).interfaceId ||
+            // ITemplateV1(ERC165, ERC173, IMulticall)
+            interfaceId == type(IERC165).interfaceId ||
+            interfaceId == type(IERC173).interfaceId || 
+            interfaceId == type(IMulticall).interfaceId;
     }
 
     function _transfer(

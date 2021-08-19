@@ -323,8 +323,22 @@ describe('StandardToken/ERC20', () => {
     });
   });
 
-  describe('#supportsInterface', () => {
+  describe.only('#supportsInterface', () => {
     it('should be corrected return value from invalid interface', async () => {
+      expect(await StandardToken.supportsInterface('0x00000001')).to.equal(false);
+
+      // expect(await StandardToken.supportsInterface(iface.getSighash('supportsInterface'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('permit'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('multicall'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('owner'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('transferOwnership'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('mint'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('mintTo'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('burn'))).to.equal(true);
+      // expect(await StandardToken.supportsInterface(iface.getSighash('burnFrom'))).to.equal(true);
+    });
+
+    it('should be success implement ERC20', async () => {
       const iface = new Interface([
         // ERC20
         'function name()',
@@ -336,42 +350,71 @@ describe('StandardToken/ERC20', () => {
         'function approve(address spender, uint256 value)',
         'function balanceOf(address target)',
         'function allowance(address owner, address spender)',
-        // ERC2612
-        'function permit(address owner,address spender,uint256 value,uint256 deadline,uint8 v,bytes32 r,bytes32 s)',
-        // Multicall
-        'function multicall(bytes[] calldata callData)',
-        // ERC173
-        'function owner()',
-        'function transferOwnership(address newOwner)',
-        // ERC165
-        'function supportsInterface(bytes4 interfaceID) external view returns (bool)',
+      ]);
+      const ERC20Selector = BigNumber.from(iface.getSighash('name'))
+        .xor(iface.getSighash('symbol'))
+        .xor(iface.getSighash('decimals'))
+        .xor(iface.getSighash('totalSupply'))
+        .xor(iface.getSighash('transfer'))
+        .xor(iface.getSighash('transferFrom'))
+        .xor(iface.getSighash('approve'))
+        .xor(iface.getSighash('balanceOf'))
+        .xor(iface.getSighash('allowance'));
+      expect(await StandardToken.supportsInterface(ERC20Selector.toHexString())).to.equal(true);
+    });
+
+    it('should be success implement IMint', async () => {
+      const iface = new Interface([
         // IMint
         'function mint(uint256 value) external returns (bool)',
         'function mintTo(address to, uint256 value) external returns (bool)',
+      ]);
+      const IMintSelector = BigNumber.from(iface.getSighash('mint')).xor(iface.getSighash('mintTo'));
+      expect(await StandardToken.supportsInterface(IMintSelector.toHexString())).to.equal(true);
+    });
+
+    it('should be success implement IBurn', async () => {
+      const iface = new Interface([
         // IBurn
         'function burn(uint256 value) external returns (bool)',
         'function burnFrom(address from, uint256 value) external returns (bool)',
       ]);
+      const IBurnSelector = BigNumber.from(iface.getSighash('burn')).xor(iface.getSighash('burnFrom'));
+      expect(await StandardToken.supportsInterface(IBurnSelector.toHexString())).to.equal(true);
+    });
 
-      expect(await StandardToken.supportsInterface('0x00000001')).to.equal(false);
-      expect(await StandardToken.supportsInterface(iface.getSighash('supportsInterface'))).to.equal(true);
+    it('should be success implement ERC2612', async () => {
+      const iface = new Interface([
+        // ERC2612
+        'function permit(address owner,address spender,uint256 value,uint256 deadline,uint8 v,bytes32 r,bytes32 s)',
+      ]);
       expect(await StandardToken.supportsInterface(iface.getSighash('permit'))).to.equal(true);
+    });
+
+    it('should be success implement ERC165', async () => {
+      const iface = new Interface([
+        // ERC165
+        'function supportsInterface(bytes4 interfaceID) external view returns (bool)',
+      ]);
+      expect(await StandardToken.supportsInterface(iface.getSighash('supportsInterface'))).to.equal(true);
+    });
+
+    it('should be success implement ERC173', async () => {
+      const iface = new Interface([
+        // ERC173
+        'function owner()',
+        'function transferOwnership(address newOwner)',
+      ]);
+      const ERC173Selector = BigNumber.from(iface.getSighash('owner')).xor(iface.getSighash('transferOwnership'));
+      expect(await StandardToken.supportsInterface(ERC173Selector.toHexString())).to.equal(true);
+    });
+
+    it('should be success implement IMulticall', async () => {
+      const iface = new Interface([
+        // Multicall
+        'function multicall(bytes[] calldata callData)',
+      ]);
       expect(await StandardToken.supportsInterface(iface.getSighash('multicall'))).to.equal(true);
-      expect(await StandardToken.supportsInterface(iface.getSighash('name'))).to.equal(true);
-      expect(await StandardToken.supportsInterface(iface.getSighash('symbol'))).to.equal(true);
-      expect(await StandardToken.supportsInterface(iface.getSighash('decimals'))).to.equal(true);
-      expect(await StandardToken.supportsInterface(iface.getSighash('totalSupply'))).to.equal(true);
-      expect(await StandardToken.supportsInterface(iface.getSighash('transfer'))).to.equal(true);
-      expect(await StandardToken.supportsInterface(iface.getSighash('transferFrom'))).to.equal(true);
-      expect(await StandardToken.supportsInterface(iface.getSighash('approve'))).to.equal(true);
-      expect(await StandardToken.supportsInterface(iface.getSighash('balanceOf'))).to.equal(true);
-      expect(await StandardToken.supportsInterface(iface.getSighash('allowance'))).to.equal(true);
-      expect(await StandardToken.supportsInterface(iface.getSighash('owner'))).to.equal(true);
-      expect(await StandardToken.supportsInterface(iface.getSighash('transferOwnership'))).to.equal(true);
-      expect(await StandardToken.supportsInterface(iface.getSighash('mint'))).to.equal(true);
-      expect(await StandardToken.supportsInterface(iface.getSighash('mintTo'))).to.equal(true);
-      expect(await StandardToken.supportsInterface(iface.getSighash('burn'))).to.equal(true);
-      expect(await StandardToken.supportsInterface(iface.getSighash('burnFrom'))).to.equal(true);
     });
   });
 });
