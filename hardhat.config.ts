@@ -54,6 +54,13 @@ export default {
     coverage: {
       url: 'http://localhost:8555',
     },
+    // mainnet: {
+    //   url: `https://${process.env.RIVET_KEY}.eth.rpc.rivet.cloud/`,
+    //   accounts: [`${process.env.DEPLOYER_PK}`],
+    //   timeout: 500000,
+    //   maxFeePerGas: 50000000000,
+    //   maxPriorityFeePerGas: 1500000000,
+    // },
     // ropsten: {
     //   url: `https://${process.env.RIVET_KEY}.ropsten.rpc.rivet.cloud/`,
     //   accounts: [`${process.env.DEPLOYER_PK}`],

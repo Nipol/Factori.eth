@@ -323,19 +323,9 @@ describe('StandardToken/ERC20', () => {
     });
   });
 
-  describe.only('#supportsInterface', () => {
+  describe('#supportsInterface', () => {
     it('should be corrected return value from invalid interface', async () => {
       expect(await StandardToken.supportsInterface('0x00000001')).to.equal(false);
-
-      // expect(await StandardToken.supportsInterface(iface.getSighash('supportsInterface'))).to.equal(true);
-      // expect(await StandardToken.supportsInterface(iface.getSighash('permit'))).to.equal(true);
-      // expect(await StandardToken.supportsInterface(iface.getSighash('multicall'))).to.equal(true);
-      // expect(await StandardToken.supportsInterface(iface.getSighash('owner'))).to.equal(true);
-      // expect(await StandardToken.supportsInterface(iface.getSighash('transferOwnership'))).to.equal(true);
-      // expect(await StandardToken.supportsInterface(iface.getSighash('mint'))).to.equal(true);
-      // expect(await StandardToken.supportsInterface(iface.getSighash('mintTo'))).to.equal(true);
-      // expect(await StandardToken.supportsInterface(iface.getSighash('burn'))).to.equal(true);
-      // expect(await StandardToken.supportsInterface(iface.getSighash('burnFrom'))).to.equal(true);
     });
 
     it('should be success implement ERC20', async () => {
