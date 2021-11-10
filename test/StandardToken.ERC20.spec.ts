@@ -21,7 +21,7 @@ describe('StandardToken/ERC20', () => {
     [wallet, walletTo, Dummy] = accounts;
 
     const StandardTokenTemplate = await ethers.getContractFactory(
-      'contracts/templates/StandardToken.sol:StandardToken',
+      'contracts/tokens/StandardToken.sol:StandardToken',
       wallet,
     );
     StandardToken = await StandardTokenTemplate.deploy();

@@ -3,85 +3,109 @@
  */
 pragma solidity ^0.8.0;
 
+import "@beandao/contracts/interfaces/IERC20.sol";
 import "@beandao/contracts/interfaces/IERC165.sol";
 import "@beandao/contracts/interfaces/IERC173.sol";
 import "@beandao/contracts/interfaces/IMulticall.sol";
 import "@beandao/contracts/interfaces/IAllowlist.sol";
 import "@beandao/contracts/library/Ownership.sol";
-import "@beandao/contracts/library/BeaconProxyDeployer.sol";
-import "@beandao/contracts/library/MinimalProxyDeployer.sol";
+import {BeaconProxyDeployer as BeaconDeployer} from "@beandao/contracts/library/BeaconProxyDeployer.sol";
+import {MinimalProxyDeployer as MinimalDeployer} from "@beandao/contracts/library/MinimalProxyDeployer.sol";
 import "@beandao/contracts/library/Beacon.sol";
+import "@beandao/contracts/library/Address.sol";
+import "@beandao/contracts/library/Multicall.sol";
 import "./IFactory.sol";
-import "hardhat/console.sol";
 
 /**
  * @title Factory V1
  * @author yoonsung.eth
- * @notice minimal proxy로 배포될 컨트랙트를 template로 추상화 하며 같은 컨트랙트를 쉽게 배포할 수 있도록 함.
- * @dev template에는 단 한번만 호출 가능한 initialize 함수가 필요하며, 이는 필수적으로 호출되어야 함.
- * ERC173이 구현되어 컨트랙트의 소유권을 옮길 수 있도록 하여야 함.
+ * @notice Abstract reusable contract into template and deploy them in small sizes `minimal proxy` and `beacon proxy`.
+ * This contract can receive a fee lower than the deploy cost, and registered addresses do not have to pay the fee.
+ * Beacon is managed in this contract, it can be useful if you need a scalable upgrade through the `beacon proxy`.
+ * @dev The template to be registered may or may not have an `initialize` function.
+ * However, at least a ERC173 and multicall for directed at self must be implemented.
  */
-contract FactoryV1 is Ownership, IFactory {
+contract FactoryV1 is Ownership, Multicall, IFactory {
+    using Address for address;
+
     /**
-     * @notice key에 따른 template 반환.
+     * @notice template key for template info.
      */
-    mapping(bytes32 => Template) public templates;
+    mapping(bytes32 => TemplateInfo) public templates;
+
     /**
-     * @notice 등록된 모든 템플릿에 대한 nonce
+     * @notice registered template for nonce.
      */
     mapping(address => uint256) private nonceForTemplate;
+
     /**
-     * @notice 템플릿에 연결된 비콘 주소
-     */
-    mapping(address => address) private beaconForTemplate;
-    /**
-     * @notice template가 등록된 숫자.
+     * @notice template count.
      */
     uint256 public nonce = 1;
 
     /**
-     * @notice Contract를 무료로 배포할 수 있는 허용된 주소
+     * @notice base fee
+     */
+    uint256 public baseFee;
+
+    /**
+     * @notice fee collector
+     */
+    address payable public feeTo;
+
+    /**
+     * @notice this is for registered addresses
      */
     IAllowlist private immutable allowlist;
 
     /**
-     * @notice 허용 목록 컨트랙트가 미리 배포되어 주입 되어야 한다.
-     * @param allowContract IAllowlist를 구현한 컨트랙트 주소
+     * @notice requiring on deploy, allowlist contract.
+     * @param allowContract IAllowlist implemented contract address.
+     * @param feeAmount basic fee for ether amount
+     * @param feeToAddr fee collector address
      */
-    constructor(address allowContract) {
-        Ownership.initialize(msg.sender);
+    constructor(
+        address allowContract,
+        uint256 feeAmount,
+        address payable feeToAddr
+    ) {
+        _transferOwnership(msg.sender);
         allowlist = IAllowlist(allowContract);
+        baseFee = feeAmount;
+        feeTo = feeToAddr;
         nonceForTemplate[address(0)] = type(uint256).max;
     }
 
     /**
-     * @notice template id를 통해서 해당 컨트랙트를 배포하는 함수, 여기에는 initialize 함수를 한 번 호출할 수 있도록 call data가 필요함.
-     * @dev deploy에서 기본적으로 오너십을 체크하지는 않기 때문에, 오너십 관리가 필요한 경우 multicall을 통해서 필수적으로 호출해 주어야 함.
-     * @param templateId bytes32 형태의 template id가 필요
-     * @param initializationCallData 템플릿에 적합한 initialize 함수를 호출하는 함수 데이터
-     * @param calls 컨트랙트가 배포된 이후에, 부수적으로 초기화 할 함수들이 있을 때 사용 가능함.
+     * @notice template id를 통해서 minimal proxy와 minimal beacon proxy를 배포하는 함수.
+     * @dev 일반적으로 배포되는 컨트랙트와 같이 컨트랙트가 생성될 때 초기화 함수를 실행해야 한다면, initializationCallData에 호출할 함수를
+     * serialize하여 주입하여야 합니다. 컨트랙트 소유권을 별도로 관리해야하는 경우 multicall을 통해서 명시적인 소유권 이전이 되어야 합니다.
+     * @param templateId 배포할 컨트랙트의 template id
+     * @param isBeacon 비콘으로 배포해야 할 것인지 결정하는 인자.
+     * @param initializationCallData 컨트랙트가 생성될 때 호출할 직렬화된 초기화 함수 정보
+     * @param calls 컨트랙트가 배포된 이후, 필요한 일련의 함수 호출 정보
      */
     function deploy(
+        bool isBeacon,
         bytes32 templateId,
         bytes memory initializationCallData,
         bytes[] memory calls
-    ) external payable override returns (address deployed) {
+    ) external payable returns (address deployed) {
         // 배포할 템플릿의 정보
-        Template memory tmp = templates[templateId];
+        TemplateInfo memory tmp = templates[templateId];
         // 템플릿을 배포하기 위한 수수료가 적정 수준인지, 템플릿 오너가 호출한 것인지 또는 호출자가 허용된 목록에 있는지 확인.
         require(
-            tmp.price == msg.value || tmp.owner == msg.sender || allowlist.allowance(msg.sender),
+            baseFee == msg.value || tmp.owner == msg.sender || allowlist.allowance(msg.sender),
             "Factory/Incorrect-amounts"
         );
+
         // 해당 함수를 호출할 때 수수료가 담긴 경우에 수수료를 컨트랙트 소유자에게 전송하고 기존 수수료에서 일정 비율 만큼 수수료를 상승 시킴
-        if (msg.value > 0) {
-            tmp.price += ((tmp.price / 10000) * 30);
-            templates[templateId] = tmp;
-            payable(this.owner()).transfer(msg.value);
-        }
-        deployed = tmp.isBeacon
-            ? BeaconProxyDeployer.deploy(tmp.template, initializationCallData)
-            : MinimalProxyDeployer.deploy(tmp.template, initializationCallData);
+        feeTo.transfer(msg.value);
+
+        deployed = isBeacon
+            ? BeaconDeployer.deploy(tmp.btemplate, initializationCallData)
+            : MinimalDeployer.deploy(tmp.template, initializationCallData);
+
         // 부수적으로 호출할 데이터가 있다면, 배포된 컨트랙트에 추가적인 call을 할 수 있음.
         if (calls.length > 0) IMulticall(deployed).multicall(calls);
         // 이벤트 호출
@@ -89,36 +113,37 @@ contract FactoryV1 is Ownership, IFactory {
     }
 
     /**
-     * @notice template id와 고정된 Seed를 통해서 해당 컨트랙트를 배포하는 함수,
-     * 여기에는 initialize 함수를 한 번 호출할 수 있도록 call data가 필요함.
-     * @dev deploy에서 기본적으로 오너십을 체크하지는 않기 때문에, 오너십 관리가 필요한 경우 multicall을 통해서 필수적으로 호출해 주어야 함.
-     * @param seed 컨트랙트를 배포할 때 사용할 seed 문자열.
-     * @param templateId bytes32 형태의 template id가 필요
-     * @param initializationCallData 템플릿에 적합한 initialize 함수를 호출하는 함수 데이터
-     * @param calls 컨트랙트가 배포된 이후에 컨트랙트에 호출할 데이터, 부수적으로 초기화 할 함수들이 있을 때 사용 가능함.
+     * @notice template id와 외부에서 관리되는 seed를 통해서 minimal proxy와 minimal beacon proxy를 배포하는 함수.
+     * @dev 일반적으로 배포되는 컨트랙트와 같이 컨트랙트가 생성될 때 초기화 함수를 실행해야 한다면, initializationCallData에 호출할 함수를
+     * serialize하여 주입하여야 합니다. 컨트랙트 소유권을 별도로 관리해야하는 경우 multicall을 통해서 명시적인 소유권 이전이 되어야 합니다.
+     * @param seed 컨트랙트 주소 확정에 필요한 외부 seed
+     * @param isBeacon 비콘으로 배포해야 할 것인지 결정하는 인자.
+     * @param templateId 배포할 컨트랙트의 template id
+     * @param initializationCallData 컨트랙트가 생성될 때 호출할 직렬화된 초기화 함수 정보
+     * @param calls 컨트랙트가 배포된 이후, 필요한 일련의 함수 호출 정보
      */
-    function deploy(
+    function deployWithSeed(
         string memory seed,
+        bool isBeacon,
         bytes32 templateId,
         bytes memory initializationCallData,
         bytes[] memory calls
-    ) external payable override returns (address deployed) {
+    ) external payable returns (address deployed) {
         // 배포할 템플릿의 정보
-        Template memory tmp = templates[templateId];
+        TemplateInfo memory tmp = templates[templateId];
         // 템플릿을 배포하기 위한 수수료가 적정 수준인지, 템플릿 오너가 호출한 것인지 또는 호출자가 허용된 목록에 있는지 확인.
         require(
-            tmp.price == msg.value || tmp.owner == msg.sender || allowlist.allowance(msg.sender),
+            baseFee == msg.value || tmp.owner == msg.sender || allowlist.allowance(msg.sender),
             "Factory/Incorrect-amounts"
         );
+
         // 해당 함수를 호출할 때 수수료가 담긴 경우에 수수료를 컨트랙트 소유자에게 전송하고 기존 수수료에서 일정 비율 만큼 수수료를 상승 시킴
-        if (msg.value > 0) {
-            tmp.price += ((tmp.price / 10000) * 30);
-            templates[templateId] = tmp;
-            payable(this.owner()).transfer(msg.value);
-        }
-        deployed = tmp.isBeacon
-            ? BeaconProxyDeployer.deploy(seed, tmp.template, initializationCallData)
-            : MinimalProxyDeployer.deploy(seed, tmp.template, initializationCallData);
+        feeTo.transfer(msg.value);
+
+        deployed = isBeacon
+            ? BeaconDeployer.deploy(seed, tmp.btemplate, initializationCallData)
+            : MinimalDeployer.deploy(seed, tmp.template, initializationCallData);
+
         // 부수적으로 호출할 데이터가 있다면, 배포된 컨트랙트에 추가적인 call을 할 수 있음.
         if (calls.length > 0) IMulticall(deployed).multicall(calls);
         // 이벤트 호출
@@ -126,49 +151,80 @@ contract FactoryV1 is Ownership, IFactory {
     }
 
     /**
-     * @notice template id와 초기화 데이터 통해서 컨트랙트를 배포할 주소를 미리 파악하는 함수
+     * @notice template id와 초기화 데이터 통해서 minimal proxy와 minimal beacon proxy로 배포할 주소를 미리 파악하는 함수
      * @dev 연결된 지갑 주소에 따라 생성될 지갑 주소가 변경되므로, 연결되어 있는 주소를 필수로 확인하여야 합니다.
-     * @param templateId bytes32 형태의 template id가 필요
-     * @param initializationCallData 템플릿에 적합한 initialize 함수를 호출하는 함수 데이터
+     * @param isBeacon 비콘으로 배포해야 할 것인지 결정하는 인자.
+     * @param templateId 배포할 컨트랙트의 template id
+     * @param initializationCallData 컨트랙트가 생성될 때 호출할 직렬화된 초기화 함수 정보
      */
-    function calculateDeployableAddress(bytes32 templateId, bytes memory initializationCallData)
-        external
-        view
-        override
-        returns (address deployable)
-    {
-        Template memory tmp = templates[templateId];
-        deployable = tmp.isBeacon
-            ? BeaconProxyDeployer.calculateAddress(tmp.template, initializationCallData)
-            : MinimalProxyDeployer.calculateAddress(tmp.template, initializationCallData);
-    }
-
-    /**
-     * @notice template id와 Seed 문자열, 초기화 데이터 통해서 컨트랙트를 배포할 주소를 미리 파악하는 함수
-     * @dev 연결된 지갑 주소에 따라 생성될 지갑 주소가 변경되므로, 연결되어 있는 주소를 필수로 확인하여야 합니다.
-     * @param seed 컨트랙트에 사용할 seed 문자열
-     * @param templateId bytes32 형태의 template id가 필요
-     * @param initializationCallData 템플릿에 적합한 initialize 함수를 호출하는 함수 데이터
-     */
-    function calculateDeployableAddress(
-        string memory seed,
+    function compute(
+        bool isBeacon,
         bytes32 templateId,
         bytes memory initializationCallData
-    ) external view override returns (address deployable) {
-        Template memory tmp = templates[templateId];
-        deployable = tmp.isBeacon
-            ? BeaconProxyDeployer.calculateAddress(seed, tmp.template, initializationCallData)
-            : MinimalProxyDeployer.calculateAddress(seed, tmp.template, initializationCallData);
+    ) external view returns (address deployable) {
+        TemplateInfo memory tmp = templates[templateId];
+        deployable = isBeacon
+            ? BeaconDeployer.calculateAddress(tmp.btemplate, initializationCallData)
+            : MinimalDeployer.calculateAddress(tmp.template, initializationCallData);
+    }
+
+    /**
+     * @notice template id와 Seed 문자열, 초기화 데이터 통해서 minimal proxy와 minimal beacon proxy로 배포할 주소를 미리 파악하는 함수
+     * @dev 연결된 지갑 주소에 따라 생성될 지갑 주소가 변경되므로, 연결되어 있는 주소를 필수로 확인하여야 합니다.
+     * @param seed 컨트랙트에 사용할 seed 문자열
+     * @param isBeacon 비콘으로 배포해야 할 것인지 결정하는 인자.
+     * @param templateId 배포할 컨트랙트의 template id
+     * @param initializationCallData 컨트랙트가 생성될 때 호출할 직렬화된 초기화 함수 정보
+     */
+    function computeWithSeed(
+        string memory seed,
+        bool isBeacon,
+        bytes32 templateId,
+        bytes memory initializationCallData
+    ) external view returns (address deployable) {
+        TemplateInfo memory tmp = templates[templateId];
+        deployable = isBeacon
+            ? BeaconDeployer.calculateAddress(seed, tmp.btemplate, initializationCallData)
+            : MinimalDeployer.calculateAddress(seed, tmp.template, initializationCallData);
+    }
+
+    /**
+     * @notice Factori.eth에 등록되지 않은 컨트랙트를 Template로 하여 Minimal Proxy로 배포합니다.
+     * @param templateAddr 템플릿으로 사용할 이미 배포된 컨트랙트 주소
+     * @param initializationCallData 배포되면서 호출되어야 하는 초기화 함수
+     * @param calls 초기화 함수 이외에, 호출되어야 하는 함수들의 배열
+     */
+    function clone(
+        address templateAddr,
+        bytes memory initializationCallData,
+        bytes[] memory calls
+    ) external returns (address deployed) {
+        require(nonceForTemplate[templateAddr] == 0, "Factory/Registered-Template");
+        deployed = MinimalDeployer.deploy(templateAddr, initializationCallData);
+        if (calls.length > 0) IMulticall(deployed).multicall(calls);
+    }
+
+    /**
+     * @notice Factori.eth에 등록되지 않은 컨트랙트를 Template로 하여 minimal proxy로 배포할 주소를 미리 파악하는 함수
+     * @dev 연결된 지갑 주소에 따라 생성될 지갑 주소가 변경되므로, 연결되어 있는 주소를 필수로 확인하여야 합니다.
+     * @param templateAddr 배포할 컨트랙트의 template id
+     * @param initializationCallData 컨트랙트가 생성될 때 호출할 직렬화된 초기화 함수 정보
+     */
+    function computeClone(address templateAddr, bytes memory initializationCallData)
+        external
+        view
+        returns (address deployable)
+    {
+        deployable = MinimalDeployer.calculateAddress(templateAddr, initializationCallData);
     }
 
     /**
      * @notice template id에 따라서 컨트랙트를 배포하기 위한 필요 가격을 가져오는 함
      * @dev 연결된 지갑 주소에 따라 생성될 지갑 주소가 변경되므로, 연결되어 있는 주소를 필수로 확인하여야 합니다.
-     * @param templateId 값을 가져올 템플릿의 아이디
      * @return price 이더리움으로 구성된 값을 가짐.
      */
-    function getPrice(bytes32 templateId) external view override returns (uint256 price) {
-        price = templates[templateId].price;
+    function getPrice() external view returns (uint256 price) {
+        price = baseFee;
     }
 
     /**
@@ -176,63 +232,73 @@ contract FactoryV1 is Ownership, IFactory {
      * @dev 같은 템플릿이 비콘과, 일반적인 템플릿으로 등록될 수 있습니다. 따라서 선택적으로 사용 가능합니다.
      * @param templateAddr 템플릿으로 사용될 컨트랙트의 주소
      * @param ownerAddr 해당 템플릿의 소유주를 지정함. 해당 소유주는 수수료를 지불하지 않음.
-     * @param price 템플릿으로 컨트랙트를 배포할 때 소모될 이더리움의 수량
      */
-    function addTemplate(
-        address templateAddr,
-        address ownerAddr,
-        uint256 price
-    ) external override onlyOwner {
+    function addTemplate(address templateAddr, address ownerAddr) external onlyOwner {
         require(nonceForTemplate[templateAddr] == 0, "Factory/Non-Valid");
         bytes32 key = keccak256(abi.encode(templateAddr, nonce));
-        templates[key] = Template({isBeacon: false, template: templateAddr, owner: ownerAddr, price: price});
+        address beaconAddr = address(new Beacon(templateAddr));
+        templates[key] = TemplateInfo({template: templateAddr, btemplate: beaconAddr, owner: ownerAddr});
         nonceForTemplate[templateAddr] = nonce++;
-        emit NewTemplate(key, templateAddr, price);
-    }
-
-    /**
-     * @notice 템플릿으로 사용되기 적합한 인터페이스를 비콘으로 배포할 수 있도록 합니다.
-     * @param templateAddr 템플릿으로 사용될 컨트랙트의 주소
-     * @param ownerAddr 해당 템플릿의 소유주를 지정함. 해당 소유주는 수수료를 지불하지 않음.
-     * @param price 템플릿으로 컨트랙트를 배포할 때 소모될 이더리움의 수량
-     */
-    function addBeacon(
-        address templateAddr,
-        address ownerAddr,
-        uint256 price
-    ) external override onlyOwner returns (address beaconAddr) {
-        require(beaconForTemplate[templateAddr] == address(0), "Factory/Non-Valid");
-        beaconAddr = address(new Beacon(templateAddr));
-        bytes32 key = keccak256(abi.encode(beaconAddr, nonce));
-        templates[key] = Template({isBeacon: true, template: beaconAddr, owner: ownerAddr, price: price});
-        beaconForTemplate[templateAddr] = beaconAddr;
-        emit NewTemplate(key, beaconAddr, price);
+        emit NewTemplate(key, templateAddr, beaconAddr);
     }
 
     /**
      * @notice 등록된 템플릿의 정보를 변경하는 함수, 비콘인 경우에는 템플릿을 업데이트 할 수 있으나 비콘이 아니라면 업데이트 불가능.
      * @param key 업데이트 될 템플릿의 아이디
-     * @param updateCode 비콘일 경우 템플릿 주소, 템플릿 소유주 주소, 가격을 순서대로 인코딩
+     * @param updateCode 비콘일 경우 템플릿 주소, 템플릿 소유주 주소를 순서대로 인코딩
      */
-    function updateTemplate(bytes32 key, bytes memory updateCode) external override onlyOwner {
-        Template memory tmp = templates[key];
-        (address templateAddr, address ownerAddr, uint256 price) = abi.decode(updateCode, (address, address, uint256));
-        require(tmp.isBeacon ? templateAddr != address(0) : templateAddr == address(0), "Factory/Non-Valid");
-        tmp.isBeacon ? tmp.template.call(abi.encode(templateAddr)) : (false, new bytes(0));
+    function updateTemplate(bytes32 key, bytes memory updateCode) external onlyOwner {
+        (address templateAddr, address ownerAddr) = abi.decode(updateCode, (address, address));
+        require(templateAddr != address(0), "Factory/Non-Valid");
+        require(nonceForTemplate[templateAddr] == 0, "Factory/registered-before");
+        require(templateAddr.isContract(), "Factory/is-not-Contract");
+        TemplateInfo memory tmp = templates[key];
+        tmp.template = templateAddr;
+        (bool success, ) = tmp.btemplate.call(abi.encode(templateAddr));
+        assert(success);
         tmp.owner = (ownerAddr != tmp.owner) ? ownerAddr : tmp.owner;
-        tmp.price = price != 0 ? price : tmp.price;
         templates[key] = tmp;
-        emit UpdatedTemplate(key, tmp.template, tmp.owner, tmp.price);
+        emit UpdatedTemplate(key, tmp.template, tmp.owner);
     }
 
     /**
      * @notice 등록된 템플릿을 삭제하는 함수
      * @param key 삭제될 템플릿의 아이디
      */
-    function removeTemplate(bytes32 key) external override onlyOwner {
-        Template memory tmp = templates[key];
+    function removeTemplate(bytes32 key) external onlyOwner {
+        TemplateInfo memory tmp = templates[key];
         require(tmp.template != address(0), "Factory/Non-Exist");
         delete templates[key];
         emit DeletedTemplate(key);
+    }
+
+    /**
+     * @notice 고정 수수료를 변경
+     * @param newFee 변경된 수수료
+     */
+    function changeFee(uint256 newFee) external onlyOwner {
+        baseFee = newFee;
+        emit ChangedFee(newFee);
+    }
+
+    /**
+     * @notice 수수료를 수취할 대상 변경
+     * @param newFeeTo 수취할 대상 주소
+     */
+    function changeFeeTo(address payable newFeeTo) external onlyOwner {
+        feeTo = newFeeTo;
+        emit ChangedFeeTo(newFeeTo);
+    }
+
+    /**
+     * @notice Factori.eth에 쌓여있는 ETH와 토큰을 호출하여, 수수료 수취 주소에 전송함
+     * @param tokenAddr 수취할 토큰 주소
+     */
+    function collect(address tokenAddr) external onlyOwner {
+        IERC20(tokenAddr).transfer(feeTo, IERC20(tokenAddr).balanceOf(address(this)));
+    }
+
+    function recoverOwnership(address deployed, address to) external onlyOwner {
+        IERC173(deployed).transferOwnership(to);
     }
 }

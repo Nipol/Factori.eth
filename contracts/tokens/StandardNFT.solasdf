@@ -6,21 +6,24 @@ pragma solidity ^0.8.0;
 import "@beandao/contracts/library/Initializer.sol";
 import "@beandao/contracts/library/Ownership.sol";
 import "@beandao/contracts/library/Multicall.sol";
-import "./ITemplateV1.sol";
 import "@beandao/contracts/interfaces/IERC721Metadata.sol";
 import "@beandao/contracts/interfaces/IERC721.sol";
+import "../ITemplateV1.sol";
 
 // mint와 burn 필요.
 // mint는 오너 서명에 의해 생성될 수 있는 기능 필요.
 contract StandardNFT is IERC721, IERC721Metadata, ITemplateV1, Multicall, Ownership, Initializer {
     string public override name;
     string public override symbol;
+
+    /// @notice mapping owner address to token count
+    mapping(address => uint256) private _balances;
+
     mapping(uint256 => string) public override tokenURI;
-    mapping(address => uint256) public override balanceOf;
     mapping(uint256 => address) public override ownerOf;
 
     function initialize(string memory nameStr, string memory symbolStr) external initializer {
-        Ownership.initialize(msg.sender);
+        _transferOwnership(msg.sender);
         name = nameStr;
         symbol = symbolStr;
     }

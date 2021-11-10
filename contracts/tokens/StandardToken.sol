@@ -15,7 +15,8 @@ import "@beandao/contracts/interfaces/IERC2612.sol";
 import "@beandao/contracts/interfaces/IERC165.sol";
 import "@beandao/contracts/interfaces/IERC173.sol";
 import "@beandao/contracts/interfaces/IERC20.sol";
-import "hardhat/console.sol";
+import "../ITemplateV1.sol";
+
 
 contract StandardToken is
     IERC20,
@@ -25,18 +26,19 @@ contract StandardToken is
     IERC165,
     IERC173,
     IMulticall,
+    ITemplateV1,
     ERC2612,
     Multicall,
     Ownership,
     Initializer
 {
-    string public override name;
-    string public override symbol;
-    uint8 public override decimals;
-    uint256 public override totalSupply;
+    string public name;
+    string public symbol;
+    uint8 public decimals;
+    uint256 public totalSupply;
 
-    mapping(address => uint256) public override balanceOf;
-    mapping(address => mapping(address => uint256)) public override allowance;
+    mapping(address => uint256) public balanceOf;
+    mapping(address => mapping(address => uint256)) public allowance;
 
     function initialize(
         string memory contractVersion,
@@ -44,7 +46,7 @@ contract StandardToken is
         string memory tokenSymbol,
         uint8 tokenDecimals
     ) external initializer {
-        Ownership.initialize(msg.sender);
+        _transferOwnership(msg.sender);
         ERC2612._initDomainSeparator(contractVersion, tokenName);
         name = tokenName;
         symbol = tokenSymbol;
@@ -52,12 +54,12 @@ contract StandardToken is
         balanceOf[address(this)] = type(uint256).max;
     }
 
-    function approve(address spender, uint256 value) external override returns (bool) {
+    function approve(address spender, uint256 value) external returns (bool) {
         _approve(msg.sender, spender, value);
         return true;
     }
 
-    function transfer(address to, uint256 value) external override returns (bool) {
+    function transfer(address to, uint256 value) external returns (bool) {
         _transfer(msg.sender, to, value);
         return true;
     }
@@ -66,7 +68,7 @@ contract StandardToken is
         address from,
         address to,
         uint256 value
-    ) external override returns (bool) {
+    ) external returns (bool) {
         allowance[from][msg.sender] -= value;
         _transfer(from, to, value);
         return true;
@@ -90,32 +92,32 @@ contract StandardToken is
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external override {
+    ) external {
         _permit(_owner, spender, value, deadline, v, r, s);
     }
 
-    function mint(uint256 value) external override onlyOwner returns (bool) {
+    function mint(uint256 value) external onlyOwner returns (bool) {
         balanceOf[msg.sender] += value;
         totalSupply += value;
         emit Transfer(address(0), msg.sender, value);
         return true;
     }
 
-    function mintTo(address to, uint256 value) external override onlyOwner returns (bool) {
+    function mintTo(address to, uint256 value) external onlyOwner returns (bool) {
         balanceOf[to] += value;
         totalSupply += value;
         emit Transfer(address(0), to, value);
         return true;
     }
 
-    function burn(uint256 value) external override onlyOwner returns (bool) {
+    function burn(uint256 value) external onlyOwner returns (bool) {
         balanceOf[msg.sender] -= value;
         totalSupply -= value;
         emit Transfer(msg.sender, address(0), value);
         return true;
     }
 
-    function burnFrom(address from, uint256 value) external override onlyOwner returns (bool) {
+    function burnFrom(address from, uint256 value) external onlyOwner returns (bool) {
         allowance[from][msg.sender] -= value;
         balanceOf[from] -= value;
         totalSupply = totalSupply - value;
@@ -123,7 +125,7 @@ contract StandardToken is
         return true;
     }
 
-    function supportsInterface(bytes4 interfaceId) external pure override returns (bool) {
+    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
         return
             // ERC20
             interfaceId == type(IERC20).interfaceId ||
@@ -133,7 +135,7 @@ contract StandardToken is
             interfaceId == type(IERC2612).interfaceId ||
             // ITemplateV1(ERC165, ERC173, IMulticall)
             interfaceId == type(IERC165).interfaceId ||
-            interfaceId == type(IERC173).interfaceId || 
+            interfaceId == type(IERC173).interfaceId ||
             interfaceId == type(IMulticall).interfaceId;
     }
 

@@ -1,5 +1,6 @@
+import { ethers } from 'hardhat';
 import { Contract, BigNumber } from 'ethers';
-import { keccak256, defaultAbiCoder, toUtf8Bytes, solidityPack } from 'ethers/lib/utils';
+import { keccak256, defaultAbiCoder, toUtf8Bytes, solidityPack, getCreate2Address } from 'ethers/lib/utils';
 
 export const EIP712DOMAIN_TYPEHASH = keccak256(
   toUtf8Bytes('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'),
@@ -49,4 +50,22 @@ export async function getApprovalDigest(
       ],
     ),
   );
+}
+
+export function getMinimalCode(address: string): string {
+  return `0x363d3d373d3d3d363d73${address.substr(2).toLowerCase()}5af43d82803e903d91602b57fd5bf3`;
+}
+
+export async function latestTimestamp(): Promise<number> {
+  return (await ethers.provider.getBlock('latest')).timestamp;
+}
+
+export function getCalcCreate(from: string, nonce: number): string {
+  return ethers.utils.getContractAddress({ from, nonce });
+}
+
+export function getCalcCreate2(creatorAddress: string, saltHex: string, byteCode: string): string {
+  const elements = ['ff', creatorAddress.slice(2), saltHex.slice(2), keccak256(byteCode).slice(2)];
+  const hash = keccak256(`0x${elements.join('')}`);
+  return `0x${hash.slice(2)}`;
 }

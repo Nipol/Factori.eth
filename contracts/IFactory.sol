@@ -5,63 +5,71 @@
 pragma solidity ^0.8.0;
 
 interface IFactory {
-    // 어떤 지불 수단으로
-    // 슬롯 맞추기
-    struct Template {
-        // 20
+    struct TemplateInfo {
         address template;
-        // 1
-        bool isBeacon;
-        // 20
+        address btemplate;
         address owner;
-        // 32
-        uint256 price;
     }
 
+    event Deployed(address deployed, address owner);
+    event NewTemplate(bytes32 indexed key, address template, address beacon);
+    event UpdatedTemplate(bytes32 indexed key, address template, address indexed owner);
+    event DeletedTemplate(bytes32 indexed key);
+    event ChangedFee(uint256 fee);
+    event ChangedFeeTo(address feeTo);
+
     function deploy(
+        bool isBeacon,
         bytes32 templateId,
         bytes memory initializationCallData,
         bytes[] memory calls
     ) external payable returns (address deployed);
 
-    function calculateDeployableAddress(bytes32 templateId, bytes memory initializationCallData)
-        external
-        view
-        returns (address deployable);
-
-    function deploy(
+    function deployWithSeed(
         string memory seed,
+        bool isBeacon,
         bytes32 templateId,
         bytes memory initializationCallData,
         bytes[] memory calls
     ) external payable returns (address deployed);
 
-    function calculateDeployableAddress(
-        string memory seed,
+    function compute(
+        bool isBeacon,
         bytes32 templateId,
         bytes memory initializationCallData
     ) external view returns (address deployable);
 
-    function getPrice(bytes32 templateId) external view returns (uint256 price);
+    function computeWithSeed(
+        string memory seed,
+        bool isBeacon,
+        bytes32 templateId,
+        bytes memory initializationCallData
+    ) external view returns (address deployable);
 
-    function addTemplate(
+    function clone(
         address templateAddr,
-        address ownerAddr,
-        uint256 price
-    ) external;
+        bytes memory initializationCallData,
+        bytes[] memory calls
+    ) external returns (address deployed);
 
-    function addBeacon(
-        address templateAddr,
-        address ownerAddr,
-        uint256 price
-    ) external returns (address beaconAddr);
+    function computeClone(address templateAddr, bytes memory initializationCallData)
+        external
+        view
+        returns (address deployable);
+
+    function getPrice() external view returns (uint256 price);
+
+    function addTemplate(address templateAddr, address ownerAddr) external;
 
     function updateTemplate(bytes32 key, bytes memory updateCode) external;
 
     function removeTemplate(bytes32 key) external;
 
-    event Deployed(address deployed, address owner);
-    event NewTemplate(bytes32 indexed key, address indexed template, uint256 price);
-    event UpdatedTemplate(bytes32 indexed key, address indexed template, address indexed owner, uint256 price);
-    event DeletedTemplate(bytes32 indexed key);
+    function changeFee(uint256 newFee) external;
+
+    function changeFeeTo(address payable newFeeTo) external;
+
+    function collect(address tokenAddr) external;
+
+    function recoverOwnership(address deployed, address to) external;
 }

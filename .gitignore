@@ -11,4 +11,6 @@ crytic-export
 .DS_Store
 contracts/README.md
 contracts/build
-scripts/deploy
+deploy/*
+test/*.json
+.env.*

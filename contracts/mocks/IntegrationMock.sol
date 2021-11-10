@@ -36,7 +36,7 @@ contract IntegrationMock {
             symbol,
             uint8(18)
         );
-        deployed = Factory.deploy{value: msg.value}(TOKEN_KEY, init, callData);
+        deployed = Factory.deploy{value: msg.value}(false, TOKEN_KEY, init, callData);
 
         emit Sample(deployed);
     }
@@ -49,7 +49,7 @@ contract IntegrationMock {
             symbol,
             uint8(18)
         );
-        calculated = Factory.calculateDeployableAddress(TOKEN_KEY, init);
+        calculated = Factory.compute(false, TOKEN_KEY, init);
     }
 }
 
@@ -86,7 +86,7 @@ contract IntegrationSeedMock {
             symbol,
             uint8(18)
         );
-        deployed = Factory.deploy{value: msg.value}(seed, TOKEN_KEY, init, callData);
+        deployed = Factory.deployWithSeed{value: msg.value}(seed, false, TOKEN_KEY, init, callData);
 
         emit Sample(deployed);
     }
@@ -99,6 +99,6 @@ contract IntegrationSeedMock {
             symbol,
             uint8(18)
         );
-        calculated = Factory.calculateDeployableAddress(seed, TOKEN_KEY, init);
+        calculated = Factory.computeWithSeed(seed, false, TOKEN_KEY, init);
     }
 }
