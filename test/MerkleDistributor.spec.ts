@@ -29,7 +29,6 @@ describe('MerkleDistributor', () => {
     const accounts = await ethers.getSigners();
     [wallet, Dummy1, Dummy2, Dummy3] = accounts;
 
-    const contractVersion = '1';
     const tokenName = 'template';
     const tokenSymbol = 'TEMP';
     const tokenDecimals = BigNumber.from('18');
@@ -43,7 +42,7 @@ describe('MerkleDistributor', () => {
     StandardToken = await StandardTokenTemplate.deploy();
 
     await StandardToken.deployed();
-    await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
+    await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
     await StandardToken.mint(initialToken);
   });
 

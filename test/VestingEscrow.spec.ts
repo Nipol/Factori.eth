@@ -8,7 +8,6 @@ describe('VestingEscrow', () => {
   let StandardToken: Contract;
   let VestingEscrow: Contract;
 
-  const contractVersion = '1';
   const tokenName = 'template';
   const tokenSymbol = 'TEMP';
   const tokenDecimals = BigNumber.from('18');
@@ -26,7 +25,7 @@ describe('VestingEscrow', () => {
       wallet,
     );
     StandardToken = await StandardTokenTemplate.deploy();
-    await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
+    await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
     await StandardToken.mint(initialToken);
 
     const VestingEscrowTemplate = await ethers.getContractFactory(

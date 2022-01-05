@@ -6,7 +6,6 @@ import { Interface } from 'ethers/lib/utils';
 describe('StandardToken/ERC20', () => {
   let StandardToken: Contract;
 
-  const contractVersion = '1';
   const tokenName = 'template';
   const tokenSymbol = 'TEMP';
   const tokenDecimals = BigNumber.from('18');
@@ -27,7 +26,7 @@ describe('StandardToken/ERC20', () => {
     StandardToken = await StandardTokenTemplate.deploy();
 
     await StandardToken.deployed();
-    await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
+    await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
     await StandardToken.mint(initialToken);
   });
 

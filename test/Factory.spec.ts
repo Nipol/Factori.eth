@@ -36,12 +36,11 @@ describe('FactoryV1', () => {
         wallet,
       );
       const StandardToken = await StandardTokenTemplate.deploy();
-      const contractVersion = '1';
       const tokenName = 'template';
       const tokenSymbol = 'TEMP';
       const tokenDecimals = BigNumber.from('18');
       await StandardToken.deployed();
-      await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
+      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
 
       const nonce = await Factory.nonce();
 
@@ -61,12 +60,11 @@ describe('FactoryV1', () => {
         wallet,
       );
       const StandardToken = await StandardTokenTemplate.deploy();
-      const contractVersion = '1';
       const tokenName = 'template';
       const tokenSymbol = 'TEMP';
       const tokenDecimals = BigNumber.from('18');
       await StandardToken.deployed();
-      await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
+      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
 
       const nonce = await Factory.nonce();
 
@@ -201,12 +199,11 @@ describe('FactoryV1', () => {
         wallet,
       );
       StandardToken = await StandardTokenTemplate.deploy();
-      const contractVersion = '1';
       const tokenName = 'template';
       const tokenSymbol = 'TEMP';
       const tokenDecimals = BigNumber.from('18');
       await StandardToken.deployed();
-      await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
+      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
 
       let nonce = await Factory.nonce();
 
@@ -242,12 +239,11 @@ describe('FactoryV1', () => {
         wallet,
       );
       StandardToken = await StandardTokenTemplate.deploy();
-      const contractVersion = '1';
       const tokenName = 'template';
       const tokenSymbol = 'TEMP';
       const tokenDecimals = BigNumber.from('18');
       await StandardToken.deployed();
-      await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
+      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
 
       let nonce = await Factory.nonce();
       MinimalKey = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, nonce]));
@@ -255,22 +251,14 @@ describe('FactoryV1', () => {
     });
 
     it('should be success for new deploy with ordinary EOA', async () => {
-      const ABI = [
-        'function initialize(string memory contractVersion, string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
-      ];
+      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
       const interfaces = new Interface(ABI);
 
-      const contractVersion = '1';
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [
-        contractVersion,
-        tokenName,
-        tokenSymbol,
-        tokenDecimals,
-      ]);
+      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
       const calculatedAddress = await Factory.connect(Dummy)['compute(bool,bytes32,bytes)'](false, MinimalKey, data);
 
@@ -307,22 +295,14 @@ describe('FactoryV1', () => {
 
       await Factory.updateTemplate(MinimalKey, updatableData);
 
-      const ABI = [
-        'function initialize(string memory contractVersion, string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
-      ];
+      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
       const interfaces = new Interface(ABI);
 
-      const contractVersion = '1';
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [
-        contractVersion,
-        tokenName,
-        tokenSymbol,
-        tokenDecimals,
-      ]);
+      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
       const calculatedAddress = await Factory.connect(Dummy)['compute(bool,bytes32,bytes)'](false, MinimalKey, data);
 
@@ -344,22 +324,14 @@ describe('FactoryV1', () => {
     it('should be success for deploy from EOA on allowlist', async () => {
       await Allowlist.authorise(await Dummy.getAddress());
 
-      const ABI = [
-        'function initialize(string memory contractVersion, string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
-      ];
+      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
       const interfaces = new Interface(ABI);
 
-      const contractVersion = '1';
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [
-        contractVersion,
-        tokenName,
-        tokenSymbol,
-        tokenDecimals,
-      ]);
+      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
       const calculatedAddress = await Factory.connect(Dummy)['compute(bool,bytes32,bytes)'](false, MinimalKey, data);
 
@@ -379,22 +351,14 @@ describe('FactoryV1', () => {
     });
 
     it('should be success making new token contract with Minimal', async () => {
-      const ABI = [
-        'function initialize(string memory contractVersion, string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
-      ];
+      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
       const interfaces = new Interface(ABI);
 
-      const contractVersion = '1';
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [
-        contractVersion,
-        tokenName,
-        tokenSymbol,
-        tokenDecimals,
-      ]);
+      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
       const calculatedAddress = await Factory['compute(bool,bytes32,bytes)'](false, MinimalKey, data);
 
@@ -415,23 +379,17 @@ describe('FactoryV1', () => {
 
     it('should be success making new token contract with call', async () => {
       const ABI = [
-        'function initialize(string memory contractVersion, string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
+        'function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
         'function mintTo(address to, uint256 value)',
         'function transferOwnership(address newOwner)',
       ];
       const interfaces = new Interface(ABI);
 
-      const contractVersion = '1';
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [
-        contractVersion,
-        tokenName,
-        tokenSymbol,
-        tokenDecimals,
-      ]);
+      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
       const initialToken = BigNumber.from('100000000000000000000');
 
@@ -465,12 +423,11 @@ describe('FactoryV1', () => {
         wallet,
       );
       const StandardToken = await StandardTokenTemplate.deploy();
-      const contractVersion = '1';
       const tokenName = 'template';
       const tokenSymbol = 'TEMP';
       const tokenDecimals = BigNumber.from('18');
       await StandardToken.deployed();
-      await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
+      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
 
       const nonce = await Factory.nonce();
 
@@ -519,12 +476,11 @@ describe('FactoryV1', () => {
         wallet,
       );
       StandardToken = await StandardTokenTemplate.deploy();
-      const contractVersion = '1';
       const tokenName = 'template';
       const tokenSymbol = 'TEMP';
       const tokenDecimals = BigNumber.from('18');
       await StandardToken.deployed();
-      await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
+      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
 
       let nonce = await Factory.nonce();
       MinimalKey = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, nonce]));
@@ -532,23 +488,15 @@ describe('FactoryV1', () => {
     });
 
     it('should be success for new deploy with ordinary EOA', async () => {
-      const ABI = [
-        'function initialize(string memory contractVersion, string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
-      ];
+      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
       const interfaces = new Interface(ABI);
       const seed = 'factorieth seed';
 
-      const contractVersion = '1';
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [
-        contractVersion,
-        tokenName,
-        tokenSymbol,
-        tokenDecimals,
-      ]);
+      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
       const calculatedAddress = await Factory.connect(Dummy)['computeWithSeed(string,bool,bytes32,bytes)'](
         seed,
@@ -607,22 +555,14 @@ describe('FactoryV1', () => {
 
       await Factory.updateTemplate(MinimalKey, updatableData);
 
-      const ABI = [
-        'function initialize(string memory contractVersion, string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
-      ];
+      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
       const interfaces = new Interface(ABI);
 
-      const contractVersion = '1';
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [
-        contractVersion,
-        tokenName,
-        tokenSymbol,
-        tokenDecimals,
-      ]);
+      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
       const calculatedAddress = await Factory.connect(Dummy)['computeWithSeed(string,bool,bytes32,bytes)'](
         seed,
@@ -658,22 +598,14 @@ describe('FactoryV1', () => {
 
       await Allowlist.authorise(await Dummy.getAddress());
 
-      const ABI = [
-        'function initialize(string memory contractVersion, string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
-      ];
+      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
       const interfaces = new Interface(ABI);
 
-      const contractVersion = '1';
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [
-        contractVersion,
-        tokenName,
-        tokenSymbol,
-        tokenDecimals,
-      ]);
+      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
       const calculatedAddress = await Factory.connect(Dummy)['computeWithSeed(string,bool,bytes32,bytes)'](
         seed,
@@ -707,22 +639,14 @@ describe('FactoryV1', () => {
     it('should be success making new token contract with Minimal', async () => {
       const seed = 'factorieth seed';
 
-      const ABI = [
-        'function initialize(string memory contractVersion, string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
-      ];
+      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
       const interfaces = new Interface(ABI);
 
-      const contractVersion = '1';
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [
-        contractVersion,
-        tokenName,
-        tokenSymbol,
-        tokenDecimals,
-      ]);
+      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
       const calculatedAddress = await Factory['computeWithSeed(string,bool,bytes32,bytes)'](
         seed,
@@ -750,23 +674,17 @@ describe('FactoryV1', () => {
       const seed = 'factorieth seed';
 
       const ABI = [
-        'function initialize(string memory contractVersion, string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
+        'function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
         'function mintTo(address to, uint256 value)',
         'function transferOwnership(address newOwner)',
       ];
       const interfaces = new Interface(ABI);
 
-      const contractVersion = '1';
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [
-        contractVersion,
-        tokenName,
-        tokenSymbol,
-        tokenDecimals,
-      ]);
+      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
       const initialToken = BigNumber.from('100000000000000000000');
 
@@ -812,12 +730,11 @@ describe('FactoryV1', () => {
         wallet,
       );
       const StandardToken = await StandardTokenTemplate.deploy();
-      const contractVersion = '1';
       const tokenName = 'template';
       const tokenSymbol = 'TEMP';
       const tokenDecimals = BigNumber.from('18');
       await StandardToken.deployed();
-      await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
+      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
 
       const nonce = await Factory.nonce();
 
@@ -865,31 +782,22 @@ describe('FactoryV1', () => {
         wallet,
       );
       StandardToken = await StandardTokenTemplate.deploy();
-      const contractVersion = '1';
       const tokenName = 'template';
       const tokenSymbol = 'TEMP';
       const tokenDecimals = BigNumber.from('18');
       await StandardToken.deployed();
-      await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
+      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
     });
 
     it('should be deploy minimal proxy', async () => {
-      const ABI = [
-        'function initialize(string memory contractVersion, string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
-      ];
+      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
       const interfaces = new Interface(ABI);
 
-      const contractVersion = '1';
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [
-        contractVersion,
-        tokenName,
-        tokenSymbol,
-        tokenDecimals,
-      ]);
+      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
       const deployed = await Factory.computeClone(StandardToken.address, data);
       await Factory.clone(StandardToken.address, data, []);
@@ -904,22 +812,14 @@ describe('FactoryV1', () => {
     it('should be reverted with already registerd template', async () => {
       await Factory.addTemplate(StandardToken.address, constants.AddressZero);
 
-      const ABI = [
-        'function initialize(string memory contractVersion, string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
-      ];
+      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
       const interfaces = new Interface(ABI);
 
-      const contractVersion = '1';
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [
-        contractVersion,
-        tokenName,
-        tokenSymbol,
-        tokenDecimals,
-      ]);
+      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
       await expect(Factory.clone(StandardToken.address, data, [])).to.revertedWith('Factory/Registered-Template');
     });
