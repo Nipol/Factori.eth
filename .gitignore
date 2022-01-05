@@ -13,4 +13,5 @@ crytic-export
 contracts/README.md
 contracts/build
 test/*.json
-.env.*
+.env.development
+.env.production
