@@ -4,43 +4,34 @@ import { Contract, BigNumber, constants, Signer, ContractFactory } from 'ethers'
 import { keccak256, defaultAbiCoder, parseEther, Interface } from 'ethers/lib/utils';
 import { getMinimalCode } from './util';
 
-const AllowlistJson = require('@beandao/contracts/build/contracts/Allowlist.json');
-
 describe('FactoryV1', () => {
-  let AllowlistDeployer: ContractFactory;
-  let FactoryDeployer: ContractFactory;
-
   let Factory: Contract;
-  let Allowlist: Contract;
 
   let wallet: Signer;
   let Dummy: Signer;
+  let deployer: Signer;
+
+  let walletAddress: string;
+  let dummyAddress: string;
 
   beforeEach(async () => {
     const accounts = await ethers.getSigners();
-    [wallet, Dummy] = accounts;
+    [wallet, Dummy, deployer] = accounts;
+    walletAddress = await wallet.getAddress();
+    dummyAddress = await Dummy.getAddress();
 
-    AllowlistDeployer = new ethers.ContractFactory(AllowlistJson.abi, AllowlistJson.bytecode, wallet);
-    Allowlist = await AllowlistDeployer.deploy();
-
-    FactoryDeployer = await ethers.getContractFactory('contracts/FactoryV1.sol:FactoryV1', wallet);
-    Factory = await FactoryDeployer.deploy(Allowlist.address, parseEther('0.001'), await wallet.getAddress());
-
-    await Factory.deployed();
+    Factory = await (
+      await ethers.getContractFactory('contracts/FactoryV1.sol:FactoryV1', deployer)
+    ).deploy(parseEther('0.01'), walletAddress);
   });
 
   describe('#addTemplate()', () => {
     it('should be success add Template with Minimal.', async () => {
       const StandardTokenTemplate = await ethers.getContractFactory(
         'contracts/tokens/StandardToken.sol:StandardToken',
-        wallet,
+        deployer,
       );
       const StandardToken = await StandardTokenTemplate.deploy();
-      const tokenName = 'template';
-      const tokenSymbol = 'TEMP';
-      const tokenDecimals = BigNumber.from('18');
-      await StandardToken.deployed();
-      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
 
       const nonce = await Factory.nonce();
 
@@ -49,7 +40,7 @@ describe('FactoryV1', () => {
       const txCount = await ethers.provider.getTransactionCount(Factory.address);
       const deployableBeaconAddr = ethers.utils.getContractAddress({ from: Factory.address, nonce: txCount });
 
-      expect(await Factory.addTemplate(StandardToken.address, constants.AddressZero))
+      expect(await Factory.addTemplate(StandardToken.address))
         .to.emit(Factory, 'NewTemplate')
         .withArgs(key, StandardToken.address, deployableBeaconAddr);
     });
@@ -57,14 +48,9 @@ describe('FactoryV1', () => {
     it('should be revert already exist template added.', async () => {
       const StandardTokenTemplate = await ethers.getContractFactory(
         'contracts/tokens/StandardToken.sol:StandardToken',
-        wallet,
+        deployer,
       );
       const StandardToken = await StandardTokenTemplate.deploy();
-      const tokenName = 'template';
-      const tokenSymbol = 'TEMP';
-      const tokenDecimals = BigNumber.from('18');
-      await StandardToken.deployed();
-      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
 
       const nonce = await Factory.nonce();
 
@@ -73,13 +59,11 @@ describe('FactoryV1', () => {
       const txCount = await ethers.provider.getTransactionCount(Factory.address);
       const deployableBeaconAddr = ethers.utils.getContractAddress({ from: Factory.address, nonce: txCount });
 
-      expect(await Factory.addTemplate(StandardToken.address, constants.AddressZero))
+      expect(await Factory.addTemplate(StandardToken.address))
         .to.emit(Factory, 'NewTemplate')
         .withArgs(key, StandardToken.address, deployableBeaconAddr);
 
-      await expect(Factory.addTemplate(StandardToken.address, constants.AddressZero)).to.be.revertedWith(
-        'Factory/Non-Valid',
-      );
+      await expect(Factory.addTemplate(StandardToken.address)).to.be.revertedWith('Factory/Non-Valid');
     });
   });
 
@@ -91,25 +75,20 @@ describe('FactoryV1', () => {
     beforeEach(async () => {
       StandardTokenTemplate = await ethers.getContractFactory(
         'contracts/tokens/StandardToken.sol:StandardToken',
-        wallet,
+        deployer,
       );
       StandardToken = await StandardTokenTemplate.deploy();
       let nonce = await Factory.nonce();
       TemplateKey = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, nonce]));
-      await Factory.addTemplate(StandardToken.address, constants.AddressZero);
+      await Factory.addTemplate(StandardToken.address);
     });
 
     it('should be success updated data', async () => {
-      StandardToken = await StandardTokenTemplate.deploy();
+      const NewStandardToken = await StandardTokenTemplate.deploy();
 
-      const updatableData = defaultAbiCoder.encode(
-        ['address', 'address'],
-        [StandardToken.address, '0x0000000000000000000000000000000000000001'],
-      );
-
-      await expect(Factory.updateTemplate(TemplateKey, updatableData))
+      await expect(Factory.updateTemplate(TemplateKey, NewStandardToken.address))
         .to.emit(Factory, 'UpdatedTemplate')
-        .withArgs(TemplateKey, StandardToken.address, '0x0000000000000000000000000000000000000001');
+        .withArgs(TemplateKey, NewStandardToken.address);
 
       const TemplateInfo = await Factory.templates(TemplateKey);
 
@@ -120,16 +99,25 @@ describe('FactoryV1', () => {
         }),
       )[0];
 
-      expect(returnedAddr).to.equal(StandardToken.address);
+      expect(returnedAddr).to.equal(NewStandardToken.address);
     });
 
     it('should be revert with Zero template Address', async () => {
-      const updatableData = defaultAbiCoder.encode(
-        ['address', 'address'],
-        [constants.AddressZero, '0x0000000000000000000000000000000000000001'],
-      );
+      const updatableData = '0x0000000000000000000000000000000000000000';
 
       await expect(Factory.updateTemplate(TemplateKey, updatableData)).to.be.revertedWith('Factory/Non-Valid');
+    });
+
+    it('should be revert with none contract Address', async () => {
+      const updatableData = '0x0000000000000000000000000000000000000001';
+
+      await expect(Factory.updateTemplate(TemplateKey, updatableData)).to.be.revertedWith('Factory/is-not-Contract');
+    });
+
+    it('should be revert with already registered contract Address', async () => {
+      await expect(Factory.updateTemplate(TemplateKey, StandardToken.address)).to.be.revertedWith(
+        'Factory/registered-before',
+      );
     });
 
     it('should be success template upgrade on beacon', async () => {
@@ -149,7 +137,7 @@ describe('FactoryV1', () => {
       const deployableBeaconAddr = ethers.utils.getContractAddress({ from: Factory.address, nonce: txCount });
       const BeaconKey = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [DummyOne.address, nonce]));
 
-      expect(await Factory.addTemplate(DummyOne.address, constants.AddressZero))
+      expect(await Factory.addTemplate(DummyOne.address))
         .to.emit(Factory, 'NewTemplate')
         .withArgs(BeaconKey, DummyOne.address, deployableBeaconAddr);
 
@@ -162,15 +150,10 @@ describe('FactoryV1', () => {
       // check deployed contract
       expect(await DummyOneDeployer.attach(calculatedAddress).checkName()).to.equal('DummyOne factori.eth');
 
-      const updatableData = defaultAbiCoder.encode(
-        ['address', 'address'],
-        [DummyTwo.address, '0x0000000000000000000000000000000000000001'],
-      );
-
       // Beacon's template upgrade.
-      await expect(Factory.updateTemplate(BeaconKey, updatableData))
+      await expect(Factory.updateTemplate(BeaconKey, DummyTwo.address))
         .to.emit(Factory, 'UpdatedTemplate')
-        .withArgs(BeaconKey, DummyTwo.address, '0x0000000000000000000000000000000000000001');
+        .withArgs(BeaconKey, DummyTwo.address);
 
       const TemplateInfo = await Factory.templates(BeaconKey);
 
@@ -208,7 +191,7 @@ describe('FactoryV1', () => {
       let nonce = await Factory.nonce();
 
       MinimalKey = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, nonce]));
-      await Factory.addTemplate(StandardToken.address, constants.AddressZero);
+      await Factory.addTemplate(StandardToken.address);
     });
 
     it('should be success with exist template', async () => {
@@ -236,18 +219,13 @@ describe('FactoryV1', () => {
     beforeEach(async () => {
       StandardTokenTemplate = await ethers.getContractFactory(
         'contracts/tokens/StandardToken.sol:StandardToken',
-        wallet,
+        deployer,
       );
       StandardToken = await StandardTokenTemplate.deploy();
-      const tokenName = 'template';
-      const tokenSymbol = 'TEMP';
-      const tokenDecimals = BigNumber.from('18');
-      await StandardToken.deployed();
-      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
 
       let nonce = await Factory.nonce();
       MinimalKey = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, nonce]));
-      await Factory.addTemplate(StandardToken.address, constants.AddressZero);
+      await Factory.addTemplate(StandardToken.address);
     });
 
     it('should be success for new deploy with ordinary EOA', async () => {
@@ -262,13 +240,18 @@ describe('FactoryV1', () => {
 
       const calculatedAddress = await Factory.connect(Dummy)['compute(bool,bytes32,bytes)'](false, MinimalKey, data);
 
+      const prevBalance = await wallet.getBalance();
+
       await expect(
         Factory.connect(Dummy)['deploy(bool,bytes32,bytes,bytes[])'](false, MinimalKey, data, [], {
-          value: parseEther('0.001'),
+          value: parseEther('0.01'),
         }),
       )
         .to.emit(Factory, 'Deployed')
-        .withArgs(calculatedAddress, await Dummy.getAddress());
+        .withArgs(calculatedAddress, dummyAddress);
+
+      const afterBalance = await wallet.getBalance();
+      expect(prevBalance.add(parseEther('0.01')).toString()).equal(afterBalance.toString());
 
       const DeployedToken = StandardTokenTemplate.attach(calculatedAddress);
 
@@ -285,71 +268,6 @@ describe('FactoryV1', () => {
       ).revertedWith('Factory/Incorrect-amounts');
     });
 
-    it('should be success for deploy from template owner EOA', async () => {
-      StandardToken = await StandardTokenTemplate.deploy();
-
-      const updatableData = defaultAbiCoder.encode(
-        ['address', 'address', 'uint256'],
-        [StandardToken.address, await Dummy.getAddress(), parseEther('0.001')],
-      );
-
-      await Factory.updateTemplate(MinimalKey, updatableData);
-
-      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
-      const interfaces = new Interface(ABI);
-
-      const tokenName = 'SAMPLE';
-      const tokenSymbol = 'SAM';
-      const tokenDecimals = BigNumber.from('18');
-
-      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
-
-      const calculatedAddress = await Factory.connect(Dummy)['compute(bool,bytes32,bytes)'](false, MinimalKey, data);
-
-      await expect(
-        Factory.connect(Dummy)['deploy(bool,bytes32,bytes,bytes[])'](false, MinimalKey, data, [], {
-          value: parseEther('0'),
-        }),
-      )
-        .to.emit(Factory, 'Deployed')
-        .withArgs(calculatedAddress, await Dummy.getAddress());
-
-      const DeployedToken = await StandardTokenTemplate.attach(calculatedAddress);
-
-      expect(await DeployedToken.symbol()).to.equal(tokenSymbol);
-      expect(await DeployedToken.name()).to.equal(tokenName);
-      expect(await DeployedToken.decimals()).to.equal(tokenDecimals);
-    });
-
-    it('should be success for deploy from EOA on allowlist', async () => {
-      await Allowlist.authorise(await Dummy.getAddress());
-
-      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
-      const interfaces = new Interface(ABI);
-
-      const tokenName = 'SAMPLE';
-      const tokenSymbol = 'SAM';
-      const tokenDecimals = BigNumber.from('18');
-
-      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
-
-      const calculatedAddress = await Factory.connect(Dummy)['compute(bool,bytes32,bytes)'](false, MinimalKey, data);
-
-      await expect(
-        Factory.connect(Dummy)['deploy(bool,bytes32,bytes,bytes[])'](false, MinimalKey, data, [], {
-          value: parseEther('0'),
-        }),
-      )
-        .to.emit(Factory, 'Deployed')
-        .withArgs(calculatedAddress, await Dummy.getAddress());
-
-      const DeployedToken = StandardTokenTemplate.attach(calculatedAddress);
-
-      expect(await DeployedToken.symbol()).to.equal(tokenSymbol);
-      expect(await DeployedToken.name()).to.equal(tokenName);
-      expect(await DeployedToken.decimals()).to.equal(tokenDecimals);
-    });
-
     it('should be success making new token contract with Minimal', async () => {
       const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
       const interfaces = new Interface(ABI);
@@ -360,15 +278,20 @@ describe('FactoryV1', () => {
 
       const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
-      const calculatedAddress = await Factory['compute(bool,bytes32,bytes)'](false, MinimalKey, data);
+      const calculatedAddress = await Factory.connect(Dummy)['compute(bool,bytes32,bytes)'](false, MinimalKey, data);
+
+      const prevBalance = await wallet.getBalance();
 
       await expect(
-        Factory['deploy(bool,bytes32,bytes,bytes[])'](false, MinimalKey, data, [], {
-          value: parseEther('0.001'),
+        Factory.connect(Dummy)['deploy(bool,bytes32,bytes,bytes[])'](false, MinimalKey, data, [], {
+          value: parseEther('0.01'),
         }),
       )
         .to.emit(Factory, 'Deployed')
-        .withArgs(calculatedAddress, await wallet.getAddress());
+        .withArgs(calculatedAddress, dummyAddress);
+
+      const afterBalance = await wallet.getBalance();
+      expect(prevBalance.add(parseEther('0.01')).toString()).equal(afterBalance.toString());
 
       const DeployedToken = await StandardTokenTemplate.attach(calculatedAddress);
 
@@ -396,17 +319,28 @@ describe('FactoryV1', () => {
       const mintCallData = interfaces.encodeFunctionData('mintTo', [await wallet.getAddress(), initialToken]);
       const ownerCallData = interfaces.encodeFunctionData('transferOwnership', [await wallet.getAddress()]);
 
-      const calculatedAddress = await Factory['compute(bool,bytes32,bytes)'](false, MinimalKey, data);
+      const calculatedAddress = await Factory.connect(Dummy)['compute(bool,bytes32,bytes)'](false, MinimalKey, data);
+
+      const prevBalance = await wallet.getBalance();
 
       expect(
-        await Factory['deploy(bool,bytes32,bytes,bytes[])'](false, MinimalKey, data, [mintCallData, ownerCallData], {
-          value: parseEther('0.001'),
-        }),
+        await Factory.connect(Dummy)['deploy(bool,bytes32,bytes,bytes[])'](
+          false,
+          MinimalKey,
+          data,
+          [mintCallData, ownerCallData],
+          {
+            value: parseEther('0.01'),
+          },
+        ),
       )
         .to.emit(Factory, 'Deployed')
-        .withArgs(calculatedAddress, await wallet.getAddress());
+        .withArgs(calculatedAddress, dummyAddress);
       // .to.emit(StandardToken, 'Transfer')
       // .withArgs(constants.AddressZero, await wallet.getAddress(), initialToken);
+
+      const afterBalance = await wallet.getBalance();
+      expect(prevBalance.add(parseEther('0.01')).toString()).equal(afterBalance.toString());
 
       const DeployedToken = await StandardTokenTemplate.attach(calculatedAddress);
 
@@ -426,7 +360,6 @@ describe('FactoryV1', () => {
       const tokenName = 'template';
       const tokenSymbol = 'TEMP';
       const tokenDecimals = BigNumber.from('18');
-      await StandardToken.deployed();
       await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
 
       const nonce = await Factory.nonce();
@@ -436,7 +369,7 @@ describe('FactoryV1', () => {
       const txCount = await ethers.provider.getTransactionCount(Factory.address);
       const deployableBeaconAddr = ethers.utils.getContractAddress({ from: Factory.address, nonce: txCount });
 
-      expect(await Factory.addTemplate(StandardToken.address, constants.AddressZero))
+      expect(await Factory.addTemplate(StandardToken.address))
         .to.emit(Factory, 'NewTemplate')
         .withArgs(key, StandardToken.address, deployableBeaconAddr);
 
@@ -448,20 +381,24 @@ describe('FactoryV1', () => {
 
       const calculatedAddr = await Integration.calculateAddress('Sample', 'SAM');
 
-      const price = Factory.getPrice();
+      const price = await Factory.getPrice();
+      const prevBalance = await wallet.getBalance();
       expect(
-        await Integration.deployToken('Sample', 'SAM', BigNumber.from('100').mul('10').mul('18'), { value: price }),
+        await Integration.connect(Dummy).deployToken('Sample', 'SAM', BigNumber.from('100').mul('10').mul('18'), {
+          value: price,
+        }),
       )
         .to.emit(Integration, 'Sample')
         .withArgs(calculatedAddr);
+
+      const afterBalance = await wallet.getBalance();
+      expect(prevBalance.add(price).toString()).equal(afterBalance.toString());
 
       const deployedToken = await StandardTokenTemplate.attach(calculatedAddr);
 
       expect(await deployedToken.name()).to.equal('Sample');
       expect(await deployedToken.symbol()).to.equal('SAM');
-      expect(await deployedToken.balanceOf(await wallet.getAddress())).to.equal(
-        BigNumber.from('100').mul('10').mul('18'),
-      );
+      expect(await deployedToken.balanceOf(dummyAddress)).to.equal(BigNumber.from('100').mul('10').mul('18'));
     });
   });
 
@@ -476,15 +413,10 @@ describe('FactoryV1', () => {
         wallet,
       );
       StandardToken = await StandardTokenTemplate.deploy();
-      const tokenName = 'template';
-      const tokenSymbol = 'TEMP';
-      const tokenDecimals = BigNumber.from('18');
-      await StandardToken.deployed();
-      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
 
       let nonce = await Factory.nonce();
       MinimalKey = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, nonce]));
-      await Factory.addTemplate(StandardToken.address, constants.AddressZero);
+      await Factory.addTemplate(StandardToken.address);
     });
 
     it('should be success for new deploy with ordinary EOA', async () => {
@@ -505,6 +437,8 @@ describe('FactoryV1', () => {
         data,
       );
 
+      const prevBalance = await wallet.getBalance();
+
       expect(
         await Factory.connect(Dummy)['deployWithSeed(string,bool,bytes32,bytes,bytes[])'](
           seed,
@@ -513,12 +447,15 @@ describe('FactoryV1', () => {
           data,
           [],
           {
-            value: parseEther('0.001'),
+            value: parseEther('0.01'),
           },
         ),
       )
         .to.emit(Factory, 'Deployed')
         .withArgs(calculatedAddress, await Dummy.getAddress());
+
+      const afterBalance = await wallet.getBalance();
+      expect(prevBalance.add(parseEther('0.01')).toString()).equal(afterBalance.toString());
 
       const DeployedToken = StandardTokenTemplate.attach(calculatedAddress);
 
@@ -544,98 +481,6 @@ describe('FactoryV1', () => {
       ).revertedWith('Factory/Incorrect-amounts');
     });
 
-    it('should be success for deploy from template owner EOA', async () => {
-      const seed = 'factorieth seed';
-      StandardToken = await StandardTokenTemplate.deploy();
-
-      const updatableData = defaultAbiCoder.encode(
-        ['address', 'address', 'uint256'],
-        [StandardToken.address, await Dummy.getAddress(), parseEther('0.001')],
-      );
-
-      await Factory.updateTemplate(MinimalKey, updatableData);
-
-      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
-      const interfaces = new Interface(ABI);
-
-      const tokenName = 'SAMPLE';
-      const tokenSymbol = 'SAM';
-      const tokenDecimals = BigNumber.from('18');
-
-      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
-
-      const calculatedAddress = await Factory.connect(Dummy)['computeWithSeed(string,bool,bytes32,bytes)'](
-        seed,
-        false,
-        MinimalKey,
-        data,
-      );
-
-      expect(
-        await Factory.connect(Dummy)['deployWithSeed(string,bool,bytes32,bytes,bytes[])'](
-          seed,
-          false,
-          MinimalKey,
-          data,
-          [],
-          {
-            value: parseEther('0'),
-          },
-        ),
-      )
-        .to.emit(Factory, 'Deployed')
-        .withArgs(calculatedAddress, await Dummy.getAddress());
-
-      const DeployedToken = await StandardTokenTemplate.attach(calculatedAddress);
-
-      expect(await DeployedToken.symbol()).to.equal(tokenSymbol);
-      expect(await DeployedToken.name()).to.equal(tokenName);
-      expect(await DeployedToken.decimals()).to.equal(tokenDecimals);
-    });
-
-    it('should be success for deploy from EOA on allowlist', async () => {
-      const seed = 'factorieth seed';
-
-      await Allowlist.authorise(await Dummy.getAddress());
-
-      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
-      const interfaces = new Interface(ABI);
-
-      const tokenName = 'SAMPLE';
-      const tokenSymbol = 'SAM';
-      const tokenDecimals = BigNumber.from('18');
-
-      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
-
-      const calculatedAddress = await Factory.connect(Dummy)['computeWithSeed(string,bool,bytes32,bytes)'](
-        seed,
-        false,
-        MinimalKey,
-        data,
-      );
-
-      expect(
-        await Factory.connect(Dummy)['deployWithSeed(string,bool,bytes32,bytes,bytes[])'](
-          seed,
-          false,
-          MinimalKey,
-          data,
-          [],
-          {
-            value: parseEther('0'),
-          },
-        ),
-      )
-        .to.emit(Factory, 'Deployed')
-        .withArgs(calculatedAddress, await Dummy.getAddress());
-
-      const DeployedToken = StandardTokenTemplate.attach(calculatedAddress);
-
-      expect(await DeployedToken.symbol()).to.equal(tokenSymbol);
-      expect(await DeployedToken.name()).to.equal(tokenName);
-      expect(await DeployedToken.decimals()).to.equal(tokenDecimals);
-    });
-
     it('should be success making new token contract with Minimal', async () => {
       const seed = 'factorieth seed';
 
@@ -648,20 +493,32 @@ describe('FactoryV1', () => {
 
       const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
-      const calculatedAddress = await Factory['computeWithSeed(string,bool,bytes32,bytes)'](
+      const calculatedAddress = await Factory.connect(Dummy)['computeWithSeed(string,bool,bytes32,bytes)'](
         seed,
         false,
         MinimalKey,
         data,
       );
 
+      const prevBalance = await wallet.getBalance();
+
       expect(
-        await Factory['deployWithSeed(string,bool,bytes32,bytes,bytes[])'](seed, false, MinimalKey, data, [], {
-          value: parseEther('0.001'),
-        }),
+        await Factory.connect(Dummy)['deployWithSeed(string,bool,bytes32,bytes,bytes[])'](
+          seed,
+          false,
+          MinimalKey,
+          data,
+          [],
+          {
+            value: parseEther('0.01'),
+          },
+        ),
       )
         .to.emit(Factory, 'Deployed')
-        .withArgs(calculatedAddress, await wallet.getAddress());
+        .withArgs(calculatedAddress, dummyAddress);
+
+      const afterBalance = await wallet.getBalance();
+      expect(prevBalance.add(parseEther('0.01')).toString()).equal(afterBalance.toString());
 
       const DeployedToken = await StandardTokenTemplate.attach(calculatedAddress);
 
@@ -691,29 +548,34 @@ describe('FactoryV1', () => {
       const mintCallData = interfaces.encodeFunctionData('mintTo', [await wallet.getAddress(), initialToken]);
       const ownerCallData = interfaces.encodeFunctionData('transferOwnership', [await wallet.getAddress()]);
 
-      const calculatedAddress = await Factory['computeWithSeed(string,bool,bytes32,bytes)'](
+      const calculatedAddress = await Factory.connect(Dummy)['computeWithSeed(string,bool,bytes32,bytes)'](
         seed,
         false,
         MinimalKey,
         data,
       );
 
+      const prevBalance = await wallet.getBalance();
+
       expect(
-        await Factory['deployWithSeed(string,bool,bytes32,bytes,bytes[])'](
+        await Factory.connect(Dummy)['deployWithSeed(string,bool,bytes32,bytes,bytes[])'](
           seed,
           false,
           MinimalKey,
           data,
           [mintCallData, ownerCallData],
           {
-            value: parseEther('0.001'),
+            value: parseEther('0.01'),
           },
         ),
       )
         .to.emit(Factory, 'Deployed')
-        .withArgs(calculatedAddress, await wallet.getAddress());
+        .withArgs(calculatedAddress, dummyAddress);
       // .to.emit(StandardToken, 'Transfer')
       // .withArgs(constants.AddressZero, await wallet.getAddress(), initialToken);
+
+      const afterBalance = await wallet.getBalance();
+      expect(prevBalance.add(parseEther('0.01')).toString()).equal(afterBalance.toString());
 
       const DeployedToken = await StandardTokenTemplate.attach(calculatedAddress);
 
@@ -743,7 +605,7 @@ describe('FactoryV1', () => {
       const txCount = await ethers.provider.getTransactionCount(Factory.address);
       const deployableBeaconAddr = ethers.utils.getContractAddress({ from: Factory.address, nonce: txCount });
 
-      expect(await Factory.addTemplate(StandardToken.address, constants.AddressZero))
+      expect(await Factory.addTemplate(StandardToken.address))
         .to.emit(Factory, 'NewTemplate')
         .withArgs(key, StandardToken.address, deployableBeaconAddr);
 
@@ -755,20 +617,25 @@ describe('FactoryV1', () => {
 
       const calculatedAddr = await IntegrationSeed.calculateAddress('Sample', 'SAM');
 
-      const price = Factory.getPrice();
+      const price = await Factory.getPrice();
+      const prevBalance = await wallet.getBalance();
+
       expect(
-        await IntegrationSeed.deployToken('Sample', 'SAM', BigNumber.from('100').mul('10').mul('18'), { value: price }),
+        await IntegrationSeed.connect(Dummy).deployToken('Sample', 'SAM', BigNumber.from('100').mul('10').mul('18'), {
+          value: price,
+        }),
       )
         .to.emit(IntegrationSeed, 'Sample')
         .withArgs(calculatedAddr);
+
+      const afterBalance = await wallet.getBalance();
+      expect(prevBalance.add(price).toString()).equal(afterBalance.toString());
 
       const deployedToken = await StandardTokenTemplate.attach(calculatedAddr);
 
       expect(await deployedToken.name()).to.equal('Sample');
       expect(await deployedToken.symbol()).to.equal('SAM');
-      expect(await deployedToken.balanceOf(await wallet.getAddress())).to.equal(
-        BigNumber.from('100').mul('10').mul('18'),
-      );
+      expect(await deployedToken.balanceOf(dummyAddress)).to.equal(BigNumber.from('100').mul('10').mul('18'));
     });
   });
 
@@ -790,6 +657,33 @@ describe('FactoryV1', () => {
     });
 
     it('should be deploy minimal proxy', async () => {
+      const ABI = [
+        'function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
+        'function mintTo(address to, uint256 value)',
+        'function transferOwnership(address newOwner)',
+      ];
+      const interfaces = new Interface(ABI);
+
+      const tokenName = 'SAMPLE';
+      const tokenSymbol = 'SAM';
+      const tokenDecimals = BigNumber.from('18');
+      const initialToken = BigNumber.from('100000000000000000000');
+
+      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
+      const mintCallData = interfaces.encodeFunctionData('mintTo', [await wallet.getAddress(), initialToken]);
+      const ownerCallData = interfaces.encodeFunctionData('transferOwnership', [await wallet.getAddress()]);
+
+      const deployed = await Factory.computeClone(StandardToken.address, data);
+      await Factory.clone(StandardToken.address, data, [mintCallData, ownerCallData]);
+
+      await expect(await ethers.provider.getCode(deployed)).to.equal(getMinimalCode(StandardToken.address));
+      const deployedToken = await StandardTokenTemplate.attach(deployed);
+
+      expect(await deployedToken.name()).to.equal(tokenName);
+      expect(await deployedToken.symbol()).to.equal(tokenSymbol);
+    });
+
+    it('should be deploy minimal proxy with ordinary EOA', async () => {
       const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
       const interfaces = new Interface(ABI);
 
@@ -799,8 +693,10 @@ describe('FactoryV1', () => {
 
       const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
-      const deployed = await Factory.computeClone(StandardToken.address, data);
-      await Factory.clone(StandardToken.address, data, []);
+      const deployed = await Factory.connect(Dummy).computeClone(StandardToken.address, data);
+      await Factory.connect(Dummy).clone(StandardToken.address, data, [], {
+        value: parseEther('0.01'),
+      });
 
       await expect(await ethers.provider.getCode(deployed)).to.equal(getMinimalCode(StandardToken.address));
       const deployedToken = await StandardTokenTemplate.attach(deployed);
@@ -809,8 +705,22 @@ describe('FactoryV1', () => {
       expect(await deployedToken.symbol()).to.equal(tokenSymbol);
     });
 
+    it('should be revert with ordinary EOA non-pay', async () => {
+      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
+      const interfaces = new Interface(ABI);
+
+      const tokenName = 'SAMPLE';
+      const tokenSymbol = 'SAM';
+      const tokenDecimals = BigNumber.from('18');
+      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
+
+      await expect(Factory.connect(Dummy).clone(StandardToken.address, data, [])).revertedWith(
+        'Factory/Incorrect-amounts',
+      );
+    });
+
     it('should be reverted with already registerd template', async () => {
-      await Factory.addTemplate(StandardToken.address, constants.AddressZero);
+      await Factory.addTemplate(StandardToken.address);
 
       const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
       const interfaces = new Interface(ABI);
@@ -822,6 +732,86 @@ describe('FactoryV1', () => {
       const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
       await expect(Factory.clone(StandardToken.address, data, [])).to.revertedWith('Factory/Registered-Template');
+    });
+  });
+
+  describe('#changeFee()', () => {
+    it('should be change fee', async () => {
+      await expect(Factory.changeFee(parseEther('0.011')))
+        .to.emit(Factory, 'FeeChanged')
+        .withArgs(parseEther('0.01'), parseEther('0.011'));
+    });
+  });
+
+  describe('#changeFeeTo()', () => {
+    it('should be change fee to', async () => {
+      await expect(Factory.changeFeeTo(dummyAddress))
+        .to.emit(Factory, 'FeeToChanged')
+        .withArgs(walletAddress, dummyAddress);
+    });
+  });
+
+  describe('#collect()', () => {
+    let tokenaddr: string;
+    let StandardToken: Contract;
+    const initialToken = BigNumber.from('100000000000000000000');
+
+    beforeEach(async () => {
+      const StandardTokenTemplate = await ethers.getContractFactory(
+        'contracts/tokens/StandardToken.sol:StandardToken',
+        wallet,
+      );
+      StandardToken = await StandardTokenTemplate.deploy();
+      tokenaddr = StandardToken.address;
+      const tokenName = 'template';
+      const tokenSymbol = 'TEMP';
+      const tokenDecimals = BigNumber.from('18');
+      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
+      await StandardToken.mintTo(Factory.address, initialToken);
+    });
+
+    it('should be collect token', async () => {
+      await expect(Factory.collect(tokenaddr))
+        .to.emit(StandardToken, 'Transfer')
+        .withArgs(Factory.address, walletAddress, initialToken);
+    });
+  });
+
+  describe('#recoverOwnership()', () => {
+    let StandardToken: Contract;
+    let StandardTokenTemplate: ContractFactory;
+
+    beforeEach(async () => {
+      StandardTokenTemplate = await ethers.getContractFactory(
+        'contracts/tokens/StandardToken.sol:StandardToken',
+        wallet,
+      );
+      StandardToken = await StandardTokenTemplate.deploy();
+    });
+
+    it('should be success recovered ownership', async () => {
+      const ABI = [
+        'function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
+        'function mintTo(address to, uint256 value)',
+      ];
+      const interfaces = new Interface(ABI);
+
+      const tokenName = 'SAMPLE';
+      const tokenSymbol = 'SAM';
+      const tokenDecimals = BigNumber.from('18');
+      const initialToken = BigNumber.from('100000000000000000000');
+
+      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
+      const mintCallData = interfaces.encodeFunctionData('mintTo', [await wallet.getAddress(), initialToken]);
+
+      const deployed = await Factory.computeClone(StandardToken.address, data);
+      await Factory.clone(StandardToken.address, data, [mintCallData]);
+
+      await expect(await ethers.provider.getCode(deployed)).to.equal(getMinimalCode(StandardToken.address));
+      const deployedToken = await StandardTokenTemplate.attach(deployed);
+
+      await Factory.recoverOwnership(deployed, dummyAddress);
+      expect(await deployedToken.owner()).to.equal(dummyAddress);
     });
   });
 });

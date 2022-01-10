@@ -86,10 +86,6 @@ contract VestingEscrow is ITemplateV1, Multicall, Ownership, Initializer {
         emit Locked(recipient, amount, startAt);
     }
 
-    function claim() external {
-        this.claim(msg.sender);
-    }
-
     function claim(address recipient) external {
         uint256 claimable = _vestedOf(recipient) - vests[recipient].totalClaimed;
         assert(token.transfer(recipient, claimable));

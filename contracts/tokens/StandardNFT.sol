@@ -3,12 +3,52 @@
  */
 pragma solidity ^0.8.0;
 
-import "@beandao/contracts/library/Initializer.sol";
-import "@beandao/contracts/library/Ownership.sol";
-import "@beandao/contracts/library/Multicall.sol";
+import "@beandao/contracts/interfaces/IERC165.sol";
+import {Ownership, IERC173} from "@beandao/contracts/library/Ownership.sol";
+import {Initializer} from "@beandao/contracts/library/Initializer.sol";
+import {ERC721, IERC721, IERC721Enumerable, IERC721Metadata} from "@beandao/contracts/library/ERC721.sol";
+import {Multicall, IMulticall} from "@beandao/contracts/library/Multicall.sol";
 import "../ITemplateV1.sol";
 
-// mint와 burn 필요.
-// mint는 오너 서명에 의해 생성될 수 있는 기능 필요.
-contract StandardNFT {
+contract ERC721Mock is ERC721, Multicall, Ownership, Initializer {
+    string public baseURI;
+
+    function initialize(
+        string memory nftName,
+        string memory nftSymbol,
+        string memory baseUri
+    ) external initializer {
+        name = nftName;
+        symbol = nftSymbol;
+        baseURI = baseUri;
+        _transferOwnership(msg.sender);
+    }
+
+    function tokenURI(uint256 tokenId) external view override returns (string memory uri) {
+        uri = string(abi.encodePacked(baseURI, tokenId));
+    }
+
+    function mint(uint256 tokenId) external {
+        _mint(msg.sender, tokenId);
+    }
+
+    function mintTo(address to, uint256 tokenId) external {
+        _mint(to, tokenId);
+    }
+
+    function safeMint(
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) external {
+        _safeMint(to, tokenId, data);
+    }
+
+    function safeMint(address to, uint256 tokenId) external {
+        _safeMint(to, tokenId, "");
+    }
+
+    function burn(uint256 tokenId) external {
+        _burn(tokenId);
+    }
 }

@@ -5,15 +5,12 @@ pragma solidity ^0.8.0;
 
 import "@beandao/contracts/interfaces/IERC20.sol";
 import "@beandao/contracts/interfaces/IERC165.sol";
-import "@beandao/contracts/interfaces/IERC173.sol";
-import "@beandao/contracts/interfaces/IMulticall.sol";
-import "@beandao/contracts/interfaces/IAllowlist.sol";
-import "@beandao/contracts/library/Ownership.sol";
-import {BeaconProxyDeployer as BeaconDeployer} from "@beandao/contracts/library/BeaconProxyDeployer.sol";
-import {MinimalProxyDeployer as MinimalDeployer} from "@beandao/contracts/library/MinimalProxyDeployer.sol";
-import "@beandao/contracts/library/Beacon.sol";
 import "@beandao/contracts/library/Address.sol";
-import "@beandao/contracts/library/Multicall.sol";
+import "@beandao/contracts/library/BeaconDeployer.sol";
+import {Ownership, IERC173} from "@beandao/contracts/library/Ownership.sol";
+import {BeaconProxyDeployer} from "@beandao/contracts/library/BeaconProxyDeployer.sol";
+import {MinimalProxyDeployer} from "@beandao/contracts/library/MinimalProxyDeployer.sol";
+import {Multicall, IMulticall} from "@beandao/contracts/library/Multicall.sol";
 import "./IFactory.sol";
 
 /**
@@ -54,23 +51,11 @@ contract FactoryV1 is Ownership, Multicall, IFactory {
     address payable public feeTo;
 
     /**
-     * @notice this is for registered addresses
-     */
-    IAllowlist private immutable allowlist;
-
-    /**
      * @notice requiring on deploy, allowlist contract.
-     * @param allowContract IAllowlist implemented contract address.
      * @param feeAmount basic fee for ether amount
      * @param feeToAddr fee collector address
      */
-    constructor(
-        address allowContract,
-        uint256 feeAmount,
-        address payable feeToAddr
-    ) {
-        _transferOwnership(msg.sender);
-        allowlist = IAllowlist(allowContract);
+    constructor(uint256 feeAmount, address payable feeToAddr) {
         baseFee = feeAmount;
         feeTo = feeToAddr;
         nonceForTemplate[address(0)] = type(uint256).max;
@@ -91,20 +76,16 @@ contract FactoryV1 is Ownership, Multicall, IFactory {
         bytes memory initializationCallData,
         bytes[] memory calls
     ) external payable returns (address deployed) {
+        // 템플릿을 배포하기 위한 수수료가 적정 수준인지 확인.
+        require(baseFee <= msg.value || owner == msg.sender, "Factory/Incorrect-amounts");
+        // 수수료 전송
+        feeTransfer(feeTo, msg.value);
         // 배포할 템플릿의 정보
         TemplateInfo memory tmp = templates[templateId];
-        // 템플릿을 배포하기 위한 수수료가 적정 수준인지, 템플릿 오너가 호출한 것인지 또는 호출자가 허용된 목록에 있는지 확인.
-        require(
-            baseFee == msg.value || tmp.owner == msg.sender || allowlist.allowance(msg.sender),
-            "Factory/Incorrect-amounts"
-        );
-
-        // 해당 함수를 호출할 때 수수료가 담긴 경우에 수수료를 컨트랙트 소유자에게 전송하고 기존 수수료에서 일정 비율 만큼 수수료를 상승 시킴
-        feeTo.transfer(msg.value);
 
         deployed = isBeacon
-            ? BeaconDeployer.deploy(tmp.btemplate, initializationCallData)
-            : MinimalDeployer.deploy(tmp.template, initializationCallData);
+            ? BeaconProxyDeployer.deploy(tmp.btemplate, initializationCallData)
+            : MinimalProxyDeployer.deploy(tmp.template, initializationCallData);
 
         // 부수적으로 호출할 데이터가 있다면, 배포된 컨트랙트에 추가적인 call을 할 수 있음.
         if (calls.length > 0) IMulticall(deployed).multicall(calls);
@@ -129,20 +110,16 @@ contract FactoryV1 is Ownership, Multicall, IFactory {
         bytes memory initializationCallData,
         bytes[] memory calls
     ) external payable returns (address deployed) {
+        // 템플릿을 배포하기 위한 수수료가 적정 수준인지 확인.
+        require(baseFee <= msg.value || owner == msg.sender, "Factory/Incorrect-amounts");
+        // 수수료 전송
+        feeTransfer(feeTo, msg.value);
         // 배포할 템플릿의 정보
         TemplateInfo memory tmp = templates[templateId];
-        // 템플릿을 배포하기 위한 수수료가 적정 수준인지, 템플릿 오너가 호출한 것인지 또는 호출자가 허용된 목록에 있는지 확인.
-        require(
-            baseFee == msg.value || tmp.owner == msg.sender || allowlist.allowance(msg.sender),
-            "Factory/Incorrect-amounts"
-        );
-
-        // 해당 함수를 호출할 때 수수료가 담긴 경우에 수수료를 컨트랙트 소유자에게 전송하고 기존 수수료에서 일정 비율 만큼 수수료를 상승 시킴
-        feeTo.transfer(msg.value);
 
         deployed = isBeacon
-            ? BeaconDeployer.deploy(seed, tmp.btemplate, initializationCallData)
-            : MinimalDeployer.deploy(seed, tmp.template, initializationCallData);
+            ? BeaconProxyDeployer.deploy(seed, tmp.btemplate, initializationCallData)
+            : MinimalProxyDeployer.deploy(seed, tmp.template, initializationCallData);
 
         // 부수적으로 호출할 데이터가 있다면, 배포된 컨트랙트에 추가적인 call을 할 수 있음.
         if (calls.length > 0) IMulticall(deployed).multicall(calls);
@@ -164,8 +141,8 @@ contract FactoryV1 is Ownership, Multicall, IFactory {
     ) external view returns (address deployable) {
         TemplateInfo memory tmp = templates[templateId];
         deployable = isBeacon
-            ? BeaconDeployer.calculateAddress(tmp.btemplate, initializationCallData)
-            : MinimalDeployer.calculateAddress(tmp.template, initializationCallData);
+            ? BeaconProxyDeployer.calculateAddress(tmp.btemplate, initializationCallData)
+            : MinimalProxyDeployer.calculateAddress(tmp.template, initializationCallData);
     }
 
     /**
@@ -184,8 +161,8 @@ contract FactoryV1 is Ownership, Multicall, IFactory {
     ) external view returns (address deployable) {
         TemplateInfo memory tmp = templates[templateId];
         deployable = isBeacon
-            ? BeaconDeployer.calculateAddress(seed, tmp.btemplate, initializationCallData)
-            : MinimalDeployer.calculateAddress(seed, tmp.template, initializationCallData);
+            ? BeaconProxyDeployer.calculateAddress(seed, tmp.btemplate, initializationCallData)
+            : MinimalProxyDeployer.calculateAddress(seed, tmp.template, initializationCallData);
     }
 
     /**
@@ -198,9 +175,13 @@ contract FactoryV1 is Ownership, Multicall, IFactory {
         address templateAddr,
         bytes memory initializationCallData,
         bytes[] memory calls
-    ) external returns (address deployed) {
+    ) external payable returns (address deployed) {
         require(nonceForTemplate[templateAddr] == 0, "Factory/Registered-Template");
-        deployed = MinimalDeployer.deploy(templateAddr, initializationCallData);
+        // 템플릿을 배포하기 위한 수수료가 적정 수준인지 확인.
+        require(baseFee == msg.value || owner == msg.sender, "Factory/Incorrect-amounts");
+        // 수수료 전송
+        feeTransfer(feeTo, msg.value);
+        deployed = MinimalProxyDeployer.deploy(templateAddr, initializationCallData);
         if (calls.length > 0) IMulticall(deployed).multicall(calls);
     }
 
@@ -215,7 +196,7 @@ contract FactoryV1 is Ownership, Multicall, IFactory {
         view
         returns (address deployable)
     {
-        deployable = MinimalDeployer.calculateAddress(templateAddr, initializationCallData);
+        deployable = MinimalProxyDeployer.calculateAddress(templateAddr, initializationCallData);
     }
 
     /**
@@ -231,13 +212,12 @@ contract FactoryV1 is Ownership, Multicall, IFactory {
      * @notice 템플릿으로 사용되기 적합한 인터페이스가 구현된 컨트랙트를 템플릿으로 가격과 함께 등록함.
      * @dev 같은 템플릿이 비콘과, 일반적인 템플릿으로 등록될 수 있습니다. 따라서 선택적으로 사용 가능합니다.
      * @param templateAddr 템플릿으로 사용될 컨트랙트의 주소
-     * @param ownerAddr 해당 템플릿의 소유주를 지정함. 해당 소유주는 수수료를 지불하지 않음.
      */
-    function addTemplate(address templateAddr, address ownerAddr) external onlyOwner {
+    function addTemplate(address templateAddr) external onlyOwner {
         require(nonceForTemplate[templateAddr] == 0, "Factory/Non-Valid");
         bytes32 key = keccak256(abi.encode(templateAddr, nonce));
-        address beaconAddr = address(new Beacon(templateAddr));
-        templates[key] = TemplateInfo({template: templateAddr, btemplate: beaconAddr, owner: ownerAddr});
+        address beaconAddr = BeaconDeployer.deploy(templateAddr);
+        templates[key] = TemplateInfo({template: templateAddr, btemplate: beaconAddr});
         nonceForTemplate[templateAddr] = nonce++;
         emit NewTemplate(key, templateAddr, beaconAddr);
     }
@@ -245,10 +225,9 @@ contract FactoryV1 is Ownership, Multicall, IFactory {
     /**
      * @notice 등록된 템플릿의 정보를 변경하는 함수, 비콘인 경우에는 템플릿을 업데이트 할 수 있으나 비콘이 아니라면 업데이트 불가능.
      * @param key 업데이트 될 템플릿의 아이디
-     * @param updateCode 비콘일 경우 템플릿 주소, 템플릿 소유주 주소를 순서대로 인코딩
+     * @param templateAddr 비콘일 경우 템플릿 주소, 템플릿 소유주 주소를 순서대로 인코딩
      */
-    function updateTemplate(bytes32 key, bytes memory updateCode) external onlyOwner {
-        (address templateAddr, address ownerAddr) = abi.decode(updateCode, (address, address));
+    function updateTemplate(bytes32 key, address templateAddr) external onlyOwner {
         require(templateAddr != address(0), "Factory/Non-Valid");
         require(nonceForTemplate[templateAddr] == 0, "Factory/registered-before");
         require(templateAddr.isContract(), "Factory/is-not-Contract");
@@ -256,9 +235,8 @@ contract FactoryV1 is Ownership, Multicall, IFactory {
         tmp.template = templateAddr;
         (bool success, ) = tmp.btemplate.call(abi.encode(templateAddr));
         assert(success);
-        tmp.owner = (ownerAddr != tmp.owner) ? ownerAddr : tmp.owner;
         templates[key] = tmp;
-        emit UpdatedTemplate(key, tmp.template, tmp.owner);
+        emit UpdatedTemplate(key, tmp.template);
     }
 
     /**
@@ -277,8 +255,9 @@ contract FactoryV1 is Ownership, Multicall, IFactory {
      * @param newFee 변경된 수수료
      */
     function changeFee(uint256 newFee) external onlyOwner {
+        uint256 prevFee = baseFee;
         baseFee = newFee;
-        emit ChangedFee(newFee);
+        emit FeeChanged(prevFee, newFee);
     }
 
     /**
@@ -286,8 +265,9 @@ contract FactoryV1 is Ownership, Multicall, IFactory {
      * @param newFeeTo 수취할 대상 주소
      */
     function changeFeeTo(address payable newFeeTo) external onlyOwner {
+        address prevFeeTo = feeTo;
         feeTo = newFeeTo;
-        emit ChangedFeeTo(newFeeTo);
+        emit FeeToChanged(prevFeeTo, newFeeTo);
     }
 
     /**
@@ -300,5 +280,18 @@ contract FactoryV1 is Ownership, Multicall, IFactory {
 
     function recoverOwnership(address deployed, address to) external onlyOwner {
         IERC173(deployed).transferOwnership(to);
+    }
+
+    function feeTransfer(address to, uint256 amount) internal returns (bool callStatus) {
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            // Transfer the ETH and store if it succeeded or not.
+            callStatus := call(gas(), to, amount, 0, 0, 0, 0)
+            let returnDataSize := returndatasize()
+            if iszero(callStatus) {
+                returndatacopy(0, 0, returnDataSize)
+                revert(0, returnDataSize)
+            }
+        }
     }
 }

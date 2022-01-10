@@ -30,8 +30,7 @@ contract IntegrationMock {
         callData[1] = abi.encodeWithSelector(IERC173.transferOwnership.selector, msg.sender);
 
         bytes memory init = abi.encodeWithSelector(
-            bytes4(keccak256("initialize(string,string,string,uint8)")),
-            "1",
+            bytes4(keccak256("initialize(string,string,uint8)")),
             name,
             symbol,
             uint8(18)
@@ -43,8 +42,7 @@ contract IntegrationMock {
 
     function calculateAddress(string calldata name, string calldata symbol) external view returns (address calculated) {
         bytes memory init = abi.encodeWithSelector(
-            bytes4(keccak256("initialize(string,string,string,uint8)")),
-            "1",
+            bytes4(keccak256("initialize(string,string,uint8)")),
             name,
             symbol,
             uint8(18)
@@ -80,8 +78,7 @@ contract IntegrationSeedMock {
         callData[1] = abi.encodeWithSelector(IERC173.transferOwnership.selector, msg.sender);
 
         bytes memory init = abi.encodeWithSelector(
-            bytes4(keccak256("initialize(string,string,string,uint8)")),
-            "1",
+            bytes4(keccak256("initialize(string,string,uint8)")),
             name,
             symbol,
             uint8(18)
@@ -93,8 +90,7 @@ contract IntegrationSeedMock {
 
     function calculateAddress(string calldata name, string calldata symbol) external view returns (address calculated) {
         bytes memory init = abi.encodeWithSelector(
-            bytes4(keccak256("initialize(string,string,string,uint8)")),
-            "1",
+            bytes4(keccak256("initialize(string,string,uint8)")),
             name,
             symbol,
             uint8(18)

@@ -5,7 +5,10 @@
   "build": {
     "dockerfile": "Dockerfile",
     // Update 'VARIANT' to pick a Node version: 10, 12, 14
-    "args": { "VARIANT": "16", "SOLC_VERSION": "0.8.10" }
+    "args": {
+      "VARIANT": "16-bullseye",
+      "SOLC_VERSION": "0.8.11"
+    }
   },
 
   // Set *default* container specific settings.json values on container create.
@@ -46,7 +49,7 @@
     },
     "files.associations": {
       "*.yul": "solidity",
-      "*.yulp": "solidity",
+      "*.yulp": "solidity"
     },
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": true

@@ -8,15 +8,14 @@ interface IFactory {
     struct TemplateInfo {
         address template;
         address btemplate;
-        address owner;
     }
 
     event Deployed(address deployed, address owner);
     event NewTemplate(bytes32 indexed key, address template, address beacon);
-    event UpdatedTemplate(bytes32 indexed key, address template, address indexed owner);
+    event UpdatedTemplate(bytes32 indexed key, address template);
     event DeletedTemplate(bytes32 indexed key);
-    event ChangedFee(uint256 fee);
-    event ChangedFeeTo(address feeTo);
+    event FeeChanged(uint256 prevFee, uint256 fee);
+    event FeeToChanged(address prevFeeTo, address feeTo);
 
     function deploy(
         bool isBeacon,
@@ -50,7 +49,7 @@ interface IFactory {
         address templateAddr,
         bytes memory initializationCallData,
         bytes[] memory calls
-    ) external returns (address deployed);
+    ) external payable returns (address deployed);
 
     function computeClone(address templateAddr, bytes memory initializationCallData)
         external
@@ -59,9 +58,9 @@ interface IFactory {
 
     function getPrice() external view returns (uint256 price);
 
-    function addTemplate(address templateAddr, address ownerAddr) external;
+    function addTemplate(address templateAddr) external;
 
-    function updateTemplate(bytes32 key, bytes memory updateCode) external;
+    function updateTemplate(bytes32 key, address templateAddr) external;
 
     function removeTemplate(bytes32 key) external;
 
