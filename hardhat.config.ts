@@ -88,7 +88,6 @@ function getChainConfig(network: keyof typeof chainIds, mainnet = false): Networ
 function getOptimismConfig(network: keyof typeof chainIds, mainnet = false): NetworkUserConfig {
   // const url: string = `https://${mainnet ? `mainnet` : `kovan`}.optimism.io/`;
   const url: string = `https://${network}.infura.io/v3/${infuraKey}`;
-  console.log(url);
   return {
     accounts: {
       count: 10,
@@ -174,6 +173,10 @@ const config: HardhatUserConfig = {
     tests: './test',
     cache: './cache',
     artifacts: './artifacts',
+  },
+
+  etherscan: {
+    apiKey: '',
   },
 
   mocha: {

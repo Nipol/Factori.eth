@@ -5,22 +5,45 @@
 ## Deployed
 
 ### Mainnet
-* FactoriV1: 0xD9BEc768Ad2aAd84cE5AAdcA49D3334e898B2D8b
-    - Owner: 0x54B5E06c82f0d3d91377E5827BFb2381Ef1CC2b7
-    - ERC20 Beacon Key: 0x82301aee25330b02ec5683a14b0da625ef01b32e2f1167f777d022933c3be3df
-    - ERC20 Minimal Key: 0x93a29c9777094fdf34309d8a898fd8cdb2717ed3b8209e3fcd9ae5cc6d0c6568
-    - Merkle Distributer template: 0x9aaDda8587f2F09Bab5199F6306d310f76C2fd6B
+* FactoriV1: 
+    - StandardERC20 key: 
+    - MerkleDistributor key: 
+    - VestingEscrow key: 
+
+### Optimism
+* FactoriV1: 
+    - StandardERC20 key: 
+    - L2StandardERC20 key: 
+    - MerkleDistributor key: 
+    - VestingEscrow key: 
 
 ### Goerli
-* FactoryV1: 0xd91b593eeeada81dc7f6a20e4d8140ef5adf598a
-    - ERC20 Template key: 0x254a2c8cf5790bce7b67ebee0b9248872894f42c48f15178f58ed5fd9df1b244
-    - ERC20 Beacon key: 0x4a11e43cfddd716c15df4ee2923729a06a73946b6910e2b2afaba3ac715a0ff1
+* FactoryV1: 0x131bC833b5857A74466ce61b0A2EE4CFc2436002
+    - Price: 0.01 ETH
+    - StandardERC20 key: 0x39d750b6e6944bb4361c7379b5f0fa20f77b99adc94192761c67ffd0e3fb04e6
+    - MerkleDistributor key: 0x1df4fa81b7029485e75e8567a980cbb02ef58e65fda79384f7df2a0b6f5e9a3a
+    - VestingEscrow key: 0x4e2407a6af55c287bda11462e5e0810cdf2cf83c38200c3f0e9cccebe5e96106
+
+### Kovan
+* FactoryV1: 0x43ccFa6D2E5cB209a4764Ad1DA46e5B5B32C644D
+    - Price: 0.01 ETH
+    - StandardERC20 key: 0x9826236a1bc4fc40f2cca879bc5ed99015ca0427eba794e5e6445427acd5055d
+    - MerkleDistributor key: 0x5d29e9fad9171dbbd99199b154f79a94c1583ceb907cb2ce6f89b701df69c647
+    - VestingEscrow key: 0xc4bfab919fc3beb03ab61980fca95cb2c49aa95c1762e6149adcd3b004266285
+
+### Optimism Testnet
+* FactoryV1: 0xd5ac3B857177A0081e2BcF4CAd803e4FE2B5F366
+    - Price: 0.001 ETH
+    - StandardERC20 key: 0x6108e99ff7450dcaa72e5352300c431df06d6a29f7d4ef425ddd124775b2138c
+    - L2StandardERC20 key: 0x7086e604b2f6abf7cd6acd06ac7185589800477c125dccfec0ea104159c12786
+    - MerkleDistributor key: 0xe8d3e74813db60888defcb8ab86ac511fce6481052109d6e003ceb2388b6cce8
+    - VestingEscrow key: 0xd460dccff7ffce909ad9de70f40f3f2e48e0d4a48374991783a70fbcb5394df3
 
 FactoryV1을 통해서 토큰을 배포하기 위해서는 다음과 같은 작업을 필요로 합니다.
 
 ```Javascript
 const ABI = [
-    'function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
+    'function initialize(bytes calldata data)',
     'function mintTo(address to, uint256 value)',
     'function transferOwnership(address newOwner)',
 ];
@@ -36,7 +59,9 @@ const tokenDecimals = ethers.BigNumber.from('18');
 const initialToken = ethers.BigNumber.from('100000000000000000000');
 
 // 토큰을 배포하면서 초기화 할 때 필요한 데이터를 직렬화 합니다.
-const initdata = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
+const initdata = interfaces.encodeFunctionData('initialize', [
+    ethers.utils.defaultAbiCoder.encode(['string', 'string', 'uint8'], [tokenName, tokenSymbol, tokenDecimals]),
+]);
 
 // 토큰 컨트랙트를 배포할 때 토큰을 수령하도록 합니다.
 // 해당 작업으로, 토큰 수량이 결정되고 총 공급량이 업데이트 됩니다.
@@ -51,14 +76,15 @@ const ownerCallData = interfaces.encodeFunctionData('transferOwnership', [
     '토큰 컨트랙트의 소유권을 가질 이더리움 주소',
 ]);
 
-//...
+const Factory = await ethers.getContractAt(FACTORY_ABI, FACTORY_ADDRESS);
 
 // factory에서 토큰 컨트랙트의 템플릿 키를 넣고, 초기화 데이터, 그리고 각각 필요한 호출을 배열형태로 넣어줍니다.
-await Factory['deploy(bytes32,bytes,bytes[])'](
-    '0x93a29c9777094fdf34309d8a898fd8cdb2717ed3b8209e3fcd9ae5cc6d0c6568', 
-    initdata, 
-    [mintCallData,ownerCallData],
-    { value: parseEther('0.01') },
-]);
-// tx가 완료되면 컨트랙트가 배포되며, 토큰을 생성하고 오너십을 넘기게 됩니다.
+await Factory['deploy(bool,bytes32,bytes,bytes[])'](
+    false,
+    TOKEN_KEY,
+    initdata,
+    [mintCallData, ownerCallData],
+    { value: ethers.utils.parseEther('0.01') },
+);
+// tx가 완료되면 토큰 컨트랙트가 배포되어 토큰을 발행하고 Factory가 가지고 있던 오너십을 넘기게 됩니다.
 ```

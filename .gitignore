@@ -2,7 +2,6 @@ node_modules
 coverage
 cache
 artifacts
-operation
 build
 coverage.json
 package-lock.json
