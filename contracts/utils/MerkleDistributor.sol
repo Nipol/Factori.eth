@@ -6,15 +6,12 @@ pragma solidity ^0.8.0;
 
 import "@beandao/contracts/interfaces/IERC20.sol";
 import "@beandao/contracts/interfaces/IERC165.sol";
-import "@beandao/contracts/interfaces/IERC173.sol";
-import "@beandao/contracts/interfaces/IMulticall.sol";
-import "@beandao/contracts/library/Initializer.sol";
-import "@beandao/contracts/library/Ownership.sol";
-import "@beandao/contracts/library/Multicall.sol";
+import {Initializer} from "@beandao/contracts/library/Initializer.sol";
+import {Ownership, IERC173} from "@beandao/contracts/library/Ownership.sol";
+import {Multicall, IMulticall} from "@beandao/contracts/library/Multicall.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import "../ITemplateV1.sol";
 
-contract MerkleDistributor is ITemplateV1, Multicall, Ownership, Initializer {
+contract MerkleDistributor is Multicall, Ownership, Initializer, IERC165 {
     IERC20 public token;
     bytes32 public root;
     mapping(uint256 => uint256) private claimedIndex;
@@ -80,7 +77,7 @@ contract MerkleDistributor is ITemplateV1, Multicall, Ownership, Initializer {
         emit Finalized(address(token), root);
     }
 
-    function supportsInterface(bytes4 interfaceID) external pure override returns (bool) {
+    function supportsInterface(bytes4 interfaceID) external pure returns (bool) {
         return
             interfaceID == type(IERC165).interfaceId ||
             interfaceID == type(IERC173).interfaceId ||

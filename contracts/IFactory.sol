@@ -69,6 +69,4 @@ interface IFactory {
     function changeFeeTo(address payable newFeeTo) external;
 
     function collect(address tokenAddr) external;
-
-    function recoverOwnership(address deployed, address to) external;
 }

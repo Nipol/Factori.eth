@@ -27,68 +27,68 @@ describe('FactoryV1', () => {
 
   describe('#addTemplate()', () => {
     it('should be success add Template with Minimal.', async () => {
-      const StandardTokenTemplate = await ethers.getContractFactory(
-        'contracts/tokens/StandardToken.sol:StandardToken',
+      const StandardERC20Template = await ethers.getContractFactory(
+        'contracts/tokens/StandardERC20.sol:StandardERC20',
         deployer,
       );
-      const StandardToken = await StandardTokenTemplate.deploy();
+      const StandardERC20 = await StandardERC20Template.deploy();
 
       const nonce = await Factory.nonce();
 
-      const key = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, nonce]));
+      const key = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardERC20.address, nonce]));
 
       const txCount = await ethers.provider.getTransactionCount(Factory.address);
       const deployableBeaconAddr = ethers.utils.getContractAddress({ from: Factory.address, nonce: txCount });
 
-      expect(await Factory.addTemplate(StandardToken.address))
+      expect(await Factory.addTemplate(StandardERC20.address))
         .to.emit(Factory, 'NewTemplate')
-        .withArgs(key, StandardToken.address, deployableBeaconAddr);
+        .withArgs(key, StandardERC20.address, deployableBeaconAddr);
     });
 
     it('should be revert already exist template added.', async () => {
-      const StandardTokenTemplate = await ethers.getContractFactory(
-        'contracts/tokens/StandardToken.sol:StandardToken',
+      const StandardERC20Template = await ethers.getContractFactory(
+        'contracts/tokens/StandardERC20.sol:StandardERC20',
         deployer,
       );
-      const StandardToken = await StandardTokenTemplate.deploy();
+      const StandardERC20 = await StandardERC20Template.deploy();
 
       const nonce = await Factory.nonce();
 
-      const key = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, nonce]));
+      const key = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardERC20.address, nonce]));
 
       const txCount = await ethers.provider.getTransactionCount(Factory.address);
       const deployableBeaconAddr = ethers.utils.getContractAddress({ from: Factory.address, nonce: txCount });
 
-      expect(await Factory.addTemplate(StandardToken.address))
+      expect(await Factory.addTemplate(StandardERC20.address))
         .to.emit(Factory, 'NewTemplate')
-        .withArgs(key, StandardToken.address, deployableBeaconAddr);
+        .withArgs(key, StandardERC20.address, deployableBeaconAddr);
 
-      await expect(Factory.addTemplate(StandardToken.address)).to.be.revertedWith('Factory/Non-Valid');
+      await expect(Factory.addTemplate(StandardERC20.address)).to.be.revertedWith('Factory/Non-Valid');
     });
   });
 
   describe('#updateTemplate', () => {
-    let StandardToken: Contract;
-    let StandardTokenTemplate: ContractFactory;
+    let StandardERC20: Contract;
+    let StandardERC20Template: ContractFactory;
     let TemplateKey: String;
 
     beforeEach(async () => {
-      StandardTokenTemplate = await ethers.getContractFactory(
-        'contracts/tokens/StandardToken.sol:StandardToken',
+      StandardERC20Template = await ethers.getContractFactory(
+        'contracts/tokens/StandardERC20.sol:StandardERC20',
         deployer,
       );
-      StandardToken = await StandardTokenTemplate.deploy();
+      StandardERC20 = await StandardERC20Template.deploy();
       let nonce = await Factory.nonce();
-      TemplateKey = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, nonce]));
-      await Factory.addTemplate(StandardToken.address);
+      TemplateKey = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardERC20.address, nonce]));
+      await Factory.addTemplate(StandardERC20.address);
     });
 
     it('should be success updated data', async () => {
-      const NewStandardToken = await StandardTokenTemplate.deploy();
+      const NewStandardERC20 = await StandardERC20Template.deploy();
 
-      await expect(Factory.updateTemplate(TemplateKey, NewStandardToken.address))
+      await expect(Factory.updateTemplate(TemplateKey, NewStandardERC20.address))
         .to.emit(Factory, 'UpdatedTemplate')
-        .withArgs(TemplateKey, NewStandardToken.address);
+        .withArgs(TemplateKey, NewStandardERC20.address);
 
       const TemplateInfo = await Factory.templates(TemplateKey);
 
@@ -99,7 +99,7 @@ describe('FactoryV1', () => {
         }),
       )[0];
 
-      expect(returnedAddr).to.equal(NewStandardToken.address);
+      expect(returnedAddr).to.equal(NewStandardERC20.address);
     });
 
     it('should be revert with Zero template Address', async () => {
@@ -115,7 +115,7 @@ describe('FactoryV1', () => {
     });
 
     it('should be revert with already registered contract Address', async () => {
-      await expect(Factory.updateTemplate(TemplateKey, StandardToken.address)).to.be.revertedWith(
+      await expect(Factory.updateTemplate(TemplateKey, StandardERC20.address)).to.be.revertedWith(
         'Factory/registered-before',
       );
     });
@@ -126,10 +126,10 @@ describe('FactoryV1', () => {
       const DummyOne = await DummyOneDeployer.deploy();
       const DummyTwo = await DummyTwoDeployer.deploy();
 
-      const ABI = ['function initialize(string memory _name)'];
+      const ABI = ['function initialize(bytes calldata data)'];
       const interfaces = new Interface(ABI);
 
-      const data = interfaces.encodeFunctionData('initialize', ['factori.eth']);
+      const data = interfaces.encodeFunctionData('initialize', [defaultAbiCoder.encode(['string'], ['factori.eth'])]);
 
       // 비콘을 등록하기 위해 비콘의 주소또한 확정
       let nonce = await Factory.nonce();
@@ -172,26 +172,21 @@ describe('FactoryV1', () => {
   });
 
   describe('#removeTemplate()', () => {
-    let StandardToken: Contract;
-    let StandardTokenTemplate: ContractFactory;
+    let StandardERC20: Contract;
+    let StandardERC20Template: ContractFactory;
     let MinimalKey: String;
 
     beforeEach(async () => {
-      StandardTokenTemplate = await ethers.getContractFactory(
-        'contracts/tokens/StandardToken.sol:StandardToken',
+      StandardERC20Template = await ethers.getContractFactory(
+        'contracts/tokens/StandardERC20.sol:StandardERC20',
         wallet,
       );
-      StandardToken = await StandardTokenTemplate.deploy();
-      const tokenName = 'template';
-      const tokenSymbol = 'TEMP';
-      const tokenDecimals = BigNumber.from('18');
-      await StandardToken.deployed();
-      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
+      StandardERC20 = await StandardERC20Template.deploy();
 
       let nonce = await Factory.nonce();
 
-      MinimalKey = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, nonce]));
-      await Factory.addTemplate(StandardToken.address);
+      MinimalKey = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardERC20.address, nonce]));
+      await Factory.addTemplate(StandardERC20.address);
     });
 
     it('should be success with exist template', async () => {
@@ -212,31 +207,33 @@ describe('FactoryV1', () => {
   });
 
   describe('#deploy()', () => {
-    let StandardToken: Contract;
-    let StandardTokenTemplate: ContractFactory;
+    let StandardERC20: Contract;
+    let StandardERC20Template: ContractFactory;
     let MinimalKey: String;
 
     beforeEach(async () => {
-      StandardTokenTemplate = await ethers.getContractFactory(
-        'contracts/tokens/StandardToken.sol:StandardToken',
+      StandardERC20Template = await ethers.getContractFactory(
+        'contracts/tokens/StandardERC20.sol:StandardERC20',
         deployer,
       );
-      StandardToken = await StandardTokenTemplate.deploy();
+      StandardERC20 = await StandardERC20Template.deploy();
 
       let nonce = await Factory.nonce();
-      MinimalKey = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, nonce]));
-      await Factory.addTemplate(StandardToken.address);
+      MinimalKey = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardERC20.address, nonce]));
+      await Factory.addTemplate(StandardERC20.address);
     });
 
     it('should be success for new deploy with ordinary EOA', async () => {
-      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
+      const ABI = ['function initialize(bytes calldata data)'];
       const interfaces = new Interface(ABI);
 
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
+      const data = interfaces.encodeFunctionData('initialize', [
+        defaultAbiCoder.encode(['string', 'string', 'uint8'], [tokenName, tokenSymbol, tokenDecimals]),
+      ]);
 
       const calculatedAddress = await Factory.connect(Dummy)['compute(bool,bytes32,bytes)'](false, MinimalKey, data);
 
@@ -253,7 +250,7 @@ describe('FactoryV1', () => {
       const afterBalance = await wallet.getBalance();
       expect(prevBalance.add(parseEther('0.01')).toString()).equal(afterBalance.toString());
 
-      const DeployedToken = StandardTokenTemplate.attach(calculatedAddress);
+      const DeployedToken = StandardERC20Template.attach(calculatedAddress);
 
       expect(await DeployedToken.symbol()).to.equal(tokenSymbol);
       expect(await DeployedToken.name()).to.equal(tokenName);
@@ -269,14 +266,16 @@ describe('FactoryV1', () => {
     });
 
     it('should be success making new token contract with Minimal', async () => {
-      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
+      const ABI = ['function initialize(bytes calldata data)'];
       const interfaces = new Interface(ABI);
 
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
+      const data = interfaces.encodeFunctionData('initialize', [
+        defaultAbiCoder.encode(['string', 'string', 'uint8'], [tokenName, tokenSymbol, tokenDecimals]),
+      ]);
 
       const calculatedAddress = await Factory.connect(Dummy)['compute(bool,bytes32,bytes)'](false, MinimalKey, data);
 
@@ -293,7 +292,7 @@ describe('FactoryV1', () => {
       const afterBalance = await wallet.getBalance();
       expect(prevBalance.add(parseEther('0.01')).toString()).equal(afterBalance.toString());
 
-      const DeployedToken = await StandardTokenTemplate.attach(calculatedAddress);
+      const DeployedToken = await StandardERC20Template.attach(calculatedAddress);
 
       expect(await DeployedToken.symbol()).to.equal(tokenSymbol);
       expect(await DeployedToken.name()).to.equal(tokenName);
@@ -302,7 +301,7 @@ describe('FactoryV1', () => {
 
     it('should be success making new token contract with call', async () => {
       const ABI = [
-        'function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
+        'function initialize(bytes calldata data)',
         'function mintTo(address to, uint256 value)',
         'function transferOwnership(address newOwner)',
       ];
@@ -311,16 +310,15 @@ describe('FactoryV1', () => {
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
-
-      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
-
       const initialToken = BigNumber.from('100000000000000000000');
 
+      const data = interfaces.encodeFunctionData('initialize', [
+        defaultAbiCoder.encode(['string', 'string', 'uint8'], [tokenName, tokenSymbol, tokenDecimals]),
+      ]);
       const mintCallData = interfaces.encodeFunctionData('mintTo', [await wallet.getAddress(), initialToken]);
       const ownerCallData = interfaces.encodeFunctionData('transferOwnership', [await wallet.getAddress()]);
 
       const calculatedAddress = await Factory.connect(Dummy)['compute(bool,bytes32,bytes)'](false, MinimalKey, data);
-
       const prevBalance = await wallet.getBalance();
 
       expect(
@@ -336,13 +334,13 @@ describe('FactoryV1', () => {
       )
         .to.emit(Factory, 'Deployed')
         .withArgs(calculatedAddress, dummyAddress);
-      // .to.emit(StandardToken, 'Transfer')
+      // .to.emit(StandardERC20, 'Transfer')
       // .withArgs(constants.AddressZero, await wallet.getAddress(), initialToken);
 
       const afterBalance = await wallet.getBalance();
       expect(prevBalance.add(parseEther('0.01')).toString()).equal(afterBalance.toString());
 
-      const DeployedToken = await StandardTokenTemplate.attach(calculatedAddress);
+      const DeployedToken = await StandardERC20Template.attach(calculatedAddress);
 
       expect(await DeployedToken.symbol()).to.equal(tokenSymbol);
       expect(await DeployedToken.name()).to.equal(tokenName);
@@ -352,26 +350,22 @@ describe('FactoryV1', () => {
     });
 
     it('should be success with integrated smart contract', async () => {
-      const StandardTokenTemplate = await ethers.getContractFactory(
-        'contracts/tokens/StandardToken.sol:StandardToken',
+      const StandardERC20Template = await ethers.getContractFactory(
+        'contracts/tokens/StandardERC20.sol:StandardERC20',
         wallet,
       );
-      const StandardToken = await StandardTokenTemplate.deploy();
-      const tokenName = 'template';
-      const tokenSymbol = 'TEMP';
-      const tokenDecimals = BigNumber.from('18');
-      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
+      const StandardERC20 = await StandardERC20Template.deploy();
 
       const nonce = await Factory.nonce();
 
-      const key = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, nonce]));
+      const key = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardERC20.address, nonce]));
 
       const txCount = await ethers.provider.getTransactionCount(Factory.address);
       const deployableBeaconAddr = ethers.utils.getContractAddress({ from: Factory.address, nonce: txCount });
 
-      expect(await Factory.addTemplate(StandardToken.address))
+      expect(await Factory.addTemplate(StandardERC20.address))
         .to.emit(Factory, 'NewTemplate')
-        .withArgs(key, StandardToken.address, deployableBeaconAddr);
+        .withArgs(key, StandardERC20.address, deployableBeaconAddr);
 
       const IntegrationDeployer = await ethers.getContractFactory(
         'contracts/mocks/IntegrationMock.sol:IntegrationMock',
@@ -394,7 +388,7 @@ describe('FactoryV1', () => {
       const afterBalance = await wallet.getBalance();
       expect(prevBalance.add(price).toString()).equal(afterBalance.toString());
 
-      const deployedToken = await StandardTokenTemplate.attach(calculatedAddr);
+      const deployedToken = await StandardERC20Template.attach(calculatedAddr);
 
       expect(await deployedToken.name()).to.equal('Sample');
       expect(await deployedToken.symbol()).to.equal('SAM');
@@ -403,24 +397,24 @@ describe('FactoryV1', () => {
   });
 
   describe('#deployWithSeed(seed)', () => {
-    let StandardToken: Contract;
-    let StandardTokenTemplate: ContractFactory;
+    let StandardERC20: Contract;
+    let StandardERC20Template: ContractFactory;
     let MinimalKey: String;
 
     beforeEach(async () => {
-      StandardTokenTemplate = await ethers.getContractFactory(
-        'contracts/tokens/StandardToken.sol:StandardToken',
+      StandardERC20Template = await ethers.getContractFactory(
+        'contracts/tokens/StandardERC20.sol:StandardERC20',
         wallet,
       );
-      StandardToken = await StandardTokenTemplate.deploy();
+      StandardERC20 = await StandardERC20Template.deploy();
 
       let nonce = await Factory.nonce();
-      MinimalKey = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, nonce]));
-      await Factory.addTemplate(StandardToken.address);
+      MinimalKey = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardERC20.address, nonce]));
+      await Factory.addTemplate(StandardERC20.address);
     });
 
     it('should be success for new deploy with ordinary EOA', async () => {
-      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
+      const ABI = ['function initialize(bytes calldata data)'];
       const interfaces = new Interface(ABI);
       const seed = 'factorieth seed';
 
@@ -428,7 +422,9 @@ describe('FactoryV1', () => {
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
+      const data = interfaces.encodeFunctionData('initialize', [
+        defaultAbiCoder.encode(['string', 'string', 'uint8'], [tokenName, tokenSymbol, tokenDecimals]),
+      ]);
 
       const calculatedAddress = await Factory.connect(Dummy)['computeWithSeed(string,bool,bytes32,bytes)'](
         seed,
@@ -457,7 +453,7 @@ describe('FactoryV1', () => {
       const afterBalance = await wallet.getBalance();
       expect(prevBalance.add(parseEther('0.01')).toString()).equal(afterBalance.toString());
 
-      const DeployedToken = StandardTokenTemplate.attach(calculatedAddress);
+      const DeployedToken = StandardERC20Template.attach(calculatedAddress);
 
       expect(await DeployedToken.symbol()).to.equal(tokenSymbol);
       expect(await DeployedToken.name()).to.equal(tokenName);
@@ -482,16 +478,17 @@ describe('FactoryV1', () => {
     });
 
     it('should be success making new token contract with Minimal', async () => {
-      const seed = 'factorieth seed';
-
-      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
+      const ABI = ['function initialize(bytes calldata data)'];
       const interfaces = new Interface(ABI);
+      const seed = 'factorieth seed';
 
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
+      const data = interfaces.encodeFunctionData('initialize', [
+        defaultAbiCoder.encode(['string', 'string', 'uint8'], [tokenName, tokenSymbol, tokenDecimals]),
+      ]);
 
       const calculatedAddress = await Factory.connect(Dummy)['computeWithSeed(string,bool,bytes32,bytes)'](
         seed,
@@ -520,7 +517,7 @@ describe('FactoryV1', () => {
       const afterBalance = await wallet.getBalance();
       expect(prevBalance.add(parseEther('0.01')).toString()).equal(afterBalance.toString());
 
-      const DeployedToken = await StandardTokenTemplate.attach(calculatedAddress);
+      const DeployedToken = await StandardERC20Template.attach(calculatedAddress);
 
       expect(await DeployedToken.symbol()).to.equal(tokenSymbol);
       expect(await DeployedToken.name()).to.equal(tokenName);
@@ -529,9 +526,8 @@ describe('FactoryV1', () => {
 
     it('should be success making new token contract with call', async () => {
       const seed = 'factorieth seed';
-
       const ABI = [
-        'function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
+        'function initialize(bytes calldata data)',
         'function mintTo(address to, uint256 value)',
         'function transferOwnership(address newOwner)',
       ];
@@ -540,11 +536,11 @@ describe('FactoryV1', () => {
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
-
-      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
-
       const initialToken = BigNumber.from('100000000000000000000');
 
+      const data = interfaces.encodeFunctionData('initialize', [
+        defaultAbiCoder.encode(['string', 'string', 'uint8'], [tokenName, tokenSymbol, tokenDecimals]),
+      ]);
       const mintCallData = interfaces.encodeFunctionData('mintTo', [await wallet.getAddress(), initialToken]);
       const ownerCallData = interfaces.encodeFunctionData('transferOwnership', [await wallet.getAddress()]);
 
@@ -571,13 +567,13 @@ describe('FactoryV1', () => {
       )
         .to.emit(Factory, 'Deployed')
         .withArgs(calculatedAddress, dummyAddress);
-      // .to.emit(StandardToken, 'Transfer')
+      // .to.emit(StandardERC20, 'Transfer')
       // .withArgs(constants.AddressZero, await wallet.getAddress(), initialToken);
 
       const afterBalance = await wallet.getBalance();
       expect(prevBalance.add(parseEther('0.01')).toString()).equal(afterBalance.toString());
 
-      const DeployedToken = await StandardTokenTemplate.attach(calculatedAddress);
+      const DeployedToken = await StandardERC20Template.attach(calculatedAddress);
 
       expect(await DeployedToken.symbol()).to.equal(tokenSymbol);
       expect(await DeployedToken.name()).to.equal(tokenName);
@@ -587,27 +583,22 @@ describe('FactoryV1', () => {
     });
 
     it('should be success with integrated smart contract', async () => {
-      const StandardTokenTemplate = await ethers.getContractFactory(
-        'contracts/tokens/StandardToken.sol:StandardToken',
+      const StandardERC20Template = await ethers.getContractFactory(
+        'contracts/tokens/StandardERC20.sol:StandardERC20',
         wallet,
       );
-      const StandardToken = await StandardTokenTemplate.deploy();
-      const tokenName = 'template';
-      const tokenSymbol = 'TEMP';
-      const tokenDecimals = BigNumber.from('18');
-      await StandardToken.deployed();
-      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
+      const StandardERC20 = await StandardERC20Template.deploy();
 
       const nonce = await Factory.nonce();
 
-      const key = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardToken.address, nonce]));
+      const key = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [StandardERC20.address, nonce]));
 
       const txCount = await ethers.provider.getTransactionCount(Factory.address);
       const deployableBeaconAddr = ethers.utils.getContractAddress({ from: Factory.address, nonce: txCount });
 
-      expect(await Factory.addTemplate(StandardToken.address))
+      expect(await Factory.addTemplate(StandardERC20.address))
         .to.emit(Factory, 'NewTemplate')
-        .withArgs(key, StandardToken.address, deployableBeaconAddr);
+        .withArgs(key, StandardERC20.address, deployableBeaconAddr);
 
       const IntegrationSeedDeployer = await ethers.getContractFactory(
         'contracts/mocks/IntegrationMock.sol:IntegrationSeedMock',
@@ -631,7 +622,7 @@ describe('FactoryV1', () => {
       const afterBalance = await wallet.getBalance();
       expect(prevBalance.add(price).toString()).equal(afterBalance.toString());
 
-      const deployedToken = await StandardTokenTemplate.attach(calculatedAddr);
+      const deployedToken = await StandardERC20Template.attach(calculatedAddr);
 
       expect(await deployedToken.name()).to.equal('Sample');
       expect(await deployedToken.symbol()).to.equal('SAM');
@@ -640,25 +631,20 @@ describe('FactoryV1', () => {
   });
 
   describe('#clone', () => {
-    let StandardToken: Contract;
-    let StandardTokenTemplate: ContractFactory;
+    let StandardERC20: Contract;
+    let StandardERC20Template: ContractFactory;
 
     beforeEach(async () => {
-      StandardTokenTemplate = await ethers.getContractFactory(
-        'contracts/tokens/StandardToken.sol:StandardToken',
+      StandardERC20Template = await ethers.getContractFactory(
+        'contracts/tokens/StandardERC20.sol:StandardERC20',
         wallet,
       );
-      StandardToken = await StandardTokenTemplate.deploy();
-      const tokenName = 'template';
-      const tokenSymbol = 'TEMP';
-      const tokenDecimals = BigNumber.from('18');
-      await StandardToken.deployed();
-      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
+      StandardERC20 = await StandardERC20Template.deploy();
     });
 
     it('should be deploy minimal proxy', async () => {
       const ABI = [
-        'function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
+        'function initialize(bytes calldata data)',
         'function mintTo(address to, uint256 value)',
         'function transferOwnership(address newOwner)',
       ];
@@ -669,69 +655,77 @@ describe('FactoryV1', () => {
       const tokenDecimals = BigNumber.from('18');
       const initialToken = BigNumber.from('100000000000000000000');
 
-      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
+      const data = interfaces.encodeFunctionData('initialize', [
+        defaultAbiCoder.encode(['string', 'string', 'uint8'], [tokenName, tokenSymbol, tokenDecimals]),
+      ]);
       const mintCallData = interfaces.encodeFunctionData('mintTo', [await wallet.getAddress(), initialToken]);
       const ownerCallData = interfaces.encodeFunctionData('transferOwnership', [await wallet.getAddress()]);
 
-      const deployed = await Factory.computeClone(StandardToken.address, data);
-      await Factory.clone(StandardToken.address, data, [mintCallData, ownerCallData]);
+      const deployed = await Factory.computeClone(StandardERC20.address, data);
+      await Factory.clone(StandardERC20.address, data, [mintCallData, ownerCallData]);
 
-      await expect(await ethers.provider.getCode(deployed)).to.equal(getMinimalCode(StandardToken.address));
-      const deployedToken = await StandardTokenTemplate.attach(deployed);
+      await expect(await ethers.provider.getCode(deployed)).to.equal(getMinimalCode(StandardERC20.address));
+      const deployedToken = await StandardERC20Template.attach(deployed);
 
       expect(await deployedToken.name()).to.equal(tokenName);
       expect(await deployedToken.symbol()).to.equal(tokenSymbol);
     });
 
     it('should be deploy minimal proxy with ordinary EOA', async () => {
-      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
+      const ABI = ['function initialize(bytes calldata data)'];
       const interfaces = new Interface(ABI);
 
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
+      const data = interfaces.encodeFunctionData('initialize', [
+        defaultAbiCoder.encode(['string', 'string', 'uint8'], [tokenName, tokenSymbol, tokenDecimals]),
+      ]);
 
-      const deployed = await Factory.connect(Dummy).computeClone(StandardToken.address, data);
-      await Factory.connect(Dummy).clone(StandardToken.address, data, [], {
+      const deployed = await Factory.connect(Dummy).computeClone(StandardERC20.address, data);
+      await Factory.connect(Dummy).clone(StandardERC20.address, data, [], {
         value: parseEther('0.01'),
       });
 
-      await expect(await ethers.provider.getCode(deployed)).to.equal(getMinimalCode(StandardToken.address));
-      const deployedToken = await StandardTokenTemplate.attach(deployed);
+      await expect(await ethers.provider.getCode(deployed)).to.equal(getMinimalCode(StandardERC20.address));
+      const deployedToken = await StandardERC20Template.attach(deployed);
 
       expect(await deployedToken.name()).to.equal(tokenName);
       expect(await deployedToken.symbol()).to.equal(tokenSymbol);
     });
 
     it('should be revert with ordinary EOA non-pay', async () => {
-      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
+      const ABI = ['function initialize(bytes calldata data)'];
       const interfaces = new Interface(ABI);
 
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
-      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
 
-      await expect(Factory.connect(Dummy).clone(StandardToken.address, data, [])).revertedWith(
+      const data = interfaces.encodeFunctionData('initialize', [
+        defaultAbiCoder.encode(['string', 'string', 'uint8'], [tokenName, tokenSymbol, tokenDecimals]),
+      ]);
+
+      await expect(Factory.connect(Dummy).clone(StandardERC20.address, data, [])).revertedWith(
         'Factory/Incorrect-amounts',
       );
     });
 
     it('should be reverted with already registerd template', async () => {
-      await Factory.addTemplate(StandardToken.address);
+      await Factory.addTemplate(StandardERC20.address);
 
-      const ABI = ['function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)'];
+      const ABI = ['function initialize(bytes calldata data)'];
       const interfaces = new Interface(ABI);
-
       const tokenName = 'SAMPLE';
       const tokenSymbol = 'SAM';
       const tokenDecimals = BigNumber.from('18');
 
-      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
+      const data = interfaces.encodeFunctionData('initialize', [
+        defaultAbiCoder.encode(['string', 'string', 'uint8'], [tokenName, tokenSymbol, tokenDecimals]),
+      ]);
 
-      await expect(Factory.clone(StandardToken.address, data, [])).to.revertedWith('Factory/Registered-Template');
+      await expect(Factory.clone(StandardERC20.address, data, [])).to.revertedWith('Factory/Registered-Template');
     });
   });
 
@@ -753,46 +747,47 @@ describe('FactoryV1', () => {
 
   describe('#collect()', () => {
     let tokenaddr: string;
-    let StandardToken: Contract;
+    let StandardERC20: Contract;
     const initialToken = BigNumber.from('100000000000000000000');
 
     beforeEach(async () => {
-      const StandardTokenTemplate = await ethers.getContractFactory(
-        'contracts/tokens/StandardToken.sol:StandardToken',
+      const StandardERC20Template = await ethers.getContractFactory(
+        'contracts/tokens/StandardERC20.sol:StandardERC20',
         wallet,
       );
-      StandardToken = await StandardTokenTemplate.deploy();
-      tokenaddr = StandardToken.address;
-      const tokenName = 'template';
-      const tokenSymbol = 'TEMP';
-      const tokenDecimals = BigNumber.from('18');
-      await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
-      await StandardToken.mintTo(Factory.address, initialToken);
+      StandardERC20 = await StandardERC20Template.deploy();
+      tokenaddr = StandardERC20.address;
+
+      await StandardERC20.initialize(
+        defaultAbiCoder.encode(['string', 'string', 'uint8'], ['template', 'TEMP', BigNumber.from('18')]),
+      );
+      await StandardERC20.mintTo(Factory.address, initialToken);
     });
 
     it('should be collect token', async () => {
       await expect(Factory.collect(tokenaddr))
-        .to.emit(StandardToken, 'Transfer')
+        .to.emit(StandardERC20, 'Transfer')
         .withArgs(Factory.address, walletAddress, initialToken);
     });
   });
 
   describe('#recoverOwnership()', () => {
-    let StandardToken: Contract;
-    let StandardTokenTemplate: ContractFactory;
+    let StandardERC20: Contract;
+    let StandardERC20Template: ContractFactory;
 
     beforeEach(async () => {
-      StandardTokenTemplate = await ethers.getContractFactory(
-        'contracts/tokens/StandardToken.sol:StandardToken',
+      StandardERC20Template = await ethers.getContractFactory(
+        'contracts/tokens/StandardERC20.sol:StandardERC20',
         wallet,
       );
-      StandardToken = await StandardTokenTemplate.deploy();
+      StandardERC20 = await StandardERC20Template.deploy();
     });
 
     it('should be success recovered ownership', async () => {
       const ABI = [
-        'function initialize(string memory tokenName, string memory tokenSymbol, uint8 tokenDecimals)',
+        'function initialize(bytes calldata data)',
         'function mintTo(address to, uint256 value)',
+        'function transferOwnership(address newOwner)',
       ];
       const interfaces = new Interface(ABI);
 
@@ -801,14 +796,16 @@ describe('FactoryV1', () => {
       const tokenDecimals = BigNumber.from('18');
       const initialToken = BigNumber.from('100000000000000000000');
 
-      const data = interfaces.encodeFunctionData('initialize', [tokenName, tokenSymbol, tokenDecimals]);
+      const data = interfaces.encodeFunctionData('initialize', [
+        defaultAbiCoder.encode(['string', 'string', 'uint8'], [tokenName, tokenSymbol, tokenDecimals]),
+      ]);
       const mintCallData = interfaces.encodeFunctionData('mintTo', [await wallet.getAddress(), initialToken]);
 
-      const deployed = await Factory.computeClone(StandardToken.address, data);
-      await Factory.clone(StandardToken.address, data, [mintCallData]);
+      const deployed = await Factory.computeClone(StandardERC20.address, data);
+      await Factory.clone(StandardERC20.address, data, [mintCallData]);
 
-      await expect(await ethers.provider.getCode(deployed)).to.equal(getMinimalCode(StandardToken.address));
-      const deployedToken = await StandardTokenTemplate.attach(deployed);
+      await expect(await ethers.provider.getCode(deployed)).to.equal(getMinimalCode(StandardERC20.address));
+      const deployedToken = await StandardERC20Template.attach(deployed);
 
       await Factory.recoverOwnership(deployed, dummyAddress);
       expect(await deployedToken.owner()).to.equal(dummyAddress);

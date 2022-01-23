@@ -1,11 +1,10 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { Contract, BigNumber, constants, Signer } from 'ethers';
-import { keccak256, defaultAbiCoder, parseEther, Interface } from 'ethers/lib/utils';
+import { defaultAbiCoder, Interface } from 'ethers/lib/utils';
 
-describe.skip('BeaconToken/ERC20', () => {
+describe('Standard/ERC20', () => {
   let StandardERC20: Contract;
-  let Factory: Contract;
 
   const tokenName = 'template';
   const tokenSymbol = 'TEMP';
@@ -17,60 +16,24 @@ describe.skip('BeaconToken/ERC20', () => {
   let Dummy: Signer;
 
   let walletAddress: string;
+  let toAddress: string;
   let dummyAddress: string;
 
   beforeEach(async () => {
     const accounts = await ethers.getSigners();
     [wallet, walletTo, Dummy] = accounts;
     walletAddress = await wallet.getAddress();
+    toAddress = await walletTo.getAddress();
     dummyAddress = await Dummy.getAddress();
 
-    const StandardERC20Template = await ethers.getContractFactory(
-      'contracts/tokens/StandardERC20.sol:StandardERC20',
-      wallet,
-    );
-    const templateStandardERC20 = await StandardERC20Template.deploy();
+    StandardERC20 = await (
+      await ethers.getContractFactory('contracts/tokens/StandardERC20.sol:StandardERC20', wallet)
+    ).deploy();
 
-    Factory = await (
-      await ethers.getContractFactory('contracts/FactoryV1.sol:FactoryV1', wallet)
-    ).deploy(parseEther('0.001'), walletAddress);
-
-    let nonce = await Factory.nonce();
-    const tkey = keccak256(defaultAbiCoder.encode(['address', 'uint256'], [templateStandardERC20.address, nonce]));
-
-    const txCount = await ethers.provider.getTransactionCount(Factory.address);
-    const deployableBeaconAddr = ethers.utils.getContractAddress({ from: Factory.address, nonce: txCount });
-
-    expect(await Factory.addTemplate(templateStandardERC20.address))
-      .to.emit(Factory, 'NewTemplate')
-      .withArgs(tkey, templateStandardERC20.address, deployableBeaconAddr);
-
-    const ABI = [
-      'function initialize(bytes calldata data)',
-      'function mintTo(address to, uint256 value)',
-      'function transferOwnership(address newOwner)',
-    ];
-    const interfaces = new Interface(ABI);
-
-    const data = interfaces.encodeFunctionData('initialize', [
+    await StandardERC20.initialize(
       defaultAbiCoder.encode(['string', 'string', 'uint8'], [tokenName, tokenSymbol, tokenDecimals]),
-    ]);
-    const mintCallData = interfaces.encodeFunctionData('mintTo', [walletAddress, initialToken]);
-    const ownerCallData = interfaces.encodeFunctionData('transferOwnership', [walletAddress]);
-
-    const calculatedAddress = await Factory.connect(Dummy)['compute(bool,bytes32,bytes)'](true, tkey, data);
-    // console.log(calculatedAddress);
-    await Factory.connect(Dummy)['deploy(bool,bytes32,bytes,bytes[])'](
-      true,
-      tkey,
-      data,
-      [mintCallData, ownerCallData],
-      {
-        value: parseEther('0.001'),
-      },
     );
-
-    StandardERC20 = StandardERC20Template.attach(calculatedAddress);
+    await StandardERC20.mint(initialToken);
   });
 
   describe('#name()', () => {
@@ -99,7 +62,6 @@ describe.skip('BeaconToken/ERC20', () => {
 
   describe('#balanceOf()', () => {
     it('should be initial Value, at Deployer Address', async () => {
-      const walletAddress = await wallet.getAddress();
       expect(await StandardERC20.balanceOf(walletAddress)).to.be.equal(initialToken);
     });
 
@@ -110,38 +72,32 @@ describe.skip('BeaconToken/ERC20', () => {
 
   describe('#allowance()', () => {
     it('should be allowance value is Zero', async () => {
-      const walletAddress = await wallet.getAddress();
-      const walletToAddress = await walletTo.getAddress();
-      expect(await StandardERC20.allowance(walletAddress, walletToAddress)).to.be.equal('0');
+      expect(await StandardERC20.allowance(walletAddress, toAddress)).to.be.equal('0');
     });
   });
 
   describe('#approve()', () => {
     it('should be success, Approval.', async () => {
       const value = BigNumber.from('5000000000000000000');
-      const walletAddress = await wallet.getAddress();
-      const walletToAddress = await walletTo.getAddress();
 
-      await expect(StandardERC20.approve(walletToAddress, value))
+      await expect(StandardERC20.approve(toAddress, value))
         .to.emit(StandardERC20, 'Approval')
-        .withArgs(walletAddress, walletToAddress, value);
-      expect(await StandardERC20.allowance(walletAddress, walletToAddress)).to.be.equal(value);
+        .withArgs(walletAddress, toAddress, value);
+      expect(await StandardERC20.allowance(walletAddress, toAddress)).to.be.equal(value);
       const value2 = BigNumber.from('0');
-      await expect(StandardERC20.approve(walletToAddress, value2))
+      await expect(StandardERC20.approve(toAddress, value2))
         .to.emit(StandardERC20, 'Approval')
-        .withArgs(walletAddress, walletToAddress, value2);
-      expect(await StandardERC20.allowance(walletAddress, walletToAddress)).to.be.equal(value2);
+        .withArgs(walletAddress, toAddress, value2);
+      expect(await StandardERC20.allowance(walletAddress, toAddress)).to.be.equal(value2);
     });
 
     it('should be success over Total Supply', async () => {
       const value = constants.MaxUint256;
-      const walletAddress = await wallet.getAddress();
-      const walletToAddress = await walletTo.getAddress();
 
-      await expect(StandardERC20.approve(walletToAddress, value))
+      await expect(StandardERC20.approve(toAddress, value))
         .to.emit(StandardERC20, 'Approval')
-        .withArgs(walletAddress, walletToAddress, value);
-      expect(await StandardERC20.allowance(walletAddress, walletToAddress)).to.be.equal(value);
+        .withArgs(walletAddress, toAddress, value);
+      expect(await StandardERC20.allowance(walletAddress, toAddress)).to.be.equal(value);
     });
 
     it('should be revert approve to token address', async () => {
@@ -157,7 +113,6 @@ describe.skip('BeaconToken/ERC20', () => {
   describe('#transfer()', () => {
     it('should be reverted, over Transfer Value', async () => {
       const value = initialToken.add('1');
-      const walletAddress = await wallet.getAddress();
       await expect(StandardERC20.transfer(walletAddress, value)).to.be.revertedWith('');
     });
 
@@ -168,13 +123,11 @@ describe.skip('BeaconToken/ERC20', () => {
 
     it('should be successfully Transfer', async () => {
       const value = BigNumber.from('1000000000000000000');
-      const walletAddress = await wallet.getAddress();
-      const walletToAddress = await walletTo.getAddress();
 
-      await expect(StandardERC20.transfer(walletToAddress, value))
+      await expect(StandardERC20.transfer(toAddress, value))
         .to.emit(StandardERC20, 'Transfer')
-        .withArgs(walletAddress, walletToAddress, value);
-      expect(await StandardERC20.balanceOf(walletToAddress)).to.equal(value);
+        .withArgs(walletAddress, toAddress, value);
+      expect(await StandardERC20.balanceOf(toAddress)).to.equal(value);
       const balance = initialToken.sub(value);
       expect(await StandardERC20.balanceOf(walletAddress)).to.equal(balance);
     });
@@ -183,48 +136,38 @@ describe.skip('BeaconToken/ERC20', () => {
   describe('#transferFrom()', () => {
     it('should be reverted, not Allow with value transfer', async () => {
       const value = BigNumber.from('5000000000000000000');
-      const walletAddress = await wallet.getAddress();
-      const walletToAddress = await walletTo.getAddress();
-      const DummyAddress = await Dummy.getAddress();
 
-      await expect(StandardERC20.approve(walletToAddress, value))
+      await expect(StandardERC20.approve(toAddress, value))
         .to.emit(StandardERC20, 'Approval')
-        .withArgs(walletAddress, walletToAddress, value);
-      expect(await StandardERC20.allowance(walletAddress, walletToAddress)).to.be.equal(value);
+        .withArgs(walletAddress, toAddress, value);
+      expect(await StandardERC20.allowance(walletAddress, toAddress)).to.be.equal(value);
 
       await StandardERC20.connect(walletTo);
 
       const newValue = value.add('1');
-      await expect(StandardERC20.transferFrom(walletAddress, DummyAddress, newValue)).to.be.revertedWith('');
+      await expect(StandardERC20.transferFrom(walletAddress, dummyAddress, newValue)).to.be.revertedWith('');
     });
 
     it('should be reverted, over transfer value', async () => {
       const value = constants.MaxUint256;
-      const walletAddress = await wallet.getAddress();
-      const walletToAddress = await walletTo.getAddress();
-      const DummyAddress = await Dummy.getAddress();
-
-      await expect(StandardERC20.approve(walletToAddress, value))
+      await expect(StandardERC20.approve(toAddress, value))
         .to.emit(StandardERC20, 'Approval')
-        .withArgs(walletAddress, walletToAddress, value);
-      expect(await StandardERC20.allowance(walletAddress, walletToAddress)).to.be.equal(value);
+        .withArgs(walletAddress, toAddress, value);
+      expect(await StandardERC20.allowance(walletAddress, toAddress)).to.be.equal(value);
 
       StandardERC20 = await StandardERC20.connect(walletTo);
 
       const newValue = initialToken.add('1');
-      await expect(StandardERC20.transferFrom(walletAddress, DummyAddress, newValue)).to.be.revertedWith('');
+      await expect(StandardERC20.transferFrom(walletAddress, dummyAddress, newValue)).to.be.revertedWith('');
     });
 
     it('should be reverted, to token contract transfer', async () => {
       const value = BigNumber.from('5000000000000000000');
-      const walletAddress = await wallet.getAddress();
-      const walletToAddress = await walletTo.getAddress();
-      const DummyAddress = await Dummy.getAddress();
 
-      await expect(StandardERC20.approve(walletToAddress, value))
+      await expect(StandardERC20.approve(toAddress, value))
         .to.emit(StandardERC20, 'Approval')
-        .withArgs(walletAddress, walletToAddress, value);
-      expect(await StandardERC20.allowance(walletAddress, walletToAddress)).to.be.equal(value);
+        .withArgs(walletAddress, toAddress, value);
+      expect(await StandardERC20.allowance(walletAddress, toAddress)).to.be.equal(value);
 
       await StandardERC20.connect(walletTo);
 
@@ -234,29 +177,25 @@ describe.skip('BeaconToken/ERC20', () => {
 
     it('should be success, over transfer value', async () => {
       const value = BigNumber.from('1000000000000000000');
-      const walletAddress = await wallet.getAddress();
-      const walletToAddress = await walletTo.getAddress();
-      const DummyAddress = await Dummy.getAddress();
 
-      await expect(StandardERC20.approve(walletToAddress, value))
+      await expect(StandardERC20.approve(toAddress, value))
         .to.emit(StandardERC20, 'Approval')
-        .withArgs(walletAddress, walletToAddress, value);
-      expect(await StandardERC20.allowance(walletAddress, walletToAddress)).to.be.equal(value);
+        .withArgs(walletAddress, toAddress, value);
+      expect(await StandardERC20.allowance(walletAddress, toAddress)).to.be.equal(value);
 
       StandardERC20 = await StandardERC20.connect(walletTo);
 
-      await expect(StandardERC20.transferFrom(walletAddress, DummyAddress, value))
+      await expect(StandardERC20.transferFrom(walletAddress, dummyAddress, value))
         .to.emit(StandardERC20, 'Transfer')
-        .withArgs(walletAddress, DummyAddress, value);
+        .withArgs(walletAddress, dummyAddress, value);
       expect(await StandardERC20.balanceOf(walletAddress)).to.be.equal(initialToken.sub(value));
-      expect(await StandardERC20.balanceOf(walletToAddress)).to.be.equal('0');
-      expect(await StandardERC20.balanceOf(DummyAddress)).to.be.equal(value);
+      expect(await StandardERC20.balanceOf(toAddress)).to.be.equal('0');
+      expect(await StandardERC20.balanceOf(dummyAddress)).to.be.equal(value);
     });
   });
 
   describe('#mint', () => {
     it('should be success minting token', async () => {
-      const walletAddress = await wallet.getAddress();
       expect(await StandardERC20.mint(initialToken))
         .to.emit(StandardERC20, 'Transfer')
         .withArgs(constants.AddressZero, walletAddress, initialToken);
@@ -275,11 +214,10 @@ describe.skip('BeaconToken/ERC20', () => {
 
   describe('#mintTo', () => {
     it('should be success minting token for dummy', async () => {
-      const DummyAddress = await Dummy.getAddress();
-      expect(await StandardERC20.mintTo(DummyAddress, initialToken))
+      expect(await StandardERC20.mintTo(dummyAddress, initialToken))
         .to.emit(StandardERC20, 'Transfer')
-        .withArgs(constants.AddressZero, DummyAddress, initialToken);
-      expect(await StandardERC20.balanceOf(DummyAddress)).to.equal(initialToken);
+        .withArgs(constants.AddressZero, dummyAddress, initialToken);
+      expect(await StandardERC20.balanceOf(dummyAddress)).to.equal(initialToken);
       expect(await StandardERC20.totalSupply()).to.equal(initialToken.mul('2'));
     });
 
@@ -289,13 +227,11 @@ describe.skip('BeaconToken/ERC20', () => {
     });
 
     it('should be revert minting maximum amount uint256', async () => {
-      const DummyAddress = await Dummy.getAddress();
-      await expect(StandardERC20.mintTo(DummyAddress, constants.MaxUint256)).to.revertedWith('');
+      await expect(StandardERC20.mintTo(dummyAddress, constants.MaxUint256)).to.revertedWith('');
     });
 
     it('should be revert from not owner call', async () => {
-      const DummyAddress = await Dummy.getAddress();
-      await expect(StandardERC20.connect(Dummy).mintTo(DummyAddress, constants.MaxUint256)).to.revertedWith(
+      await expect(StandardERC20.connect(Dummy).mintTo(dummyAddress, constants.MaxUint256)).to.revertedWith(
         'Ownership/Not-Authorized',
       );
     });
@@ -303,7 +239,6 @@ describe.skip('BeaconToken/ERC20', () => {
 
   describe('#burn', () => {
     it('should be success self burn', async () => {
-      const walletAddress = await wallet.getAddress();
       expect(await StandardERC20.burn(initialToken))
         .to.emit(StandardERC20, 'Transfer')
         .withArgs(walletAddress, constants.AddressZero, initialToken);
@@ -312,7 +247,6 @@ describe.skip('BeaconToken/ERC20', () => {
     });
 
     it('should be revert at balance zero', async () => {
-      const walletAddress = await wallet.getAddress();
       expect(await StandardERC20.burn(initialToken))
         .to.emit(StandardERC20, 'Transfer')
         .withArgs(walletAddress, constants.AddressZero, initialToken);
@@ -326,40 +260,32 @@ describe.skip('BeaconToken/ERC20', () => {
 
   describe('#burnFrom', () => {
     it('should be success burn another account balance', async () => {
-      const walletAddress = await wallet.getAddress();
-      const DummyAddress = await Dummy.getAddress();
-
-      await StandardERC20.transfer(DummyAddress, initialToken);
+      await StandardERC20.transfer(dummyAddress, initialToken);
 
       await StandardERC20.connect(Dummy).approve(walletAddress, constants.MaxUint256);
 
-      expect(await StandardERC20.burnFrom(DummyAddress, initialToken))
+      expect(await StandardERC20.burnFrom(dummyAddress, initialToken))
         .to.emit(StandardERC20, 'Transfer')
-        .withArgs(DummyAddress, constants.AddressZero, initialToken);
+        .withArgs(dummyAddress, constants.AddressZero, initialToken);
 
       expect(await StandardERC20.balanceOf(walletAddress)).to.equal('0');
-      expect(await StandardERC20.balanceOf(DummyAddress)).to.equal('0');
+      expect(await StandardERC20.balanceOf(dummyAddress)).to.equal('0');
       expect(await StandardERC20.totalSupply()).to.equal('0');
     });
 
     it('should be revert at balance zero', async () => {
-      const walletAddress = await wallet.getAddress();
-      const DummyAddress = await Dummy.getAddress();
-
       await StandardERC20.connect(Dummy).approve(walletAddress, constants.MaxUint256);
 
-      await expect(StandardERC20.burnFrom(DummyAddress, initialToken)).revertedWith('');
+      await expect(StandardERC20.burnFrom(dummyAddress, initialToken)).revertedWith('');
     });
 
     it('should be revert at not approved', async () => {
-      const DummyAddress = await Dummy.getAddress();
-      await StandardERC20.transfer(DummyAddress, initialToken);
-      await expect(StandardERC20.burnFrom(DummyAddress, initialToken)).revertedWith('');
+      await StandardERC20.transfer(dummyAddress, initialToken);
+      await expect(StandardERC20.burnFrom(dummyAddress, initialToken)).revertedWith('');
     });
 
     it('shoule be revert from not owner call', async () => {
-      const DummyAddress = await Dummy.getAddress();
-      await expect(StandardERC20.connect(Dummy).burnFrom(DummyAddress, initialToken)).revertedWith(
+      await expect(StandardERC20.connect(Dummy).burnFrom(dummyAddress, initialToken)).revertedWith(
         'Ownership/Not-Authorized',
       );
     });

@@ -13,18 +13,22 @@ import {ERC20, IERC20} from "@beandao/contracts/library/ERC20.sol";
 import {ERC2612, IERC2612} from "@beandao/contracts/library/ERC2612.sol";
 import {Multicall, IMulticall} from "@beandao/contracts/library/Multicall.sol";
 
-contract StandardToken is ERC20, ERC2612, Ownership, Multicall, Initializer, IERC165, IBurn, IMint {
-    function initialize(
-        string memory tokenName,
-        string memory tokenSymbol,
-        uint8 tokenDecimals
-    ) external initializer {
+/**
+ * @title StandardERC20
+ * @author yoonsung.eth
+ * @notice ERC20과 ERC2612를 기본으로, ERC165, ERC173 명세를 구현하고 있습니다.
+ */
+contract StandardERC20 is ERC20, ERC2612, Ownership, Multicall, Initializer, IERC165, IBurn, IMint {
+    /**
+     * @notice ERC20을 초기화 합니다. 토큰의 이름, 심볼, 소수점 정보를 필요로 합니다. 이 함수는 실행될 때 단 한번만 실행됩니다.
+     * 이 함수가 실행될 때 이 함수를 실행한 당사자가 해당 컨트랙트의 소유권을 받게됩니다.
+     * @param data 토큰 이름, 토큰 심볼, 소수점 정보를 abi encode 하여, bytes 형태로 전달하여야 합니다.
+     */
+    function initialize(bytes calldata data) external initializer {
+        (name, symbol, decimals) = abi.decode(data, (string, string, uint8));
         version = "1";
-        name = tokenName;
-        symbol = tokenSymbol;
-        decimals = tokenDecimals;
         balanceOf[address(this)] = type(uint256).max;
-        _initDomainSeparator(tokenName, version);
+        _initDomainSeparator(name, version);
         _transferOwnership(msg.sender);
     }
 

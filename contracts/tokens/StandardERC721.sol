@@ -8,19 +8,12 @@ import {Ownership, IERC173} from "@beandao/contracts/library/Ownership.sol";
 import {Initializer} from "@beandao/contracts/library/Initializer.sol";
 import {ERC721, IERC721, IERC721Enumerable, IERC721Metadata} from "@beandao/contracts/library/ERC721.sol";
 import {Multicall, IMulticall} from "@beandao/contracts/library/Multicall.sol";
-import "../ITemplateV1.sol";
 
-contract ERC721Mock is ERC721, Multicall, Ownership, Initializer {
+contract StandardERC721 is ERC721, Multicall, Ownership, Initializer {
     string public baseURI;
 
-    function initialize(
-        string memory nftName,
-        string memory nftSymbol,
-        string memory baseUri
-    ) external initializer {
-        name = nftName;
-        symbol = nftSymbol;
-        baseURI = baseUri;
+    function initialize(bytes calldata data) external initializer {
+        (name, symbol, baseURI) = abi.decode(data, (string, string, string));
         _transferOwnership(msg.sender);
     }
 

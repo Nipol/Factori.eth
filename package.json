@@ -74,7 +74,9 @@
     "release": "scripts/release.sh",
     "vertigo": "scripts/vertigo.sh",
     "analyze": "slither ./contracts",
-    "hardhat:goerli": "cross-env NODE_ENV=production hardhat --network goerli",
+    "hardhat:goerli": "cross-env NODE_ENV=zproduction hardhat --network goerli",
+    "hardhat:kovan": "cross-env NODE_ENV=production hardhat --network kovan",
+    "hardhat:optimism-kovan": "cross-env NODE_ENV=production hardhat --network optimism-kovan",
     "hardhat:mainnet": "cross-env NODE_ENV=production hardhat --network mainnet"
   }
 }

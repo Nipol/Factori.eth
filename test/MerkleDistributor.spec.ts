@@ -3,6 +3,7 @@ import { ethers } from 'hardhat';
 import { Contract, BigNumber, constants, Signer } from 'ethers';
 
 import distributionTable from './result.json';
+import { defaultAbiCoder } from 'ethers/lib/utils';
 
 interface resultType {
   merkleRoot: string;
@@ -18,7 +19,7 @@ interface resultType {
 
 describe('MerkleDistributor', () => {
   let MerkleDistributor: Contract;
-  let StandardToken: Contract;
+  let StandardERC20: Contract;
 
   let wallet: Signer;
   let Dummy1: Signer;
@@ -29,21 +30,19 @@ describe('MerkleDistributor', () => {
     const accounts = await ethers.getSigners();
     [wallet, Dummy1, Dummy2, Dummy3] = accounts;
 
-    const tokenName = 'template';
-    const tokenSymbol = 'TEMP';
-    const tokenDecimals = BigNumber.from('18');
     // 100000개
     const initialToken = BigNumber.from('100000000000000000000000');
 
-    const StandardTokenTemplate = await ethers.getContractFactory(
-      'contracts/tokens/StandardToken.sol:StandardToken',
+    const StandardERC20Template = await ethers.getContractFactory(
+      'contracts/tokens/StandardERC20.sol:StandardERC20',
       wallet,
     );
-    StandardToken = await StandardTokenTemplate.deploy();
+    StandardERC20 = await StandardERC20Template.deploy();
 
-    await StandardToken.deployed();
-    await StandardToken.initialize(tokenName, tokenSymbol, tokenDecimals);
-    await StandardToken.mint(initialToken);
+    await StandardERC20.initialize(
+      defaultAbiCoder.encode(['string', 'string', 'uint8'], ['template', 'TEMP', BigNumber.from('18')]),
+    );
+    await StandardERC20.mint(initialToken);
   });
 
   it('should be same token addr', async () => {
@@ -52,9 +51,9 @@ describe('MerkleDistributor', () => {
       wallet,
     );
     MerkleDistributor = await MerkleDistributorTemplate.deploy();
-    await MerkleDistributor.initialize(StandardToken.address, constants.HashZero);
+    await MerkleDistributor.initialize(StandardERC20.address, constants.HashZero);
 
-    expect(await MerkleDistributor.token()).to.equal(StandardToken.address);
+    expect(await MerkleDistributor.token()).to.equal(StandardERC20.address);
   });
 
   it('should be same merkle root', async () => {
@@ -64,7 +63,7 @@ describe('MerkleDistributor', () => {
       wallet,
     );
     MerkleDistributor = await MerkleDistributorTemplate.deploy();
-    await MerkleDistributor.initialize(StandardToken.address, modHash);
+    await MerkleDistributor.initialize(StandardERC20.address, modHash);
 
     expect(await MerkleDistributor.root()).to.equal(modHash);
   });
@@ -77,11 +76,11 @@ describe('MerkleDistributor', () => {
         wallet,
       );
       MerkleDistributor = await MerkleDistributorTemplate.deploy();
-      await MerkleDistributor.initialize(StandardToken.address, table.merkleRoot);
+      await MerkleDistributor.initialize(StandardERC20.address, table.merkleRoot);
 
       // 배포 컨트랙트로 토큰 전송
-      await StandardToken.transfer(MerkleDistributor.address, '0x64');
-      expect(await StandardToken.balanceOf(MerkleDistributor.address)).to.equal('0x64');
+      await StandardERC20.transfer(MerkleDistributor.address, '0x64');
+      expect(await StandardERC20.balanceOf(MerkleDistributor.address)).to.equal('0x64');
 
       const addrs = ['0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'];
 
@@ -95,7 +94,61 @@ describe('MerkleDistributor', () => {
           .withArgs(index, addr, amount);
       });
 
-      expect(await StandardToken.balanceOf(MerkleDistributor.address)).to.equal('0');
+      expect(await StandardERC20.balanceOf(MerkleDistributor.address)).to.equal('0');
+    });
+
+    it('should be reverted with already claimed', async () => {
+      const table: resultType = distributionTable;
+      const MerkleDistributorTemplate = await ethers.getContractFactory(
+        'contracts/utils/MerkleDistributor.sol:MerkleDistributor',
+        wallet,
+      );
+      MerkleDistributor = await MerkleDistributorTemplate.deploy();
+      await MerkleDistributor.initialize(StandardERC20.address, table.merkleRoot);
+
+      // 배포 컨트랙트로 토큰 전송
+      await StandardERC20.transfer(MerkleDistributor.address, '0x64');
+      expect(await StandardERC20.balanceOf(MerkleDistributor.address)).to.equal('0x64');
+
+      const addrs = ['0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'];
+
+      const index = table.claims[`${addrs[0]}`]?.index;
+      const amount = table.claims[`${addrs[0]}`]?.amount;
+      const proof = table.claims[`${addrs[0]}`]?.proof;
+
+      expect(await MerkleDistributor.claim(index, addrs[0], amount, proof))
+        .to.emit(MerkleDistributor, 'Claimed')
+        .withArgs(index, addrs[0], amount);
+
+      expect(await StandardERC20.balanceOf(MerkleDistributor.address)).to.equal('0');
+
+      await expect(MerkleDistributor.claim(index, addrs[0], amount, proof)).revertedWith(
+        'MerkleDistributor/Already claimed',
+      );
+    });
+
+    it('should be reverted abnormaly proof', async () => {
+      const table: resultType = distributionTable;
+      const MerkleDistributorTemplate = await ethers.getContractFactory(
+        'contracts/utils/MerkleDistributor.sol:MerkleDistributor',
+        wallet,
+      );
+      MerkleDistributor = await MerkleDistributorTemplate.deploy();
+      await MerkleDistributor.initialize(StandardERC20.address, table.merkleRoot);
+
+      // 배포 컨트랙트로 토큰 전송
+      await StandardERC20.transfer(MerkleDistributor.address, '0x64');
+      expect(await StandardERC20.balanceOf(MerkleDistributor.address)).to.equal('0x64');
+
+      const addrs = ['0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'];
+
+      const index = table.claims[`${addrs[0]}`]?.index;
+      const amount = table.claims[`${addrs[0]}`]?.amount;
+      const proof: string[] = [constants.HashZero];
+
+      await expect(MerkleDistributor.claim(index, addrs[0], amount, proof)).revertedWith(
+        'MerkleDistributor/Invalid proof',
+      );
     });
   });
 
@@ -107,17 +160,17 @@ describe('MerkleDistributor', () => {
         wallet,
       );
       MerkleDistributor = await MerkleDistributorTemplate.deploy();
-      await MerkleDistributor.initialize(StandardToken.address, table.merkleRoot);
+      await MerkleDistributor.initialize(StandardERC20.address, table.merkleRoot);
 
       // 배포 컨트랙트로 토큰 전송
-      await StandardToken.transfer(MerkleDistributor.address, '903000000000000000000');
-      expect(await StandardToken.balanceOf(MerkleDistributor.address)).to.equal('903000000000000000000');
+      await StandardERC20.transfer(MerkleDistributor.address, '903000000000000000000');
+      expect(await StandardERC20.balanceOf(MerkleDistributor.address)).to.equal('903000000000000000000');
 
       expect(await MerkleDistributor.finalize())
         .to.emit(MerkleDistributor, 'Finalized')
-        .withArgs(StandardToken.address, constants.HashZero);
+        .withArgs(StandardERC20.address, constants.HashZero);
 
-      expect(await StandardToken.balanceOf(MerkleDistributor.address)).to.equal('0');
+      expect(await StandardERC20.balanceOf(MerkleDistributor.address)).to.equal('0');
     });
   });
 });

@@ -30,10 +30,8 @@ contract IntegrationMock {
         callData[1] = abi.encodeWithSelector(IERC173.transferOwnership.selector, msg.sender);
 
         bytes memory init = abi.encodeWithSelector(
-            bytes4(keccak256("initialize(string,string,uint8)")),
-            name,
-            symbol,
-            uint8(18)
+            bytes4(keccak256("initialize(bytes)")),
+            abi.encode(name, symbol, uint8(18))
         );
         deployed = Factory.deploy{value: msg.value}(false, TOKEN_KEY, init, callData);
 
@@ -42,10 +40,8 @@ contract IntegrationMock {
 
     function calculateAddress(string calldata name, string calldata symbol) external view returns (address calculated) {
         bytes memory init = abi.encodeWithSelector(
-            bytes4(keccak256("initialize(string,string,uint8)")),
-            name,
-            symbol,
-            uint8(18)
+            bytes4(keccak256("initialize(bytes)")),
+            abi.encode(name, symbol, uint8(18))
         );
         calculated = Factory.compute(false, TOKEN_KEY, init);
     }
@@ -78,10 +74,8 @@ contract IntegrationSeedMock {
         callData[1] = abi.encodeWithSelector(IERC173.transferOwnership.selector, msg.sender);
 
         bytes memory init = abi.encodeWithSelector(
-            bytes4(keccak256("initialize(string,string,uint8)")),
-            name,
-            symbol,
-            uint8(18)
+            bytes4(keccak256("initialize(bytes)")),
+            abi.encode(name, symbol, uint8(18))
         );
         deployed = Factory.deployWithSeed{value: msg.value}(seed, false, TOKEN_KEY, init, callData);
 
@@ -90,10 +84,8 @@ contract IntegrationSeedMock {
 
     function calculateAddress(string calldata name, string calldata symbol) external view returns (address calculated) {
         bytes memory init = abi.encodeWithSelector(
-            bytes4(keccak256("initialize(string,string,uint8)")),
-            name,
-            symbol,
-            uint8(18)
+            bytes4(keccak256("initialize(bytes)")),
+            abi.encode(name, symbol, uint8(18))
         );
         calculated = Factory.computeWithSeed(seed, false, TOKEN_KEY, init);
     }

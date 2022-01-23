@@ -1,50 +1,46 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import { DeployFunction } from 'hardhat-deploy/types';
-import { constants } from 'ethers';
-import { parseEther } from 'ethers/lib/utils';
+import { DeployFunction, TxOptions } from 'hardhat-deploy/types';
+import { defaultAbiCoder, parseEther } from 'ethers/lib/utils';
+import { BigNumber } from 'ethers';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
   const { deploy, execute } = deployments;
-  const artifact = await deployments.getArtifact('Allowlist');
+
+  const tokenName = 'template';
+  const tokenSymbol = 'TEMP';
+  const tokenDecimals = BigNumber.from('18');
 
   const { deployer } = await getNamedAccounts();
 
-  await deploy('MerkleDistributor', {
+  await deploy('StandardERC20', {
     from: deployer,
     maxFeePerGas: parseEther('0.000000070'),
     maxPriorityFeePerGas: parseEther('0.000000002'),
-    gasLimit: '1200000',
     log: true,
   });
 
   await execute(
-    'MerkleDistributor',
+    'StandardERC20',
     {
       from: deployer,
       maxFeePerGas: parseEther('0.000000070'),
       maxPriorityFeePerGas: parseEther('0.000000002'),
+      gasLimit: '265492',
     },
     'initialize',
-    constants.AddressZero,
-    constants.HashZero,
+    defaultAbiCoder.encode(['string', 'string', 'uint8'], [tokenName, tokenSymbol, tokenDecimals]),
   );
-
   await execute(
-    'MerkleDistributor',
+    'StandardERC20',
     {
       from: deployer,
       maxFeePerGas: parseEther('0.000000070'),
       maxPriorityFeePerGas: parseEther('0.000000002'),
+      gasLimit: '50000',
     },
     'resignOwnership',
   );
-
-  // const op: TxOptions = {
-  //   from: deployer,
-  // };
-
-  // await execute('StandardToken', op, 'resignOwnership');
 };
 export default func;
-func.tags = ['Allowlist'];
+func.tags = ['StandardERC20'];
