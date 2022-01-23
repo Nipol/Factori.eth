@@ -1,5 +1,5 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import { DeployFunction, TxOptions } from 'hardhat-deploy/types';
+import { DeployFunction } from 'hardhat-deploy/types';
 import { defaultAbiCoder, parseEther } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
 

@@ -38,7 +38,7 @@ const chainIds = {
   goerli: 5,
   kovan: 42,
   optimism: 10,
-  optimismKovan: 69,
+  'optimism-kovan': 69,
   hardhat: 31337,
 };
 
@@ -86,7 +86,8 @@ function getChainConfig(network: keyof typeof chainIds, mainnet = false): Networ
 }
 
 function getOptimismConfig(network: keyof typeof chainIds, mainnet = false): NetworkUserConfig {
-  const url: string = `https://${mainnet ? `mainnet` : `kovan`}.optimism.io/`;
+  // const url: string = `https://${mainnet ? `mainnet` : `kovan`}.optimism.io/`;
+  const url: string = `https://${network}.infura.io/v3/${infuraKey}`;
   console.log(url);
   return {
     accounts: {
@@ -97,6 +98,9 @@ function getOptimismConfig(network: keyof typeof chainIds, mainnet = false): Net
     chainId: chainIds[network],
     deploy: ['deploy_l2'],
     url,
+    companionNetworks: {
+      l1: 'kovan',
+    },
   };
 }
 
@@ -131,7 +135,7 @@ const config: HardhatUserConfig = {
     rinkeby: getChainConfig('rinkeby'),
     ropsten: getChainConfig('ropsten'),
     mainnet: getChainConfig('eth', true),
-    'optimism-kovan': getOptimismConfig('optimismKovan'),
+    'optimism-kovan': getOptimismConfig('optimism-kovan'),
   },
 
   solidity: {

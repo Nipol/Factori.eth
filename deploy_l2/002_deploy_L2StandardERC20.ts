@@ -15,8 +15,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   await deploy('L2StandardERC20', {
     from: deployer,
-    maxFeePerGas: parseEther('0.000000070'),
-    maxPriorityFeePerGas: parseEther('0.000000002'),
     log: true,
   });
 
@@ -24,9 +22,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     'L2StandardERC20',
     {
       from: deployer,
-      maxFeePerGas: parseEther('0.000000070'),
-      maxPriorityFeePerGas: parseEther('0.000000002'),
-      gasLimit: '165492',
+      gasLimit: '265492',
     },
     'initialize',
     defaultAbiCoder.encode(

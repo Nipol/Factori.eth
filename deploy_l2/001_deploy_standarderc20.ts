@@ -15,8 +15,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   await deploy('StandardERC20', {
     from: deployer,
-    maxFeePerGas: parseEther('0.000000070'),
-    maxPriorityFeePerGas: parseEther('0.000000002'),
     log: true,
   });
 
@@ -24,8 +22,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     'StandardERC20',
     {
       from: deployer,
-      maxFeePerGas: parseEther('0.000000070'),
-      maxPriorityFeePerGas: parseEther('0.000000002'),
       gasLimit: '265492',
     },
     'initialize',
@@ -35,8 +31,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     'StandardERC20',
     {
       from: deployer,
-      maxFeePerGas: parseEther('0.000000070'),
-      maxPriorityFeePerGas: parseEther('0.000000002'),
       gasLimit: '50000',
     },
     'resignOwnership',

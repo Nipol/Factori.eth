@@ -11,8 +11,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   await deploy('MerkleDistributor', {
     from: deployer,
-    maxFeePerGas: parseEther('0.000000070'),
-    maxPriorityFeePerGas: parseEther('0.000000002'),
     log: true,
   });
 
@@ -20,8 +18,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     'MerkleDistributor',
     {
       from: deployer,
-      maxFeePerGas: parseEther('0.000000070'),
-      maxPriorityFeePerGas: parseEther('0.000000002'),
       gasLimit: '53101',
     },
     'initialize',
@@ -33,8 +29,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     'MerkleDistributor',
     {
       from: deployer,
-      maxFeePerGas: parseEther('0.000000070'),
-      maxPriorityFeePerGas: parseEther('0.000000002'),
       gasLimit: '50000',
     },
     'resignOwnership',
