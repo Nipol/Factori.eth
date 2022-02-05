@@ -11,7 +11,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   await deploy('VestingEscrow', {
     from: deployer,
-    maxFeePerGas: parseEther('0.000000070'),
+    maxFeePerGas: parseEther('0.000000060'),
     maxPriorityFeePerGas: parseEther('0.000000002'),
     log: true,
   });
@@ -20,7 +20,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     'VestingEscrow',
     {
       from: deployer,
-      maxFeePerGas: parseEther('0.000000070'),
+      maxFeePerGas: parseEther('0.000000060'),
       maxPriorityFeePerGas: parseEther('0.000000002'),
       gasLimit: '51285',
     },
@@ -33,7 +33,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     'VestingEscrow',
     {
       from: deployer,
-      maxFeePerGas: parseEther('0.000000070'),
+      maxFeePerGas: parseEther('0.000000060'),
       maxPriorityFeePerGas: parseEther('0.000000002'),
       gasLimit: '50000',
     },

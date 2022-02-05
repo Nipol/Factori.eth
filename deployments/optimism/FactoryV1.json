@@ -1,0 +1,898 @@
+{
+  "address": "0x677ef2B01493e235fE2271AFcd01d7e22975Ce5b",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "feeAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address payable",
+          "name": "feeToAddr",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "key",
+          "type": "bytes32"
+        }
+      ],
+      "name": "DeletedTemplate",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "deployed",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "Deployed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "prevFee",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "fee",
+          "type": "uint256"
+        }
+      ],
+      "name": "FeeChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "prevFeeTo",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "feeTo",
+          "type": "address"
+        }
+      ],
+      "name": "FeeToChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "key",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "template",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "beacon",
+          "type": "address"
+        }
+      ],
+      "name": "NewTemplate",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "key",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "template",
+          "type": "address"
+        }
+      ],
+      "name": "UpdatedTemplate",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "templateAddr",
+          "type": "address"
+        }
+      ],
+      "name": "addTemplate",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "baseFee",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "newFee",
+          "type": "uint256"
+        }
+      ],
+      "name": "changeFee",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "newFeeTo",
+          "type": "address"
+        }
+      ],
+      "name": "changeFeeTo",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "templateAddr",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "initializationCallData",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes[]",
+          "name": "calls",
+          "type": "bytes[]"
+        }
+      ],
+      "name": "clone",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "deployed",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "tokenAddr",
+          "type": "address"
+        }
+      ],
+      "name": "collect",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bool",
+          "name": "isBeacon",
+          "type": "bool"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "templateId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "initializationCallData",
+          "type": "bytes"
+        }
+      ],
+      "name": "compute",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "deployable",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "templateAddr",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "initializationCallData",
+          "type": "bytes"
+        }
+      ],
+      "name": "computeClone",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "deployable",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "seed",
+          "type": "string"
+        },
+        {
+          "internalType": "bool",
+          "name": "isBeacon",
+          "type": "bool"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "templateId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "initializationCallData",
+          "type": "bytes"
+        }
+      ],
+      "name": "computeWithSeed",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "deployable",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bool",
+          "name": "isBeacon",
+          "type": "bool"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "templateId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "initializationCallData",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes[]",
+          "name": "calls",
+          "type": "bytes[]"
+        }
+      ],
+      "name": "deploy",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "deployed",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "seed",
+          "type": "string"
+        },
+        {
+          "internalType": "bool",
+          "name": "isBeacon",
+          "type": "bool"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "templateId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "initializationCallData",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes[]",
+          "name": "calls",
+          "type": "bytes[]"
+        }
+      ],
+      "name": "deployWithSeed",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "deployed",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "feeTo",
+      "outputs": [
+        {
+          "internalType": "address payable",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getPrice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes[]",
+          "name": "callData",
+          "type": "bytes[]"
+        }
+      ],
+      "name": "multicall",
+      "outputs": [
+        {
+          "internalType": "bytes[]",
+          "name": "returnData",
+          "type": "bytes[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nonce",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "deployed",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        }
+      ],
+      "name": "recoverOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "key",
+          "type": "bytes32"
+        }
+      ],
+      "name": "removeTemplate",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "resignOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "templates",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "template",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "btemplate",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "key",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "templateAddr",
+          "type": "address"
+        }
+      ],
+      "name": "updateTemplate",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x245b9d716ef0bb68ff7f54b32f81f7a2cc045bc54eed3047bae41cc0df764261",
+  "receipt": {
+    "to": null,
+    "from": "0x54B5E06c82f0d3d91377E5827BFb2381Ef1CC2b7",
+    "contractAddress": "0x677ef2B01493e235fE2271AFcd01d7e22975Ce5b",
+    "transactionIndex": 0,
+    "gasUsed": "3104676",
+    "logsBloom": "0x00000000000000000000000000000000000000000004000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000020000000000000000000800000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000020000000010000000000000000400000000000040000000000000000000000000000",
+    "blockHash": "0xcefb4e81ce3b095ce15266e43494f839f9377e3cfe441d86378150d821e70793",
+    "transactionHash": "0x245b9d716ef0bb68ff7f54b32f81f7a2cc045bc54eed3047bae41cc0df764261",
+    "logs": [
+      {
+        "transactionIndex": 0,
+        "blockNumber": 3233341,
+        "transactionHash": "0x245b9d716ef0bb68ff7f54b32f81f7a2cc045bc54eed3047bae41cc0df764261",
+        "address": "0x677ef2B01493e235fE2271AFcd01d7e22975Ce5b",
+        "topics": [
+          "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "0x00000000000000000000000054b5e06c82f0d3d91377e5827bfb2381ef1cc2b7"
+        ],
+        "data": "0x",
+        "logIndex": 0,
+        "blockHash": "0xcefb4e81ce3b095ce15266e43494f839f9377e3cfe441d86378150d821e70793"
+      }
+    ],
+    "blockNumber": 3233341,
+    "cumulativeGasUsed": "3104676",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "1000000000000000",
+    "0x54B5E06c82f0d3d91377E5827BFb2381Ef1CC2b7"
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "9cb17cafb54a33799e572b3a1d761130",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.11+commit.d7f03943\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"feeAmount\",\"type\":\"uint256\"},{\"internalType\":\"address payable\",\"name\":\"feeToAddr\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"}],\"name\":\"DeletedTemplate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"deployed\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"Deployed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"prevFee\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"fee\",\"type\":\"uint256\"}],\"name\":\"FeeChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"prevFeeTo\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"feeTo\",\"type\":\"address\"}],\"name\":\"FeeToChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"template\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"beacon\",\"type\":\"address\"}],\"name\":\"NewTemplate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"template\",\"type\":\"address\"}],\"name\":\"UpdatedTemplate\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"templateAddr\",\"type\":\"address\"}],\"name\":\"addTemplate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"baseFee\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"newFee\",\"type\":\"uint256\"}],\"name\":\"changeFee\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"newFeeTo\",\"type\":\"address\"}],\"name\":\"changeFeeTo\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"templateAddr\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"initializationCallData\",\"type\":\"bytes\"},{\"internalType\":\"bytes[]\",\"name\":\"calls\",\"type\":\"bytes[]\"}],\"name\":\"clone\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"deployed\",\"type\":\"address\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenAddr\",\"type\":\"address\"}],\"name\":\"collect\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bool\",\"name\":\"isBeacon\",\"type\":\"bool\"},{\"internalType\":\"bytes32\",\"name\":\"templateId\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"initializationCallData\",\"type\":\"bytes\"}],\"name\":\"compute\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"deployable\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"templateAddr\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"initializationCallData\",\"type\":\"bytes\"}],\"name\":\"computeClone\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"deployable\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"seed\",\"type\":\"string\"},{\"internalType\":\"bool\",\"name\":\"isBeacon\",\"type\":\"bool\"},{\"internalType\":\"bytes32\",\"name\":\"templateId\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"initializationCallData\",\"type\":\"bytes\"}],\"name\":\"computeWithSeed\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"deployable\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bool\",\"name\":\"isBeacon\",\"type\":\"bool\"},{\"internalType\":\"bytes32\",\"name\":\"templateId\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"initializationCallData\",\"type\":\"bytes\"},{\"internalType\":\"bytes[]\",\"name\":\"calls\",\"type\":\"bytes[]\"}],\"name\":\"deploy\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"deployed\",\"type\":\"address\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"seed\",\"type\":\"string\"},{\"internalType\":\"bool\",\"name\":\"isBeacon\",\"type\":\"bool\"},{\"internalType\":\"bytes32\",\"name\":\"templateId\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"initializationCallData\",\"type\":\"bytes\"},{\"internalType\":\"bytes[]\",\"name\":\"calls\",\"type\":\"bytes[]\"}],\"name\":\"deployWithSeed\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"deployed\",\"type\":\"address\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"feeTo\",\"outputs\":[{\"internalType\":\"address payable\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getPrice\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"price\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes[]\",\"name\":\"callData\",\"type\":\"bytes[]\"}],\"name\":\"multicall\",\"outputs\":[{\"internalType\":\"bytes[]\",\"name\":\"returnData\",\"type\":\"bytes[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"nonce\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"deployed\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"}],\"name\":\"recoverOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"}],\"name\":\"removeTemplate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"resignOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"templates\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"template\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"btemplate\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"templateAddr\",\"type\":\"address\"}],\"name\":\"updateTemplate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"author\":\"yoonsung.eth\",\"details\":\"The template to be registered may or may not have an `initialize` function. However, at least a ERC173 and multicall for directed at self must be implemented.\",\"kind\":\"dev\",\"methods\":{\"addTemplate(address)\":{\"details\":\"\\uac19\\uc740 \\ud15c\\ud50c\\ub9bf\\uc774 \\ube44\\ucf58\\uacfc, \\uc77c\\ubc18\\uc801\\uc778 \\ud15c\\ud50c\\ub9bf\\uc73c\\ub85c \\ub4f1\\ub85d\\ub420 \\uc218 \\uc788\\uc2b5\\ub2c8\\ub2e4. \\ub530\\ub77c\\uc11c \\uc120\\ud0dd\\uc801\\uc73c\\ub85c \\uc0ac\\uc6a9 \\uac00\\ub2a5\\ud569\\ub2c8\\ub2e4.\",\"params\":{\"templateAddr\":\"\\ud15c\\ud50c\\ub9bf\\uc73c\\ub85c \\uc0ac\\uc6a9\\ub420 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc758 \\uc8fc\\uc18c\"}},\"changeFee(uint256)\":{\"params\":{\"newFee\":\"\\ubcc0\\uacbd\\ub41c \\uc218\\uc218\\ub8cc\"}},\"changeFeeTo(address)\":{\"params\":{\"newFeeTo\":\"\\uc218\\ucde8\\ud560 \\ub300\\uc0c1 \\uc8fc\\uc18c\"}},\"clone(address,bytes,bytes[])\":{\"params\":{\"calls\":\"\\ucd08\\uae30\\ud654 \\ud568\\uc218 \\uc774\\uc678\\uc5d0, \\ud638\\ucd9c\\ub418\\uc5b4\\uc57c \\ud558\\ub294 \\ud568\\uc218\\ub4e4\\uc758 \\ubc30\\uc5f4\",\"initializationCallData\":\"\\ubc30\\ud3ec\\ub418\\uba74\\uc11c \\ud638\\ucd9c\\ub418\\uc5b4\\uc57c \\ud558\\ub294 \\ucd08\\uae30\\ud654 \\ud568\\uc218\",\"templateAddr\":\"\\ud15c\\ud50c\\ub9bf\\uc73c\\ub85c \\uc0ac\\uc6a9\\ud560 \\uc774\\ubbf8 \\ubc30\\ud3ec\\ub41c \\ucee8\\ud2b8\\ub799\\ud2b8 \\uc8fc\\uc18c\"}},\"collect(address)\":{\"params\":{\"tokenAddr\":\"\\uc218\\ucde8\\ud560 \\ud1a0\\ud070 \\uc8fc\\uc18c\"}},\"compute(bool,bytes32,bytes)\":{\"details\":\"\\uc5f0\\uacb0\\ub41c \\uc9c0\\uac11 \\uc8fc\\uc18c\\uc5d0 \\ub530\\ub77c \\uc0dd\\uc131\\ub420 \\uc9c0\\uac11 \\uc8fc\\uc18c\\uac00 \\ubcc0\\uacbd\\ub418\\ubbc0\\ub85c, \\uc5f0\\uacb0\\ub418\\uc5b4 \\uc788\\ub294 \\uc8fc\\uc18c\\ub97c \\ud544\\uc218\\ub85c \\ud655\\uc778\\ud558\\uc5ec\\uc57c \\ud569\\ub2c8\\ub2e4.\",\"params\":{\"initializationCallData\":\"\\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\uc0dd\\uc131\\ub420 \\ub54c \\ud638\\ucd9c\\ud560 \\uc9c1\\ub82c\\ud654\\ub41c \\ucd08\\uae30\\ud654 \\ud568\\uc218 \\uc815\\ubcf4\",\"isBeacon\":\"\\ube44\\ucf58\\uc73c\\ub85c \\ubc30\\ud3ec\\ud574\\uc57c \\ud560 \\uac83\\uc778\\uc9c0 \\uacb0\\uc815\\ud558\\ub294 \\uc778\\uc790.\",\"templateId\":\"\\ubc30\\ud3ec\\ud560 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc758 template id\"}},\"computeClone(address,bytes)\":{\"details\":\"\\uc5f0\\uacb0\\ub41c \\uc9c0\\uac11 \\uc8fc\\uc18c\\uc5d0 \\ub530\\ub77c \\uc0dd\\uc131\\ub420 \\uc9c0\\uac11 \\uc8fc\\uc18c\\uac00 \\ubcc0\\uacbd\\ub418\\ubbc0\\ub85c, \\uc5f0\\uacb0\\ub418\\uc5b4 \\uc788\\ub294 \\uc8fc\\uc18c\\ub97c \\ud544\\uc218\\ub85c \\ud655\\uc778\\ud558\\uc5ec\\uc57c \\ud569\\ub2c8\\ub2e4.\",\"params\":{\"initializationCallData\":\"\\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\uc0dd\\uc131\\ub420 \\ub54c \\ud638\\ucd9c\\ud560 \\uc9c1\\ub82c\\ud654\\ub41c \\ucd08\\uae30\\ud654 \\ud568\\uc218 \\uc815\\ubcf4\",\"templateAddr\":\"\\ubc30\\ud3ec\\ud560 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc758 template id\"}},\"computeWithSeed(string,bool,bytes32,bytes)\":{\"details\":\"\\uc5f0\\uacb0\\ub41c \\uc9c0\\uac11 \\uc8fc\\uc18c\\uc5d0 \\ub530\\ub77c \\uc0dd\\uc131\\ub420 \\uc9c0\\uac11 \\uc8fc\\uc18c\\uac00 \\ubcc0\\uacbd\\ub418\\ubbc0\\ub85c, \\uc5f0\\uacb0\\ub418\\uc5b4 \\uc788\\ub294 \\uc8fc\\uc18c\\ub97c \\ud544\\uc218\\ub85c \\ud655\\uc778\\ud558\\uc5ec\\uc57c \\ud569\\ub2c8\\ub2e4.\",\"params\":{\"initializationCallData\":\"\\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\uc0dd\\uc131\\ub420 \\ub54c \\ud638\\ucd9c\\ud560 \\uc9c1\\ub82c\\ud654\\ub41c \\ucd08\\uae30\\ud654 \\ud568\\uc218 \\uc815\\ubcf4\",\"isBeacon\":\"\\ube44\\ucf58\\uc73c\\ub85c \\ubc30\\ud3ec\\ud574\\uc57c \\ud560 \\uac83\\uc778\\uc9c0 \\uacb0\\uc815\\ud558\\ub294 \\uc778\\uc790.\",\"seed\":\"\\ucee8\\ud2b8\\ub799\\ud2b8\\uc5d0 \\uc0ac\\uc6a9\\ud560 seed \\ubb38\\uc790\\uc5f4\",\"templateId\":\"\\ubc30\\ud3ec\\ud560 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc758 template id\"}},\"constructor\":{\"params\":{\"feeAmount\":\"basic fee for ether amount\",\"feeToAddr\":\"fee collector address\"}},\"deploy(bool,bytes32,bytes,bytes[])\":{\"details\":\"\\uc77c\\ubc18\\uc801\\uc73c\\ub85c \\ubc30\\ud3ec\\ub418\\ub294 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc640 \\uac19\\uc774 \\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\uc0dd\\uc131\\ub420 \\ub54c \\ucd08\\uae30\\ud654 \\ud568\\uc218\\ub97c \\uc2e4\\ud589\\ud574\\uc57c \\ud55c\\ub2e4\\uba74, initializationCallData\\uc5d0 \\ud638\\ucd9c\\ud560 \\ud568\\uc218\\ub97c serialize\\ud558\\uc5ec \\uc8fc\\uc785\\ud558\\uc5ec\\uc57c \\ud569\\ub2c8\\ub2e4. \\ucee8\\ud2b8\\ub799\\ud2b8 \\uc18c\\uc720\\uad8c\\uc744 \\ubcc4\\ub3c4\\ub85c \\uad00\\ub9ac\\ud574\\uc57c\\ud558\\ub294 \\uacbd\\uc6b0 multicall\\uc744 \\ud1b5\\ud574\\uc11c \\uba85\\uc2dc\\uc801\\uc778 \\uc18c\\uc720\\uad8c \\uc774\\uc804\\uc774 \\ub418\\uc5b4\\uc57c \\ud569\\ub2c8\\ub2e4.\",\"params\":{\"calls\":\"\\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\ubc30\\ud3ec\\ub41c \\uc774\\ud6c4, \\ud544\\uc694\\ud55c \\uc77c\\ub828\\uc758 \\ud568\\uc218 \\ud638\\ucd9c \\uc815\\ubcf4\",\"initializationCallData\":\"\\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\uc0dd\\uc131\\ub420 \\ub54c \\ud638\\ucd9c\\ud560 \\uc9c1\\ub82c\\ud654\\ub41c \\ucd08\\uae30\\ud654 \\ud568\\uc218 \\uc815\\ubcf4\",\"isBeacon\":\"\\ube44\\ucf58\\uc73c\\ub85c \\ubc30\\ud3ec\\ud574\\uc57c \\ud560 \\uac83\\uc778\\uc9c0 \\uacb0\\uc815\\ud558\\ub294 \\uc778\\uc790.\",\"templateId\":\"\\ubc30\\ud3ec\\ud560 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc758 template id\"}},\"deployWithSeed(string,bool,bytes32,bytes,bytes[])\":{\"details\":\"\\uc77c\\ubc18\\uc801\\uc73c\\ub85c \\ubc30\\ud3ec\\ub418\\ub294 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc640 \\uac19\\uc774 \\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\uc0dd\\uc131\\ub420 \\ub54c \\ucd08\\uae30\\ud654 \\ud568\\uc218\\ub97c \\uc2e4\\ud589\\ud574\\uc57c \\ud55c\\ub2e4\\uba74, initializationCallData\\uc5d0 \\ud638\\ucd9c\\ud560 \\ud568\\uc218\\ub97c serialize\\ud558\\uc5ec \\uc8fc\\uc785\\ud558\\uc5ec\\uc57c \\ud569\\ub2c8\\ub2e4. \\ucee8\\ud2b8\\ub799\\ud2b8 \\uc18c\\uc720\\uad8c\\uc744 \\ubcc4\\ub3c4\\ub85c \\uad00\\ub9ac\\ud574\\uc57c\\ud558\\ub294 \\uacbd\\uc6b0 multicall\\uc744 \\ud1b5\\ud574\\uc11c \\uba85\\uc2dc\\uc801\\uc778 \\uc18c\\uc720\\uad8c \\uc774\\uc804\\uc774 \\ub418\\uc5b4\\uc57c \\ud569\\ub2c8\\ub2e4.\",\"params\":{\"calls\":\"\\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\ubc30\\ud3ec\\ub41c \\uc774\\ud6c4, \\ud544\\uc694\\ud55c \\uc77c\\ub828\\uc758 \\ud568\\uc218 \\ud638\\ucd9c \\uc815\\ubcf4\",\"initializationCallData\":\"\\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\uc0dd\\uc131\\ub420 \\ub54c \\ud638\\ucd9c\\ud560 \\uc9c1\\ub82c\\ud654\\ub41c \\ucd08\\uae30\\ud654 \\ud568\\uc218 \\uc815\\ubcf4\",\"isBeacon\":\"\\ube44\\ucf58\\uc73c\\ub85c \\ubc30\\ud3ec\\ud574\\uc57c \\ud560 \\uac83\\uc778\\uc9c0 \\uacb0\\uc815\\ud558\\ub294 \\uc778\\uc790.\",\"seed\":\"\\ucee8\\ud2b8\\ub799\\ud2b8 \\uc8fc\\uc18c \\ud655\\uc815\\uc5d0 \\ud544\\uc694\\ud55c \\uc678\\ubd80 seed\",\"templateId\":\"\\ubc30\\ud3ec\\ud560 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc758 template id\"}},\"getPrice()\":{\"details\":\"\\uc5f0\\uacb0\\ub41c \\uc9c0\\uac11 \\uc8fc\\uc18c\\uc5d0 \\ub530\\ub77c \\uc0dd\\uc131\\ub420 \\uc9c0\\uac11 \\uc8fc\\uc18c\\uac00 \\ubcc0\\uacbd\\ub418\\ubbc0\\ub85c, \\uc5f0\\uacb0\\ub418\\uc5b4 \\uc788\\ub294 \\uc8fc\\uc18c\\ub97c \\ud544\\uc218\\ub85c \\ud655\\uc778\\ud558\\uc5ec\\uc57c \\ud569\\ub2c8\\ub2e4.\",\"returns\":{\"price\":\"\\uc774\\ub354\\ub9ac\\uc6c0\\uc73c\\ub85c \\uad6c\\uc131\\ub41c \\uac12\\uc744 \\uac00\\uc9d0.\"}},\"removeTemplate(bytes32)\":{\"params\":{\"key\":\"\\uc0ad\\uc81c\\ub420 \\ud15c\\ud50c\\ub9bf\\uc758 \\uc544\\uc774\\ub514\"}},\"transferOwnership(address)\":{\"params\":{\"newOwner\":\"The address of the new owner of the contract\"}},\"updateTemplate(bytes32,address)\":{\"params\":{\"key\":\"\\uc5c5\\ub370\\uc774\\ud2b8 \\ub420 \\ud15c\\ud50c\\ub9bf\\uc758 \\uc544\\uc774\\ub514\",\"templateAddr\":\"\\ube44\\ucf58\\uc77c \\uacbd\\uc6b0 \\ud15c\\ud50c\\ub9bf \\uc8fc\\uc18c, \\ud15c\\ud50c\\ub9bf \\uc18c\\uc720\\uc8fc \\uc8fc\\uc18c\\ub97c \\uc21c\\uc11c\\ub300\\ub85c \\uc778\\ucf54\\ub529\"}}},\"title\":\"Factory V1\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"addTemplate(address)\":{\"notice\":\"\\ud15c\\ud50c\\ub9bf\\uc73c\\ub85c \\uc0ac\\uc6a9\\ub418\\uae30 \\uc801\\ud569\\ud55c \\uc778\\ud130\\ud398\\uc774\\uc2a4\\uac00 \\uad6c\\ud604\\ub41c \\ucee8\\ud2b8\\ub799\\ud2b8\\ub97c \\ud15c\\ud50c\\ub9bf\\uc73c\\ub85c \\uac00\\uaca9\\uacfc \\ud568\\uaed8 \\ub4f1\\ub85d\\ud568.\"},\"baseFee()\":{\"notice\":\"base fee\"},\"changeFee(uint256)\":{\"notice\":\"\\uace0\\uc815 \\uc218\\uc218\\ub8cc\\ub97c \\ubcc0\\uacbd\"},\"changeFeeTo(address)\":{\"notice\":\"\\uc218\\uc218\\ub8cc\\ub97c \\uc218\\ucde8\\ud560 \\ub300\\uc0c1 \\ubcc0\\uacbd\"},\"clone(address,bytes,bytes[])\":{\"notice\":\"Factori.eth\\uc5d0 \\ub4f1\\ub85d\\ub418\\uc9c0 \\uc54a\\uc740 \\ucee8\\ud2b8\\ub799\\ud2b8\\ub97c Template\\ub85c \\ud558\\uc5ec Minimal Proxy\\ub85c \\ubc30\\ud3ec\\ud569\\ub2c8\\ub2e4.\"},\"collect(address)\":{\"notice\":\"Factori.eth\\uc5d0 \\uc313\\uc5ec\\uc788\\ub294 ETH\\uc640 \\ud1a0\\ud070\\uc744 \\ud638\\ucd9c\\ud558\\uc5ec, \\uc218\\uc218\\ub8cc \\uc218\\ucde8 \\uc8fc\\uc18c\\uc5d0 \\uc804\\uc1a1\\ud568\"},\"compute(bool,bytes32,bytes)\":{\"notice\":\"template id\\uc640 \\ucd08\\uae30\\ud654 \\ub370\\uc774\\ud130 \\ud1b5\\ud574\\uc11c minimal proxy\\uc640 minimal beacon proxy\\ub85c \\ubc30\\ud3ec\\ud560 \\uc8fc\\uc18c\\ub97c \\ubbf8\\ub9ac \\ud30c\\uc545\\ud558\\ub294 \\ud568\\uc218\"},\"computeClone(address,bytes)\":{\"notice\":\"Factori.eth\\uc5d0 \\ub4f1\\ub85d\\ub418\\uc9c0 \\uc54a\\uc740 \\ucee8\\ud2b8\\ub799\\ud2b8\\ub97c Template\\ub85c \\ud558\\uc5ec minimal proxy\\ub85c \\ubc30\\ud3ec\\ud560 \\uc8fc\\uc18c\\ub97c \\ubbf8\\ub9ac \\ud30c\\uc545\\ud558\\ub294 \\ud568\\uc218\"},\"computeWithSeed(string,bool,bytes32,bytes)\":{\"notice\":\"template id\\uc640 Seed \\ubb38\\uc790\\uc5f4, \\ucd08\\uae30\\ud654 \\ub370\\uc774\\ud130 \\ud1b5\\ud574\\uc11c minimal proxy\\uc640 minimal beacon proxy\\ub85c \\ubc30\\ud3ec\\ud560 \\uc8fc\\uc18c\\ub97c \\ubbf8\\ub9ac \\ud30c\\uc545\\ud558\\ub294 \\ud568\\uc218\"},\"constructor\":{\"notice\":\"requiring on deploy, allowlist contract.\"},\"deploy(bool,bytes32,bytes,bytes[])\":{\"notice\":\"template id\\ub97c \\ud1b5\\ud574\\uc11c minimal proxy\\uc640 minimal beacon proxy\\ub97c \\ubc30\\ud3ec\\ud558\\ub294 \\ud568\\uc218.\"},\"deployWithSeed(string,bool,bytes32,bytes,bytes[])\":{\"notice\":\"template id\\uc640 \\uc678\\ubd80\\uc5d0\\uc11c \\uad00\\ub9ac\\ub418\\ub294 seed\\ub97c \\ud1b5\\ud574\\uc11c minimal proxy\\uc640 minimal beacon proxy\\ub97c \\ubc30\\ud3ec\\ud558\\ub294 \\ud568\\uc218.\"},\"feeTo()\":{\"notice\":\"fee collector\"},\"getPrice()\":{\"notice\":\"template id\\uc5d0 \\ub530\\ub77c\\uc11c \\ucee8\\ud2b8\\ub799\\ud2b8\\ub97c \\ubc30\\ud3ec\\ud558\\uae30 \\uc704\\ud55c \\ud544\\uc694 \\uac00\\uaca9\\uc744 \\uac00\\uc838\\uc624\\ub294 \\ud568\"},\"nonce()\":{\"notice\":\"template count.\"},\"owner()\":{\"notice\":\"Get the address of the owner\"},\"removeTemplate(bytes32)\":{\"notice\":\"\\ub4f1\\ub85d\\ub41c \\ud15c\\ud50c\\ub9bf\\uc744 \\uc0ad\\uc81c\\ud558\\ub294 \\ud568\\uc218\"},\"templates(bytes32)\":{\"notice\":\"template key for template info.\"},\"transferOwnership(address)\":{\"notice\":\"Set the address of the new owner of the contract\"},\"updateTemplate(bytes32,address)\":{\"notice\":\"\\ub4f1\\ub85d\\ub41c \\ud15c\\ud50c\\ub9bf\\uc758 \\uc815\\ubcf4\\ub97c \\ubcc0\\uacbd\\ud558\\ub294 \\ud568\\uc218, \\ube44\\ucf58\\uc778 \\uacbd\\uc6b0\\uc5d0\\ub294 \\ud15c\\ud50c\\ub9bf\\uc744 \\uc5c5\\ub370\\uc774\\ud2b8 \\ud560 \\uc218 \\uc788\\uc73c\\ub098 \\ube44\\ucf58\\uc774 \\uc544\\ub2c8\\ub77c\\uba74 \\uc5c5\\ub370\\uc774\\ud2b8 \\ubd88\\uac00\\ub2a5.\"}},\"notice\":\"Abstract reusable contract into template and deploy them in small sizes `minimal proxy` and `beacon proxy`. This contract can receive a fee lower than the deploy cost, and registered addresses do not have to pay the fee. Beacon is managed in this contract, it can be useful if you need a scalable upgrade through the `beacon proxy`.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/FactoryV1.sol\":\"FactoryV1\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":42069},\"remappings\":[]},\"sources\":{\"@beandao/contracts/interfaces/IERC165.sol\":{\"content\":\"/**\\n * SPDX-License-Identifier: LGPL-3.0-or-later\\n */\\n\\npragma solidity ^0.8.0;\\n\\ninterface IERC165 {\\n    /// @notice Query if a contract implements an interface\\n    /// @param interfaceID The interface identifier, as specified in ERC-165\\n    /// @dev Interface identification is specified in ERC-165. This function\\n    ///  uses less than 30,000 gas.\\n    /// @return `true` if the contract implements `interfaceID` and\\n    ///  `interfaceID` is not 0xffffffff, `false` otherwise\\n    function supportsInterface(bytes4 interfaceID) external view returns (bool);\\n}\\n\",\"keccak256\":\"0x926a161685c9d85f47e1f40a00c2ec6d724dd40e31075ddadf757b3b919761ac\",\"license\":\"LGPL-3.0-or-later\"},\"@beandao/contracts/interfaces/IERC173.sol\":{\"content\":\"/**\\n * SPDX-License-Identifier: LGPL-3.0-or-later\\n */\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @title ERC-173 Contract Ownership Standard\\n * @dev See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-173.md\\n * Note: the ERC-165 identifier for this interface is 0x7f5828d0\\n */\\ninterface IERC173 {\\n    /**\\n     * @dev This emits when ownership of a contract changes.\\n     */\\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\\n\\n    /**\\n     * @notice Get the address of the owner\\n     * @return The address of the owner.\\n     */\\n    function owner() external view returns (address);\\n\\n    /**\\n     * @notice Set the address of the new owner of the contract\\n     * @param newOwner The address of the new owner of the contract\\n     */\\n    function transferOwnership(address newOwner) external;\\n}\\n\",\"keccak256\":\"0x0ba55f97268661fa524bc5f452c53067af5331b82e51cc7f3ce7640897540bf1\",\"license\":\"LGPL-3.0-or-later\"},\"@beandao/contracts/interfaces/IERC20.sol\":{\"content\":\"/**\\n * SPDX-License-Identifier: LGPL-3.0-or-later\\n */\\n\\npragma solidity ^0.8.0;\\n\\ninterface IERC20 {\\n    event Transfer(address indexed from, address indexed to, uint256 value);\\n    event Approval(address indexed owner, address indexed spender, uint256 value);\\n\\n    function name() external view returns (string memory);\\n\\n    function symbol() external view returns (string memory);\\n\\n    function decimals() external view returns (uint8);\\n\\n    function totalSupply() external view returns (uint256);\\n\\n    function transfer(address to, uint256 value) external returns (bool);\\n\\n    function transferFrom(\\n        address from,\\n        address to,\\n        uint256 value\\n    ) external returns (bool);\\n\\n    function approve(address spender, uint256 value) external returns (bool);\\n\\n    function balanceOf(address target) external view returns (uint256);\\n\\n    function allowance(address owner, address spender) external view returns (uint256);\\n}\\n\",\"keccak256\":\"0xecd385c0b84b876e7a44b8765e0ad788c7bbde5383c07c650be0476f37e30924\",\"license\":\"LGPL-3.0-or-later\"},\"@beandao/contracts/interfaces/IMulticall.sol\":{\"content\":\"/**\\n * SPDX-License-Identifier: LGPL-3.0-or-later\\n */\\n\\npragma solidity ^0.8.0;\\n\\ninterface IMulticall {\\n    function multicall(bytes[] calldata callData) external returns (bytes[] memory returnData);\\n}\\n\",\"keccak256\":\"0x5f3a7ed9a0c3e8b4c73341b29cb89c5c19edfb2dd070694ccbde6af9aa45044f\",\"license\":\"LGPL-3.0-or-later\"},\"@beandao/contracts/library/Address.sol\":{\"content\":\"/**\\n * SPDX-License-Identifier: LGPL-3.0-or-later\\n */\\n\\npragma solidity ^0.8.0;\\n\\nlibrary Address {\\n    function isContract(address target) internal view returns (bool result) {\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly {\\n            result := gt(extcodesize(target), 0)\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xb8faa1b47376b255e2f37190ca28a76fd880369c7fcd468cc71fde6fe65d9710\",\"license\":\"LGPL-3.0-or-later\"},\"@beandao/contracts/library/BeaconDeployer.sol\":{\"content\":\"/**\\n * SPDX-License-Identifier: LGPL-3.0-or-later\\n */\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @title BeaconDeployer\\n * @author yoonsung.eth\\n * @notice library that deploy Beacon contract.\\n */\\nlibrary BeaconDeployer {\\n    function deploy(address implementation) internal returns (address result) {\\n        bytes memory code = abi.encodePacked(\\n            hex\\\"606161002960003933600081816002015260310152602080380360803960805160005560616000f3fe337f00000000000000000000000000000000000000000000000000000000000000001415602e57600035600055005b337f00000000000000000000000000000000000000000000000000000000000000001460605760005460005260206000f35b\\\",\\n            abi.encode(implementation)\\n        );\\n\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly {\\n            result := create(0, add(code, 0x20), mload(code))\\n\\n            // pass along failure message from failed contract deployment and revert.\\n            if iszero(extcodesize(result)) {\\n                returndatacopy(0, 0, returndatasize())\\n                revert(0, returndatasize())\\n            }\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xb24096da0c31e4c6564035ee691092e2d72e37f80a0ab5ad8ecd55f80d46bd9f\",\"license\":\"LGPL-3.0-or-later\"},\"@beandao/contracts/library/BeaconMaker.sol\":{\"content\":\"/**\\n * SPDX-License-Identifier: LGPL-3.0-or-later\\n */\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @title BeaconMaker\\n * @author yoonsung.eth\\n * @notice Beacon Minimal Proxy\\ub97c \\ubc30\\ud3ec\\ud558\\ub294 \\uae30\\ub2a5\\uc744 \\uac00\\uc9c4 Maker Dummy\\n * @dev template\\uc5d0\\ub294 \\ub2e8 \\ud55c\\ubc88\\ub9cc \\ud638\\ucd9c \\uac00\\ub2a5\\ud55c initialize \\ud568\\uc218\\uac00 \\ud544\\uc694\\ud558\\uba70, \\uc774\\ub294 \\ud544\\uc218\\uc801\\uc73c\\ub85c \\ud638\\ucd9c\\ub418\\uc5b4 \\uacfc\\uc815\\uc774 \\uc0dd\\ub7b5\\ub418\\uc5b4\\uc57c \\ud568.\\n */\\ncontract BeaconMaker {\\n    /**\\n     * @param beacon call \\ud588\\uc744 \\uacbd\\uc6b0, \\uc8fc\\uc18c\\uac00 \\ubc18\\ud658\\ub418\\uc5b4\\uc57c \\ud558\\ub294 \\ucee8\\ud2b8\\ub799\\ud2b8\\n     */\\n    constructor(address beacon) payable {\\n        // Beacon Address\\n        bytes20 targetBytes = bytes20(beacon);\\n        // place Beacon Proxy code in memory.\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly {\\n            let clone := mload(0x40)\\n            mstore(clone, 0x3d3d3d3d3d730000000000000000000000000000000000000000000000000000)\\n            mstore(add(clone, 0x6), targetBytes)\\n            mstore(add(clone, 0x1a), 0x5afa3d82803e368260203750808036602082515af43d82803e903d91603a57fd)\\n            mstore(add(clone, 0x3a), 0x5bf3000000000000000000000000000000000000000000000000000000000000)\\n            // return Beacon Minimal Proxy code to write it to spawned contract runtime.\\n            return(add(0x00, clone), 0x3c) // Beacon Minimal Proxy runtime code, length\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xfdd5c6c93fea6fa4abb7d1788f7b5f46f9963d72eb7e46ecc502eaddfdc30d57\",\"license\":\"LGPL-3.0-or-later\"},\"@beandao/contracts/library/BeaconMakerWithCall.sol\":{\"content\":\"/**\\n * SPDX-License-Identifier: LGPL-3.0-or-later\\n */\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @title BeaconMakerWithCall\\n * @author yoonsung.eth\\n * @notice Beacon Minimal Proxy\\ub97c \\ubc30\\ud3ec\\ud558\\ub294 \\uae30\\ub2a5\\uc744 \\uac00\\uc9c4 Maker Dummy\\n * @dev template\\uc5d0\\ub294 \\ub2e8 \\ud55c\\ubc88\\ub9cc \\ud638\\ucd9c \\uac00\\ub2a5\\ud55c initialize \\ud568\\uc218\\uac00 \\ud544\\uc694\\ud558\\uba70, \\uc774\\ub294 \\ud544\\uc218\\uc801\\uc73c\\ub85c \\ud638\\ucd9c\\ub418\\uc5b4 \\uacfc\\uc815\\uc774 \\uc0dd\\ub7b5\\ub418\\uc5b4\\uc57c \\ud568.\\n */\\ncontract BeaconMakerWithCall {\\n    /**\\n     * @param beacon call \\ud588\\uc744 \\uacbd\\uc6b0, \\uc8fc\\uc18c\\uac00 \\ubc18\\ud658\\ub418\\uc5b4\\uc57c \\ud568\\n     * @param initializationCalldata template\\ub85c \\ubc30\\ud3ec\\ud560 \\ub54c \\ucd08\\uae30\\ud654 \\ud560 \\ud568\\uc218\\n     */\\n    constructor(address beacon, bytes memory initializationCalldata) payable {\\n        (, bytes memory returnData) = beacon.staticcall(\\\"\\\");\\n        address template = abi.decode(returnData, (address));\\n        // solhint-disable-next-line avoid-low-level-calls\\n        (bool success, ) = template.delegatecall(initializationCalldata);\\n        if (!success) {\\n            // pass along failure message from delegatecall and revert.\\n            // solhint-disable-next-line no-inline-assembly\\n            assembly {\\n                returndatacopy(0, 0, returndatasize())\\n                revert(0, returndatasize())\\n            }\\n        }\\n\\n        // Beacon Address\\n        bytes20 targetBytes = bytes20(beacon);\\n        // place Beacon Proxy code in memory.\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly {\\n            let clone := mload(0x40)\\n            mstore(clone, 0x3d3d3d3d3d730000000000000000000000000000000000000000000000000000)\\n            mstore(add(clone, 0x6), targetBytes)\\n            mstore(add(clone, 0x1a), 0x5afa3d82803e368260203750808036602082515af43d82803e903d91603a57fd)\\n            mstore(add(clone, 0x3a), 0x5bf3000000000000000000000000000000000000000000000000000000000000)\\n            // return Beacon Minimal Proxy code to write it to spawned contract runtime.\\n            return(add(0x00, clone), 0x3c) // Beacon Minimal Proxy runtime code, length\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x7d02f0e8944e754a635be30528e0c09325e25371a3b650c1c85c32220f768161\",\"license\":\"LGPL-3.0-or-later\"},\"@beandao/contracts/library/BeaconProxyDeployer.sol\":{\"content\":\"/**\\n * SPDX-License-Identifier: LGPL-3.0-or-later\\n */\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"./BeaconMaker.sol\\\";\\nimport \\\"./BeaconMakerWithCall.sol\\\";\\n\\n/**\\n * @title BeaconProxyDeployer\\n * @author yoonsung.eth\\n * @notice Beacon Minimal Proxy\\ub97c \\ubc30\\ud3ec\\ud558\\ub294 \\uae30\\ub2a5\\uc744 \\uac00\\uc9c4 \\ub77c\\uc774\\ube0c\\ub7ec\\ub9ac\\n */\\nlibrary BeaconProxyDeployer {\\n    function deploy(address beacon, bytes memory initializationCalldata) internal returns (address result) {\\n        bytes memory createCode = creation(beacon, initializationCalldata);\\n\\n        (bytes32 salt, ) = getSaltAndTarget(createCode);\\n\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly {\\n            let encoded_data := add(0x20, createCode) // load initialization code.\\n            let encoded_size := mload(createCode) // load the init code's length.\\n            result := create2(\\n                // call `CREATE2` w/ 4 arguments.\\n                0, // forward any supplied endowment.\\n                encoded_data, // pass in initialization code.\\n                encoded_size, // pass in init code's length.\\n                salt // pass in the salt value.\\n            )\\n\\n            // pass along failure message from failed contract deployment and revert.\\n            if iszero(extcodesize(result)) {\\n                returndatacopy(0, 0, returndatasize())\\n                revert(0, returndatasize())\\n            }\\n        }\\n    }\\n\\n    function deploy(\\n        string memory seed,\\n        address beacon,\\n        bytes memory initializationCalldata\\n    ) internal returns (address result) {\\n        bytes memory createCode = creation(beacon, initializationCalldata);\\n\\n        bytes32 salt = keccak256(abi.encodePacked(msg.sender, seed));\\n\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly {\\n            let encoded_data := add(0x20, createCode) // load initialization code.\\n            let encoded_size := mload(createCode) // load the init code's length.\\n            result := create2(\\n                // call `CREATE2` w/ 4 arguments.\\n                0, // forward any supplied endowment.\\n                encoded_data, // pass in initialization code.\\n                encoded_size, // pass in init code's length.\\n                salt // pass in the salt value.\\n            )\\n\\n            // pass along failure message from failed contract deployment and revert.\\n            if iszero(extcodesize(result)) {\\n                returndatacopy(0, 0, returndatasize())\\n                revert(0, returndatasize())\\n            }\\n        }\\n    }\\n\\n    function calculateAddress(address template, bytes memory initializationCalldata)\\n        internal\\n        view\\n        returns (address addr)\\n    {\\n        bytes memory createCode = creation(template, initializationCalldata);\\n\\n        (, addr) = getSaltAndTarget(createCode);\\n    }\\n\\n    function calculateAddress(\\n        string memory seed,\\n        address template,\\n        bytes memory initializationCalldata\\n    ) internal view returns (address addr) {\\n        bytes memory createCode = creation(template, initializationCalldata);\\n\\n        addr = getTargetFromSeed(createCode, seed);\\n    }\\n\\n    function isBeacon(address beaconAddr, address target) internal view returns (bool result) {\\n        bytes20 beaconAddrBytes = bytes20(beaconAddr);\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly {\\n            let clone := mload(0x40)\\n            mstore(clone, 0x3d3d3d3d3d730000000000000000000000000000000000000000000000000000)\\n            mstore(add(clone, 0x6), beaconAddrBytes)\\n            mstore(add(clone, 0x1a), 0x5afa3d82803e368260203750808036602082515af43d82803e903d91603a57fd)\\n            mstore(add(clone, 0x3a), 0x5bf3000000000000000000000000000000000000000000000000000000000000)\\n\\n            let other := add(clone, 0x40)\\n            extcodecopy(target, other, 0, 0x3c)\\n            result := eq(mload(clone), mload(other))\\n        }\\n    }\\n\\n    function getSaltAndTarget(bytes memory initCode) internal view returns (bytes32 salt, address target) {\\n        // get the keccak256 hash of the init code for address derivation.\\n        bytes32 initCodeHash = keccak256(initCode);\\n\\n        // set the initial nonce to be provided when constructing the salt.\\n        uint256 nonce = 0;\\n\\n        // declare variable for code size of derived address.\\n        bool exist;\\n\\n        while (true) {\\n            // derive `CREATE2` salt using `msg.sender` and nonce.\\n            salt = keccak256(abi.encodePacked(msg.sender, nonce));\\n\\n            target = address( // derive the target deployment address.\\n                uint160( // downcast to match the address type.\\n                    uint256( // cast to uint to truncate upper digits.\\n                        keccak256( // compute CREATE2 hash using 4 inputs.\\n                            abi.encodePacked( // pack all inputs to the hash together.\\n                                bytes1(0xff), // pass in the control character.\\n                                address(this), // pass in the address of this contract.\\n                                salt, // pass in the salt from above.\\n                                initCodeHash // pass in hash of contract creation code.\\n                            )\\n                        )\\n                    )\\n                )\\n            );\\n\\n            // determine if a contract is already deployed to the target address.\\n            // solhint-disable-next-line no-inline-assembly\\n            assembly {\\n                exist := gt(extcodesize(target), 0)\\n            }\\n\\n            // exit the loop if no contract is deployed to the target address.\\n            if (!exist) {\\n                break;\\n            }\\n\\n            // otherwise, increment the nonce and derive a new salt.\\n            nonce++;\\n        }\\n    }\\n\\n    function getTargetFromSeed(bytes memory initCode, string memory seed) internal view returns (address target) {\\n        // get the keccak256 hash of the init code for address derivation.\\n        bytes32 initCodeHash = keccak256(initCode);\\n\\n        bytes32 salt = keccak256(abi.encodePacked(msg.sender, seed));\\n\\n        target = address( // derive the target deployment address.\\n            uint160( // downcast to match the address type.\\n                uint256( // cast to uint to truncate upper digits.\\n                    keccak256( // compute CREATE2 hash using 4 inputs.\\n                        abi.encodePacked( // pack all inputs to the hash together.\\n                            bytes1(0xff), // pass in the control character.\\n                            address(this), // pass in the address of this contract.\\n                            salt, // pass in the salt from above.\\n                            initCodeHash // pass in hash of contract creation code.\\n                        )\\n                    )\\n                )\\n            )\\n        );\\n    }\\n\\n    function creation(address addr, bytes memory initializationCalldata)\\n        private\\n        pure\\n        returns (bytes memory createCode)\\n    {\\n        createCode = initializationCalldata.length > 0\\n            ? abi.encodePacked(\\n                type(BeaconMakerWithCall).creationCode,\\n                abi.encode(address(addr), initializationCalldata)\\n            )\\n            : abi.encodePacked(type(BeaconMaker).creationCode, abi.encode(address(addr)));\\n    }\\n}\\n\",\"keccak256\":\"0x23aad9897fa663b686052c9aa422b509478c7127a89d8e2d4531bf37a427178c\",\"license\":\"LGPL-3.0-or-later\"},\"@beandao/contracts/library/MinimalMaker.sol\":{\"content\":\"/**\\n * SPDX-License-Identifier: LGPL-3.0-or-later\\n */\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @title MinimalMaker\\n * @author yoonsung.eth\\n * @notice Minimal Proxy\\ub97c \\ubc30\\ud3ec\\ud558\\ub294 \\uae30\\ub2a5\\uc744 \\uac00\\uc9c4 Maker Dummy\\n * @dev template\\uc5d0\\ub294 \\ub2e8 \\ud55c\\ubc88\\ub9cc \\ud638\\ucd9c \\uac00\\ub2a5\\ud55c initialize \\ud568\\uc218\\uac00 \\ud544\\uc694\\ud558\\uba70, \\uc774\\ub294 \\ud544\\uc218\\uc801\\uc73c\\ub85c \\ud638\\ucd9c\\ub418\\uc5b4 \\uacfc\\uc815\\uc774 \\uc0dd\\ub7b5\\ub418\\uc5b4\\uc57c \\ud568.\\n */\\ncontract MinimalMaker {\\n    constructor(address template) payable {\\n        // Template Address\\n        bytes20 targetBytes = bytes20(template);\\n        // place Minimal Proxy eip-1167 code in memory.\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly {\\n            let clone := mload(0x40)\\n            mstore(clone, 0x363d3d373d3d3d363d7300000000000000000000000000000000000000000000)\\n            mstore(add(clone, 0xa), targetBytes)\\n            mstore(add(clone, 0x1e), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)\\n            // return eip-1167 code to write it to spawned contract runtime.\\n            return(add(0x00, clone), 0x2d) // eip-1167 runtime code, length\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x6b6b5a0954b60d6153ef1778eac37c152ed4aa52ac8c1db4b09c21729f9c862f\",\"license\":\"LGPL-3.0-or-later\"},\"@beandao/contracts/library/MinimalMakerWithCall.sol\":{\"content\":\"/**\\n * SPDX-License-Identifier: LGPL-3.0-or-later\\n */\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @title MinimalMakerWithCall\\n * @author yoonsung.eth\\n * @notice Minimal Proxy\\ub97c \\ubc30\\ud3ec\\ud558\\ub294 \\uae30\\ub2a5\\uc744 \\uac00\\uc9c4 Maker Dummy\\n * @dev template\\uc5d0\\ub294 \\ub2e8 \\ud55c\\ubc88\\ub9cc \\ud638\\ucd9c \\uac00\\ub2a5\\ud55c initialize \\ud568\\uc218\\uac00 \\ud544\\uc694\\ud558\\uba70, \\uc774\\ub294 \\ud544\\uc218\\uc801\\uc73c\\ub85c \\ud638\\ucd9c\\ub418\\uc5b4 \\uacfc\\uc815\\uc774 \\uc0dd\\ub7b5\\ub418\\uc5b4\\uc57c \\ud568.\\n */\\ncontract MinimalMakerWithCall {\\n    constructor(address template, bytes memory initializationCalldata) payable {\\n        // solhint-disable-next-line avoid-low-level-calls\\n        (bool success, ) = template.delegatecall(initializationCalldata);\\n        if (!success) {\\n            // pass along failure message from delegatecall and revert.\\n            // solhint-disable-next-line no-inline-assembly\\n            assembly {\\n                returndatacopy(0, 0, returndatasize())\\n                revert(0, returndatasize())\\n            }\\n        }\\n\\n        // Template Address\\n        bytes20 targetBytes = bytes20(template);\\n        // place Minimal Proxy eip-1167 code in memory.\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly {\\n            let clone := mload(0x40)\\n            mstore(clone, 0x363d3d373d3d3d363d7300000000000000000000000000000000000000000000)\\n            mstore(add(clone, 0xa), targetBytes)\\n            mstore(add(clone, 0x1e), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)\\n            // return eip-1167 code to write it to spawned contract runtime.\\n            return(add(0x00, clone), 0x2d) // eip-1167 runtime code, length\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xafe51bb5bd0f805969bf79cefb063e054977e1538f1740b58dc0f3aaccb5afd4\",\"license\":\"LGPL-3.0-or-later\"},\"@beandao/contracts/library/MinimalProxyDeployer.sol\":{\"content\":\"/**\\n * SPDX-License-Identifier: LGPL-3.0-or-later\\n */\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"./MinimalMaker.sol\\\";\\nimport \\\"./MinimalMakerWithCall.sol\\\";\\n\\n/**\\n * @title MinimalProxyDeployer\\n * @author yoonsung.eth\\n * @notice Minimal Proxy\\ub97c \\ubc30\\ud3ec\\ud558\\ub294 \\uae30\\ub2a5\\uc744 \\uac00\\uc9c4 \\ub77c\\uc774\\ube0c\\ub7ec\\ub9ac\\n */\\nlibrary MinimalProxyDeployer {\\n    function deploy(address template, bytes memory initializationCalldata) internal returns (address result) {\\n        bytes memory createCode = creation(template, initializationCalldata);\\n\\n        (bytes32 salt, ) = getSaltAndTarget(createCode);\\n\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly {\\n            let encoded_data := add(0x20, createCode) // load initialization code.\\n            let encoded_size := mload(createCode) // load the init code's length.\\n            result := create2(\\n                // call `CREATE2` w/ 4 arguments.\\n                0, // forward any supplied endowment.\\n                encoded_data, // pass in initialization code.\\n                encoded_size, // pass in init code's length.\\n                salt // pass in the salt value.\\n            )\\n\\n            // pass along failure message from failed contract deployment and revert.\\n            if iszero(extcodesize(result)) {\\n                returndatacopy(0, 0, returndatasize())\\n                revert(0, returndatasize())\\n            }\\n        }\\n    }\\n\\n    function deploy(\\n        string memory seed,\\n        address template,\\n        bytes memory initializationCalldata\\n    ) internal returns (address result) {\\n        bytes memory createCode = creation(template, initializationCalldata);\\n\\n        bytes32 salt = keccak256(abi.encodePacked(msg.sender, seed));\\n\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly {\\n            let encoded_data := add(0x20, createCode) // load initialization code.\\n            let encoded_size := mload(createCode) // load the init code's length.\\n            result := create2(\\n                // call `CREATE2` w/ 4 arguments.\\n                0, // forward any supplied endowment.\\n                encoded_data, // pass in initialization code.\\n                encoded_size, // pass in init code's length.\\n                salt // pass in the salt value.\\n            )\\n\\n            // pass along failure message from failed contract deployment and revert.\\n            if iszero(extcodesize(result)) {\\n                returndatacopy(0, 0, returndatasize())\\n                revert(0, returndatasize())\\n            }\\n        }\\n    }\\n\\n    function calculateAddress(address template, bytes memory initializationCalldata)\\n        internal\\n        view\\n        returns (address addr)\\n    {\\n        bytes memory createCode = creation(template, initializationCalldata);\\n\\n        (, addr) = getSaltAndTarget(createCode);\\n    }\\n\\n    function calculateAddress(\\n        string memory seed,\\n        address template,\\n        bytes memory initializationCalldata\\n    ) internal view returns (address addr) {\\n        bytes memory createCode = creation(template, initializationCalldata);\\n\\n        addr = getTargetFromSeed(createCode, seed);\\n    }\\n\\n    function isMinimal(address templateAddr, address target) internal view returns (bool result) {\\n        bytes20 templateAddrBytes = bytes20(templateAddr);\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly {\\n            let clone := mload(0x40)\\n            mstore(clone, 0x363d3d373d3d3d363d7300000000000000000000000000000000000000000000)\\n            mstore(add(clone, 0xa), templateAddrBytes)\\n            mstore(add(clone, 0x1e), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)\\n\\n            let other := add(clone, 0x40)\\n            extcodecopy(target, other, 0, 0x2d)\\n            result := eq(mload(clone), mload(other))\\n        }\\n    }\\n\\n    function getSaltAndTarget(bytes memory initCode) internal view returns (bytes32 salt, address target) {\\n        // get the keccak256 hash of the init code for address derivation.\\n        bytes32 initCodeHash = keccak256(initCode);\\n\\n        // set the initial nonce to be provided when constructing the salt.\\n        uint256 nonce = 0;\\n\\n        // declare variable for code size of derived address.\\n        bool exist;\\n\\n        while (true) {\\n            // derive `CREATE2` salt using `msg.sender` and nonce.\\n            salt = keccak256(abi.encodePacked(msg.sender, nonce));\\n\\n            target = address( // derive the target deployment address.\\n                uint160( // downcast to match the address type.\\n                    uint256( // cast to uint to truncate upper digits.\\n                        keccak256( // compute CREATE2 hash using 4 inputs.\\n                            abi.encodePacked( // pack all inputs to the hash together.\\n                                bytes1(0xff), // pass in the control character.\\n                                address(this), // pass in the address of this contract.\\n                                salt, // pass in the salt from above.\\n                                initCodeHash // pass in hash of contract creation code.\\n                            )\\n                        )\\n                    )\\n                )\\n            );\\n\\n            // determine if a contract is already deployed to the target address.\\n            // solhint-disable-next-line no-inline-assembly\\n            assembly {\\n                exist := gt(extcodesize(target), 0)\\n            }\\n\\n            // exit the loop if no contract is deployed to the target address.\\n            if (!exist) {\\n                break;\\n            }\\n\\n            // otherwise, increment the nonce and derive a new salt.\\n            nonce++;\\n        }\\n    }\\n\\n    function getTargetFromSeed(bytes memory initCode, string memory seed) internal view returns (address target) {\\n        // get the keccak256 hash of the init code for address derivation.\\n        bytes32 initCodeHash = keccak256(initCode);\\n\\n        bytes32 salt = keccak256(abi.encodePacked(msg.sender, seed));\\n\\n        target = address( // derive the target deployment address.\\n            uint160( // downcast to match the address type.\\n                uint256( // cast to uint to truncate upper digits.\\n                    keccak256( // compute CREATE2 hash using 4 inputs.\\n                        abi.encodePacked( // pack all inputs to the hash together.\\n                            bytes1(0xff), // pass in the control character.\\n                            address(this), // pass in the address of this contract.\\n                            salt, // pass in the salt from above.\\n                            initCodeHash // pass in hash of contract creation code.\\n                        )\\n                    )\\n                )\\n            )\\n        );\\n    }\\n\\n    function creation(address addr, bytes memory initializationCalldata)\\n        private\\n        pure\\n        returns (bytes memory createCode)\\n    {\\n        createCode = initializationCalldata.length > 0\\n            ? abi.encodePacked(\\n                type(MinimalMakerWithCall).creationCode,\\n                abi.encode(address(addr), initializationCalldata)\\n            )\\n            : abi.encodePacked(type(MinimalMaker).creationCode, abi.encode(address(addr)));\\n    }\\n}\\n\",\"keccak256\":\"0x94e2735c0fe2b2f1f00a751182795bd2b3a28be9d4ad98ffd688ed409ea9fbbb\",\"license\":\"LGPL-3.0-or-later\"},\"@beandao/contracts/library/Multicall.sol\":{\"content\":\"/**\\n * SPDX-License-Identifier: LGPL-3.0-or-later\\n */\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"../interfaces/IMulticall.sol\\\";\\n\\n/**\\n * @title Multicall\\n * @author yoonsung.eth\\n * @notice \\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\uac00\\uc9c0\\uace0 \\uc788\\ub294 \\ud2b8\\ub79c\\uc7ad\\uc158\\uc744 \\uc21c\\uc11c\\ub300\\ub85c \\uc2e4\\ud589\\uc2dc\\ud0ac \\uc218 \\uc788\\uc74c.\\n */\\nabstract contract Multicall is IMulticall {\\n    function multicall(bytes[] calldata callData) external override returns (bytes[] memory returnData) {\\n        returnData = new bytes[](callData.length);\\n        for (uint256 i = 0; i < callData.length; i++) {\\n            (bool success, bytes memory result) = address(this).delegatecall(callData[i]);\\n            // Next 5 lines from https://ethereum.stackexchange.com/a/83577\\n            if (!success) {\\n                // revert called without a message\\n                if (result.length < 68) revert();\\n                // solhint-disable-next-line no-inline-assembly\\n                assembly {\\n                    result := add(result, 0x04)\\n                }\\n                revert(abi.decode(result, (string)));\\n            }\\n\\n            returnData[i] = result;\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x299ab7b874b9cce8b2d826005fbde9e7e5e06e415922f9e242b6fb3e86dcb914\",\"license\":\"LGPL-3.0-or-later\"},\"@beandao/contracts/library/Ownership.sol\":{\"content\":\"/**\\n * SPDX-License-Identifier: LGPL-3.0-or-later\\n */\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"../interfaces/IERC173.sol\\\";\\n\\n/**\\n * @title Ownership\\n * @author yoonsung.eth\\n * @notice \\ub2e8\\uc77c Ownership\\uc744 \\uac00\\uc9c8 \\uc218 \\uc788\\ub3c4\\ub85d \\ub3c4\\uc640\\uc8fc\\ub294 \\ucd94\\uc0c1 \\ucee8\\ud2b8\\ub799\\ud2b8\\n * @dev constructor \\uae30\\ubc18 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc5d0\\uc11c\\ub294 \\uc0dd\\uc131 \\uc2dc\\uc810\\uc5d0 owner\\uac00 msg.sender\\ub85c \\uc9c0\\uc815\\ub418\\uba70,\\n *      Proxy\\ub85c \\uc791\\ub3d9\\ub418\\ub294 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc758 \\uacbd\\uc6b0 `__transferOwnership(address)`\\ub97c \\uba85\\uc2dc\\uc801\\uc73c\\ub85c \\ud638\\ucd9c\\ud558\\uc5ec owner\\ub97c \\uc9c0\\uc815\\ud558\\uc5ec\\uc57c \\ud55c\\ub2e4.\\n */\\nabstract contract Ownership is IERC173 {\\n    address public override owner;\\n\\n    modifier onlyOwner() {\\n        require(owner == msg.sender, \\\"Ownership/Not-Authorized\\\");\\n        _;\\n    }\\n\\n    constructor() {\\n        owner = msg.sender;\\n        emit OwnershipTransferred(address(0), msg.sender);\\n    }\\n\\n    function transferOwnership(address newOwner) external virtual override onlyOwner {\\n        require(newOwner != address(0), \\\"Ownership/Not-Allowed-Zero\\\");\\n        _transferOwnership(newOwner);\\n    }\\n\\n    function resignOwnership() external virtual onlyOwner {\\n        delete owner;\\n        emit OwnershipTransferred(msg.sender, address(0));\\n    }\\n\\n    function _transferOwnership(address newOwner) internal {\\n        address prev = owner;\\n        owner = newOwner;\\n        emit OwnershipTransferred(prev, newOwner);\\n    }\\n}\\n\",\"keccak256\":\"0x6d58adf2a3a2e93b54f9f34fdffdcec669dbd6985c5de884dbb321fc0d5a7385\",\"license\":\"LGPL-3.0-or-later\"},\"contracts/FactoryV1.sol\":{\"content\":\"/**\\n * SPDX-License-Identifier: LGPL-3.0-or-later\\n */\\npragma solidity ^0.8.0;\\n\\nimport \\\"@beandao/contracts/interfaces/IERC20.sol\\\";\\nimport \\\"@beandao/contracts/interfaces/IERC165.sol\\\";\\nimport \\\"@beandao/contracts/library/Address.sol\\\";\\nimport \\\"@beandao/contracts/library/BeaconDeployer.sol\\\";\\nimport {Ownership, IERC173} from \\\"@beandao/contracts/library/Ownership.sol\\\";\\nimport {BeaconProxyDeployer} from \\\"@beandao/contracts/library/BeaconProxyDeployer.sol\\\";\\nimport {MinimalProxyDeployer} from \\\"@beandao/contracts/library/MinimalProxyDeployer.sol\\\";\\nimport {Multicall, IMulticall} from \\\"@beandao/contracts/library/Multicall.sol\\\";\\nimport \\\"./IFactory.sol\\\";\\n\\n/**\\n * @title Factory V1\\n * @author yoonsung.eth\\n * @notice Abstract reusable contract into template and deploy them in small sizes `minimal proxy` and `beacon proxy`.\\n * This contract can receive a fee lower than the deploy cost, and registered addresses do not have to pay the fee.\\n * Beacon is managed in this contract, it can be useful if you need a scalable upgrade through the `beacon proxy`.\\n * @dev The template to be registered may or may not have an `initialize` function.\\n * However, at least a ERC173 and multicall for directed at self must be implemented.\\n */\\ncontract FactoryV1 is Ownership, Multicall, IFactory {\\n    using Address for address;\\n\\n    /**\\n     * @notice template key for template info.\\n     */\\n    mapping(bytes32 => TemplateInfo) public templates;\\n\\n    /**\\n     * @notice registered template for nonce.\\n     */\\n    mapping(address => uint256) private nonceForTemplate;\\n\\n    /**\\n     * @notice template count.\\n     */\\n    uint256 public nonce = 1;\\n\\n    /**\\n     * @notice base fee\\n     */\\n    uint256 public baseFee;\\n\\n    /**\\n     * @notice fee collector\\n     */\\n    address payable public feeTo;\\n\\n    /**\\n     * @notice requiring on deploy, allowlist contract.\\n     * @param feeAmount basic fee for ether amount\\n     * @param feeToAddr fee collector address\\n     */\\n    constructor(uint256 feeAmount, address payable feeToAddr) {\\n        baseFee = feeAmount;\\n        feeTo = feeToAddr;\\n        nonceForTemplate[address(0)] = type(uint256).max;\\n    }\\n\\n    /**\\n     * @notice template id\\ub97c \\ud1b5\\ud574\\uc11c minimal proxy\\uc640 minimal beacon proxy\\ub97c \\ubc30\\ud3ec\\ud558\\ub294 \\ud568\\uc218.\\n     * @dev \\uc77c\\ubc18\\uc801\\uc73c\\ub85c \\ubc30\\ud3ec\\ub418\\ub294 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc640 \\uac19\\uc774 \\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\uc0dd\\uc131\\ub420 \\ub54c \\ucd08\\uae30\\ud654 \\ud568\\uc218\\ub97c \\uc2e4\\ud589\\ud574\\uc57c \\ud55c\\ub2e4\\uba74, initializationCallData\\uc5d0 \\ud638\\ucd9c\\ud560 \\ud568\\uc218\\ub97c\\n     * serialize\\ud558\\uc5ec \\uc8fc\\uc785\\ud558\\uc5ec\\uc57c \\ud569\\ub2c8\\ub2e4. \\ucee8\\ud2b8\\ub799\\ud2b8 \\uc18c\\uc720\\uad8c\\uc744 \\ubcc4\\ub3c4\\ub85c \\uad00\\ub9ac\\ud574\\uc57c\\ud558\\ub294 \\uacbd\\uc6b0 multicall\\uc744 \\ud1b5\\ud574\\uc11c \\uba85\\uc2dc\\uc801\\uc778 \\uc18c\\uc720\\uad8c \\uc774\\uc804\\uc774 \\ub418\\uc5b4\\uc57c \\ud569\\ub2c8\\ub2e4.\\n     * @param templateId \\ubc30\\ud3ec\\ud560 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc758 template id\\n     * @param isBeacon \\ube44\\ucf58\\uc73c\\ub85c \\ubc30\\ud3ec\\ud574\\uc57c \\ud560 \\uac83\\uc778\\uc9c0 \\uacb0\\uc815\\ud558\\ub294 \\uc778\\uc790.\\n     * @param initializationCallData \\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\uc0dd\\uc131\\ub420 \\ub54c \\ud638\\ucd9c\\ud560 \\uc9c1\\ub82c\\ud654\\ub41c \\ucd08\\uae30\\ud654 \\ud568\\uc218 \\uc815\\ubcf4\\n     * @param calls \\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\ubc30\\ud3ec\\ub41c \\uc774\\ud6c4, \\ud544\\uc694\\ud55c \\uc77c\\ub828\\uc758 \\ud568\\uc218 \\ud638\\ucd9c \\uc815\\ubcf4\\n     */\\n    function deploy(\\n        bool isBeacon,\\n        bytes32 templateId,\\n        bytes memory initializationCallData,\\n        bytes[] memory calls\\n    ) external payable returns (address deployed) {\\n        // \\ud15c\\ud50c\\ub9bf\\uc744 \\ubc30\\ud3ec\\ud558\\uae30 \\uc704\\ud55c \\uc218\\uc218\\ub8cc\\uac00 \\uc801\\uc815 \\uc218\\uc900\\uc778\\uc9c0 \\ud655\\uc778.\\n        require(baseFee <= msg.value || owner == msg.sender, \\\"Factory/Incorrect-amounts\\\");\\n        // \\uc218\\uc218\\ub8cc \\uc804\\uc1a1\\n        feeTransfer(feeTo, msg.value);\\n        // \\ubc30\\ud3ec\\ud560 \\ud15c\\ud50c\\ub9bf\\uc758 \\uc815\\ubcf4\\n        TemplateInfo memory tmp = templates[templateId];\\n\\n        deployed = isBeacon\\n            ? BeaconProxyDeployer.deploy(tmp.btemplate, initializationCallData)\\n            : MinimalProxyDeployer.deploy(tmp.template, initializationCallData);\\n\\n        // \\ubd80\\uc218\\uc801\\uc73c\\ub85c \\ud638\\ucd9c\\ud560 \\ub370\\uc774\\ud130\\uac00 \\uc788\\ub2e4\\uba74, \\ubc30\\ud3ec\\ub41c \\ucee8\\ud2b8\\ub799\\ud2b8\\uc5d0 \\ucd94\\uac00\\uc801\\uc778 call\\uc744 \\ud560 \\uc218 \\uc788\\uc74c.\\n        if (calls.length > 0) IMulticall(deployed).multicall(calls);\\n        // \\uc774\\ubca4\\ud2b8 \\ud638\\ucd9c\\n        emit Deployed(deployed, msg.sender);\\n    }\\n\\n    /**\\n     * @notice template id\\uc640 \\uc678\\ubd80\\uc5d0\\uc11c \\uad00\\ub9ac\\ub418\\ub294 seed\\ub97c \\ud1b5\\ud574\\uc11c minimal proxy\\uc640 minimal beacon proxy\\ub97c \\ubc30\\ud3ec\\ud558\\ub294 \\ud568\\uc218.\\n     * @dev \\uc77c\\ubc18\\uc801\\uc73c\\ub85c \\ubc30\\ud3ec\\ub418\\ub294 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc640 \\uac19\\uc774 \\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\uc0dd\\uc131\\ub420 \\ub54c \\ucd08\\uae30\\ud654 \\ud568\\uc218\\ub97c \\uc2e4\\ud589\\ud574\\uc57c \\ud55c\\ub2e4\\uba74, initializationCallData\\uc5d0 \\ud638\\ucd9c\\ud560 \\ud568\\uc218\\ub97c\\n     * serialize\\ud558\\uc5ec \\uc8fc\\uc785\\ud558\\uc5ec\\uc57c \\ud569\\ub2c8\\ub2e4. \\ucee8\\ud2b8\\ub799\\ud2b8 \\uc18c\\uc720\\uad8c\\uc744 \\ubcc4\\ub3c4\\ub85c \\uad00\\ub9ac\\ud574\\uc57c\\ud558\\ub294 \\uacbd\\uc6b0 multicall\\uc744 \\ud1b5\\ud574\\uc11c \\uba85\\uc2dc\\uc801\\uc778 \\uc18c\\uc720\\uad8c \\uc774\\uc804\\uc774 \\ub418\\uc5b4\\uc57c \\ud569\\ub2c8\\ub2e4.\\n     * @param seed \\ucee8\\ud2b8\\ub799\\ud2b8 \\uc8fc\\uc18c \\ud655\\uc815\\uc5d0 \\ud544\\uc694\\ud55c \\uc678\\ubd80 seed\\n     * @param isBeacon \\ube44\\ucf58\\uc73c\\ub85c \\ubc30\\ud3ec\\ud574\\uc57c \\ud560 \\uac83\\uc778\\uc9c0 \\uacb0\\uc815\\ud558\\ub294 \\uc778\\uc790.\\n     * @param templateId \\ubc30\\ud3ec\\ud560 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc758 template id\\n     * @param initializationCallData \\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\uc0dd\\uc131\\ub420 \\ub54c \\ud638\\ucd9c\\ud560 \\uc9c1\\ub82c\\ud654\\ub41c \\ucd08\\uae30\\ud654 \\ud568\\uc218 \\uc815\\ubcf4\\n     * @param calls \\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\ubc30\\ud3ec\\ub41c \\uc774\\ud6c4, \\ud544\\uc694\\ud55c \\uc77c\\ub828\\uc758 \\ud568\\uc218 \\ud638\\ucd9c \\uc815\\ubcf4\\n     */\\n    function deployWithSeed(\\n        string memory seed,\\n        bool isBeacon,\\n        bytes32 templateId,\\n        bytes memory initializationCallData,\\n        bytes[] memory calls\\n    ) external payable returns (address deployed) {\\n        // \\ud15c\\ud50c\\ub9bf\\uc744 \\ubc30\\ud3ec\\ud558\\uae30 \\uc704\\ud55c \\uc218\\uc218\\ub8cc\\uac00 \\uc801\\uc815 \\uc218\\uc900\\uc778\\uc9c0 \\ud655\\uc778.\\n        require(baseFee <= msg.value || owner == msg.sender, \\\"Factory/Incorrect-amounts\\\");\\n        // \\uc218\\uc218\\ub8cc \\uc804\\uc1a1\\n        feeTransfer(feeTo, msg.value);\\n        // \\ubc30\\ud3ec\\ud560 \\ud15c\\ud50c\\ub9bf\\uc758 \\uc815\\ubcf4\\n        TemplateInfo memory tmp = templates[templateId];\\n\\n        deployed = isBeacon\\n            ? BeaconProxyDeployer.deploy(seed, tmp.btemplate, initializationCallData)\\n            : MinimalProxyDeployer.deploy(seed, tmp.template, initializationCallData);\\n\\n        // \\ubd80\\uc218\\uc801\\uc73c\\ub85c \\ud638\\ucd9c\\ud560 \\ub370\\uc774\\ud130\\uac00 \\uc788\\ub2e4\\uba74, \\ubc30\\ud3ec\\ub41c \\ucee8\\ud2b8\\ub799\\ud2b8\\uc5d0 \\ucd94\\uac00\\uc801\\uc778 call\\uc744 \\ud560 \\uc218 \\uc788\\uc74c.\\n        if (calls.length > 0) IMulticall(deployed).multicall(calls);\\n        // \\uc774\\ubca4\\ud2b8 \\ud638\\ucd9c\\n        emit Deployed(deployed, msg.sender);\\n    }\\n\\n    /**\\n     * @notice template id\\uc640 \\ucd08\\uae30\\ud654 \\ub370\\uc774\\ud130 \\ud1b5\\ud574\\uc11c minimal proxy\\uc640 minimal beacon proxy\\ub85c \\ubc30\\ud3ec\\ud560 \\uc8fc\\uc18c\\ub97c \\ubbf8\\ub9ac \\ud30c\\uc545\\ud558\\ub294 \\ud568\\uc218\\n     * @dev \\uc5f0\\uacb0\\ub41c \\uc9c0\\uac11 \\uc8fc\\uc18c\\uc5d0 \\ub530\\ub77c \\uc0dd\\uc131\\ub420 \\uc9c0\\uac11 \\uc8fc\\uc18c\\uac00 \\ubcc0\\uacbd\\ub418\\ubbc0\\ub85c, \\uc5f0\\uacb0\\ub418\\uc5b4 \\uc788\\ub294 \\uc8fc\\uc18c\\ub97c \\ud544\\uc218\\ub85c \\ud655\\uc778\\ud558\\uc5ec\\uc57c \\ud569\\ub2c8\\ub2e4.\\n     * @param isBeacon \\ube44\\ucf58\\uc73c\\ub85c \\ubc30\\ud3ec\\ud574\\uc57c \\ud560 \\uac83\\uc778\\uc9c0 \\uacb0\\uc815\\ud558\\ub294 \\uc778\\uc790.\\n     * @param templateId \\ubc30\\ud3ec\\ud560 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc758 template id\\n     * @param initializationCallData \\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\uc0dd\\uc131\\ub420 \\ub54c \\ud638\\ucd9c\\ud560 \\uc9c1\\ub82c\\ud654\\ub41c \\ucd08\\uae30\\ud654 \\ud568\\uc218 \\uc815\\ubcf4\\n     */\\n    function compute(\\n        bool isBeacon,\\n        bytes32 templateId,\\n        bytes memory initializationCallData\\n    ) external view returns (address deployable) {\\n        TemplateInfo memory tmp = templates[templateId];\\n        deployable = isBeacon\\n            ? BeaconProxyDeployer.calculateAddress(tmp.btemplate, initializationCallData)\\n            : MinimalProxyDeployer.calculateAddress(tmp.template, initializationCallData);\\n    }\\n\\n    /**\\n     * @notice template id\\uc640 Seed \\ubb38\\uc790\\uc5f4, \\ucd08\\uae30\\ud654 \\ub370\\uc774\\ud130 \\ud1b5\\ud574\\uc11c minimal proxy\\uc640 minimal beacon proxy\\ub85c \\ubc30\\ud3ec\\ud560 \\uc8fc\\uc18c\\ub97c \\ubbf8\\ub9ac \\ud30c\\uc545\\ud558\\ub294 \\ud568\\uc218\\n     * @dev \\uc5f0\\uacb0\\ub41c \\uc9c0\\uac11 \\uc8fc\\uc18c\\uc5d0 \\ub530\\ub77c \\uc0dd\\uc131\\ub420 \\uc9c0\\uac11 \\uc8fc\\uc18c\\uac00 \\ubcc0\\uacbd\\ub418\\ubbc0\\ub85c, \\uc5f0\\uacb0\\ub418\\uc5b4 \\uc788\\ub294 \\uc8fc\\uc18c\\ub97c \\ud544\\uc218\\ub85c \\ud655\\uc778\\ud558\\uc5ec\\uc57c \\ud569\\ub2c8\\ub2e4.\\n     * @param seed \\ucee8\\ud2b8\\ub799\\ud2b8\\uc5d0 \\uc0ac\\uc6a9\\ud560 seed \\ubb38\\uc790\\uc5f4\\n     * @param isBeacon \\ube44\\ucf58\\uc73c\\ub85c \\ubc30\\ud3ec\\ud574\\uc57c \\ud560 \\uac83\\uc778\\uc9c0 \\uacb0\\uc815\\ud558\\ub294 \\uc778\\uc790.\\n     * @param templateId \\ubc30\\ud3ec\\ud560 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc758 template id\\n     * @param initializationCallData \\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\uc0dd\\uc131\\ub420 \\ub54c \\ud638\\ucd9c\\ud560 \\uc9c1\\ub82c\\ud654\\ub41c \\ucd08\\uae30\\ud654 \\ud568\\uc218 \\uc815\\ubcf4\\n     */\\n    function computeWithSeed(\\n        string memory seed,\\n        bool isBeacon,\\n        bytes32 templateId,\\n        bytes memory initializationCallData\\n    ) external view returns (address deployable) {\\n        TemplateInfo memory tmp = templates[templateId];\\n        deployable = isBeacon\\n            ? BeaconProxyDeployer.calculateAddress(seed, tmp.btemplate, initializationCallData)\\n            : MinimalProxyDeployer.calculateAddress(seed, tmp.template, initializationCallData);\\n    }\\n\\n    /**\\n     * @notice Factori.eth\\uc5d0 \\ub4f1\\ub85d\\ub418\\uc9c0 \\uc54a\\uc740 \\ucee8\\ud2b8\\ub799\\ud2b8\\ub97c Template\\ub85c \\ud558\\uc5ec Minimal Proxy\\ub85c \\ubc30\\ud3ec\\ud569\\ub2c8\\ub2e4.\\n     * @param templateAddr \\ud15c\\ud50c\\ub9bf\\uc73c\\ub85c \\uc0ac\\uc6a9\\ud560 \\uc774\\ubbf8 \\ubc30\\ud3ec\\ub41c \\ucee8\\ud2b8\\ub799\\ud2b8 \\uc8fc\\uc18c\\n     * @param initializationCallData \\ubc30\\ud3ec\\ub418\\uba74\\uc11c \\ud638\\ucd9c\\ub418\\uc5b4\\uc57c \\ud558\\ub294 \\ucd08\\uae30\\ud654 \\ud568\\uc218\\n     * @param calls \\ucd08\\uae30\\ud654 \\ud568\\uc218 \\uc774\\uc678\\uc5d0, \\ud638\\ucd9c\\ub418\\uc5b4\\uc57c \\ud558\\ub294 \\ud568\\uc218\\ub4e4\\uc758 \\ubc30\\uc5f4\\n     */\\n    function clone(\\n        address templateAddr,\\n        bytes memory initializationCallData,\\n        bytes[] memory calls\\n    ) external payable returns (address deployed) {\\n        require(nonceForTemplate[templateAddr] == 0, \\\"Factory/Registered-Template\\\");\\n        // \\ud15c\\ud50c\\ub9bf\\uc744 \\ubc30\\ud3ec\\ud558\\uae30 \\uc704\\ud55c \\uc218\\uc218\\ub8cc\\uac00 \\uc801\\uc815 \\uc218\\uc900\\uc778\\uc9c0 \\ud655\\uc778.\\n        require(baseFee == msg.value || owner == msg.sender, \\\"Factory/Incorrect-amounts\\\");\\n        // \\uc218\\uc218\\ub8cc \\uc804\\uc1a1\\n        feeTransfer(feeTo, msg.value);\\n        deployed = MinimalProxyDeployer.deploy(templateAddr, initializationCallData);\\n        if (calls.length > 0) IMulticall(deployed).multicall(calls);\\n    }\\n\\n    /**\\n     * @notice Factori.eth\\uc5d0 \\ub4f1\\ub85d\\ub418\\uc9c0 \\uc54a\\uc740 \\ucee8\\ud2b8\\ub799\\ud2b8\\ub97c Template\\ub85c \\ud558\\uc5ec minimal proxy\\ub85c \\ubc30\\ud3ec\\ud560 \\uc8fc\\uc18c\\ub97c \\ubbf8\\ub9ac \\ud30c\\uc545\\ud558\\ub294 \\ud568\\uc218\\n     * @dev \\uc5f0\\uacb0\\ub41c \\uc9c0\\uac11 \\uc8fc\\uc18c\\uc5d0 \\ub530\\ub77c \\uc0dd\\uc131\\ub420 \\uc9c0\\uac11 \\uc8fc\\uc18c\\uac00 \\ubcc0\\uacbd\\ub418\\ubbc0\\ub85c, \\uc5f0\\uacb0\\ub418\\uc5b4 \\uc788\\ub294 \\uc8fc\\uc18c\\ub97c \\ud544\\uc218\\ub85c \\ud655\\uc778\\ud558\\uc5ec\\uc57c \\ud569\\ub2c8\\ub2e4.\\n     * @param templateAddr \\ubc30\\ud3ec\\ud560 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc758 template id\\n     * @param initializationCallData \\ucee8\\ud2b8\\ub799\\ud2b8\\uac00 \\uc0dd\\uc131\\ub420 \\ub54c \\ud638\\ucd9c\\ud560 \\uc9c1\\ub82c\\ud654\\ub41c \\ucd08\\uae30\\ud654 \\ud568\\uc218 \\uc815\\ubcf4\\n     */\\n    function computeClone(address templateAddr, bytes memory initializationCallData)\\n        external\\n        view\\n        returns (address deployable)\\n    {\\n        deployable = MinimalProxyDeployer.calculateAddress(templateAddr, initializationCallData);\\n    }\\n\\n    /**\\n     * @notice template id\\uc5d0 \\ub530\\ub77c\\uc11c \\ucee8\\ud2b8\\ub799\\ud2b8\\ub97c \\ubc30\\ud3ec\\ud558\\uae30 \\uc704\\ud55c \\ud544\\uc694 \\uac00\\uaca9\\uc744 \\uac00\\uc838\\uc624\\ub294 \\ud568\\n     * @dev \\uc5f0\\uacb0\\ub41c \\uc9c0\\uac11 \\uc8fc\\uc18c\\uc5d0 \\ub530\\ub77c \\uc0dd\\uc131\\ub420 \\uc9c0\\uac11 \\uc8fc\\uc18c\\uac00 \\ubcc0\\uacbd\\ub418\\ubbc0\\ub85c, \\uc5f0\\uacb0\\ub418\\uc5b4 \\uc788\\ub294 \\uc8fc\\uc18c\\ub97c \\ud544\\uc218\\ub85c \\ud655\\uc778\\ud558\\uc5ec\\uc57c \\ud569\\ub2c8\\ub2e4.\\n     * @return price \\uc774\\ub354\\ub9ac\\uc6c0\\uc73c\\ub85c \\uad6c\\uc131\\ub41c \\uac12\\uc744 \\uac00\\uc9d0.\\n     */\\n    function getPrice() external view returns (uint256 price) {\\n        price = baseFee;\\n    }\\n\\n    /**\\n     * @notice \\ud15c\\ud50c\\ub9bf\\uc73c\\ub85c \\uc0ac\\uc6a9\\ub418\\uae30 \\uc801\\ud569\\ud55c \\uc778\\ud130\\ud398\\uc774\\uc2a4\\uac00 \\uad6c\\ud604\\ub41c \\ucee8\\ud2b8\\ub799\\ud2b8\\ub97c \\ud15c\\ud50c\\ub9bf\\uc73c\\ub85c \\uac00\\uaca9\\uacfc \\ud568\\uaed8 \\ub4f1\\ub85d\\ud568.\\n     * @dev \\uac19\\uc740 \\ud15c\\ud50c\\ub9bf\\uc774 \\ube44\\ucf58\\uacfc, \\uc77c\\ubc18\\uc801\\uc778 \\ud15c\\ud50c\\ub9bf\\uc73c\\ub85c \\ub4f1\\ub85d\\ub420 \\uc218 \\uc788\\uc2b5\\ub2c8\\ub2e4. \\ub530\\ub77c\\uc11c \\uc120\\ud0dd\\uc801\\uc73c\\ub85c \\uc0ac\\uc6a9 \\uac00\\ub2a5\\ud569\\ub2c8\\ub2e4.\\n     * @param templateAddr \\ud15c\\ud50c\\ub9bf\\uc73c\\ub85c \\uc0ac\\uc6a9\\ub420 \\ucee8\\ud2b8\\ub799\\ud2b8\\uc758 \\uc8fc\\uc18c\\n     */\\n    function addTemplate(address templateAddr) external onlyOwner {\\n        require(nonceForTemplate[templateAddr] == 0, \\\"Factory/Non-Valid\\\");\\n        bytes32 key = keccak256(abi.encode(templateAddr, nonce));\\n        address beaconAddr = BeaconDeployer.deploy(templateAddr);\\n        templates[key] = TemplateInfo({template: templateAddr, btemplate: beaconAddr});\\n        nonceForTemplate[templateAddr] = nonce++;\\n        emit NewTemplate(key, templateAddr, beaconAddr);\\n    }\\n\\n    /**\\n     * @notice \\ub4f1\\ub85d\\ub41c \\ud15c\\ud50c\\ub9bf\\uc758 \\uc815\\ubcf4\\ub97c \\ubcc0\\uacbd\\ud558\\ub294 \\ud568\\uc218, \\ube44\\ucf58\\uc778 \\uacbd\\uc6b0\\uc5d0\\ub294 \\ud15c\\ud50c\\ub9bf\\uc744 \\uc5c5\\ub370\\uc774\\ud2b8 \\ud560 \\uc218 \\uc788\\uc73c\\ub098 \\ube44\\ucf58\\uc774 \\uc544\\ub2c8\\ub77c\\uba74 \\uc5c5\\ub370\\uc774\\ud2b8 \\ubd88\\uac00\\ub2a5.\\n     * @param key \\uc5c5\\ub370\\uc774\\ud2b8 \\ub420 \\ud15c\\ud50c\\ub9bf\\uc758 \\uc544\\uc774\\ub514\\n     * @param templateAddr \\ube44\\ucf58\\uc77c \\uacbd\\uc6b0 \\ud15c\\ud50c\\ub9bf \\uc8fc\\uc18c, \\ud15c\\ud50c\\ub9bf \\uc18c\\uc720\\uc8fc \\uc8fc\\uc18c\\ub97c \\uc21c\\uc11c\\ub300\\ub85c \\uc778\\ucf54\\ub529\\n     */\\n    function updateTemplate(bytes32 key, address templateAddr) external onlyOwner {\\n        require(templateAddr != address(0), \\\"Factory/Non-Valid\\\");\\n        require(nonceForTemplate[templateAddr] == 0, \\\"Factory/registered-before\\\");\\n        require(templateAddr.isContract(), \\\"Factory/is-not-Contract\\\");\\n        TemplateInfo memory tmp = templates[key];\\n        tmp.template = templateAddr;\\n        (bool success, ) = tmp.btemplate.call(abi.encode(templateAddr));\\n        assert(success);\\n        templates[key] = tmp;\\n        emit UpdatedTemplate(key, tmp.template);\\n    }\\n\\n    /**\\n     * @notice \\ub4f1\\ub85d\\ub41c \\ud15c\\ud50c\\ub9bf\\uc744 \\uc0ad\\uc81c\\ud558\\ub294 \\ud568\\uc218\\n     * @param key \\uc0ad\\uc81c\\ub420 \\ud15c\\ud50c\\ub9bf\\uc758 \\uc544\\uc774\\ub514\\n     */\\n    function removeTemplate(bytes32 key) external onlyOwner {\\n        TemplateInfo memory tmp = templates[key];\\n        require(tmp.template != address(0), \\\"Factory/Non-Exist\\\");\\n        delete templates[key];\\n        emit DeletedTemplate(key);\\n    }\\n\\n    /**\\n     * @notice \\uace0\\uc815 \\uc218\\uc218\\ub8cc\\ub97c \\ubcc0\\uacbd\\n     * @param newFee \\ubcc0\\uacbd\\ub41c \\uc218\\uc218\\ub8cc\\n     */\\n    function changeFee(uint256 newFee) external onlyOwner {\\n        uint256 prevFee = baseFee;\\n        baseFee = newFee;\\n        emit FeeChanged(prevFee, newFee);\\n    }\\n\\n    /**\\n     * @notice \\uc218\\uc218\\ub8cc\\ub97c \\uc218\\ucde8\\ud560 \\ub300\\uc0c1 \\ubcc0\\uacbd\\n     * @param newFeeTo \\uc218\\ucde8\\ud560 \\ub300\\uc0c1 \\uc8fc\\uc18c\\n     */\\n    function changeFeeTo(address payable newFeeTo) external onlyOwner {\\n        address prevFeeTo = feeTo;\\n        feeTo = newFeeTo;\\n        emit FeeToChanged(prevFeeTo, newFeeTo);\\n    }\\n\\n    /**\\n     * @notice Factori.eth\\uc5d0 \\uc313\\uc5ec\\uc788\\ub294 ETH\\uc640 \\ud1a0\\ud070\\uc744 \\ud638\\ucd9c\\ud558\\uc5ec, \\uc218\\uc218\\ub8cc \\uc218\\ucde8 \\uc8fc\\uc18c\\uc5d0 \\uc804\\uc1a1\\ud568\\n     * @param tokenAddr \\uc218\\ucde8\\ud560 \\ud1a0\\ud070 \\uc8fc\\uc18c\\n     */\\n    function collect(address tokenAddr) external onlyOwner {\\n        IERC20(tokenAddr).transfer(feeTo, IERC20(tokenAddr).balanceOf(address(this)));\\n    }\\n\\n    function recoverOwnership(address deployed, address to) external onlyOwner {\\n        IERC173(deployed).transferOwnership(to);\\n    }\\n\\n    function feeTransfer(address to, uint256 amount) internal returns (bool callStatus) {\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly {\\n            // Transfer the ETH and store if it succeeded or not.\\n            callStatus := call(gas(), to, amount, 0, 0, 0, 0)\\n            let returnDataSize := returndatasize()\\n            if iszero(callStatus) {\\n                returndatacopy(0, 0, returnDataSize)\\n                revert(0, returnDataSize)\\n            }\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xe773bb86f5175e3e626c70abb1c4b9f63c6c9d61fb71dcb4bd7714d2413150d5\",\"license\":\"LGPL-3.0-or-later\"},\"contracts/IFactory.sol\":{\"content\":\"/**\\n * SPDX-License-Identifier: LGPL-3.0-or-later\\n */\\n\\npragma solidity ^0.8.0;\\n\\ninterface IFactory {\\n    struct TemplateInfo {\\n        address template;\\n        address btemplate;\\n    }\\n\\n    event Deployed(address deployed, address owner);\\n    event NewTemplate(bytes32 indexed key, address template, address beacon);\\n    event UpdatedTemplate(bytes32 indexed key, address template);\\n    event DeletedTemplate(bytes32 indexed key);\\n    event FeeChanged(uint256 prevFee, uint256 fee);\\n    event FeeToChanged(address prevFeeTo, address feeTo);\\n\\n    function deploy(\\n        bool isBeacon,\\n        bytes32 templateId,\\n        bytes memory initializationCallData,\\n        bytes[] memory calls\\n    ) external payable returns (address deployed);\\n\\n    function deployWithSeed(\\n        string memory seed,\\n        bool isBeacon,\\n        bytes32 templateId,\\n        bytes memory initializationCallData,\\n        bytes[] memory calls\\n    ) external payable returns (address deployed);\\n\\n    function compute(\\n        bool isBeacon,\\n        bytes32 templateId,\\n        bytes memory initializationCallData\\n    ) external view returns (address deployable);\\n\\n    function computeWithSeed(\\n        string memory seed,\\n        bool isBeacon,\\n        bytes32 templateId,\\n        bytes memory initializationCallData\\n    ) external view returns (address deployable);\\n\\n    function clone(\\n        address templateAddr,\\n        bytes memory initializationCallData,\\n        bytes[] memory calls\\n    ) external payable returns (address deployed);\\n\\n    function computeClone(address templateAddr, bytes memory initializationCallData)\\n        external\\n        view\\n        returns (address deployable);\\n\\n    function getPrice() external view returns (uint256 price);\\n\\n    function addTemplate(address templateAddr) external;\\n\\n    function updateTemplate(bytes32 key, address templateAddr) external;\\n\\n    function removeTemplate(bytes32 key) external;\\n\\n    function changeFee(uint256 newFee) external;\\n\\n    function changeFeeTo(address payable newFeeTo) external;\\n\\n    function collect(address tokenAddr) external;\\n}\\n\",\"keccak256\":\"0xcef53b82ec526344eff8d319c0663e18319c7c0a807f4aebc0749f305e493145\",\"license\":\"LGPL-3.0-or-later\"}},\"version\":1}",
+  "bytecode": "0x608060405260016003553480156200001657600080fd5b50604051620036b7380380620036b78339810160408190526200003991620000d1565b600080546001600160a01b0319163390811782556040519091907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908290a3600491909155600580546001600160a01b0319166001600160a01b039092169190911790556000805260026020526000197fac33ff75c19e70fe83507db0d683fd3465c996598dc972688b7ace676c89077b5562000110565b60008060408385031215620000e557600080fd5b825160208401519092506001600160a01b03811681146200010557600080fd5b809150509250929050565b61359780620001206000396000f3fe608060405260043610620001935760003560e01c80636ef25c3a11620000db578063ac9650d81162000089578063e7274c2b1162000060578063e7274c2b14620004be578063ed0c709114620004e3578063f2fde38b14620004fb57600080fd5b8063ac9650d8146200044d578063affed0e01462000481578063bdcf41ee146200049957600080fd5b8063973388b311620000be578063973388b314620003fa57806398d5fdca146200041f578063a7d5eb82146200043657600080fd5b80636ef25c3a14620003a45780638da5cb5b14620003cb57600080fd5b80635046da821162000145578063569f52e5116200011c578063569f52e514620003435780635950222b146200035a5780636a1db1bf146200037f57600080fd5b80635046da8214620002e25780635313992b14620002f957806355b30266146200031e57600080fd5b80630a631576116200017a5780630a631576146200021857806323b1cde4146200029857806347e09a0b14620002bd57600080fd5b8063017e7e58146200019857806306ec16f814620001f1575b600080fd5b348015620001a557600080fd5b50600554620001c79073ffffffffffffffffffffffffffffffffffffffff1681565b60405173ffffffffffffffffffffffffffffffffffffffff90911681526020015b60405180910390f35b348015620001fe57600080fd5b50620002166200021036600462002429565b62000520565b005b3480156200022557600080fd5b506200026a6200023736600462002449565b6001602081905260009182526040909120805491015473ffffffffffffffffffffffffffffffffffffffff918216911682565b6040805173ffffffffffffffffffffffffffffffffffffffff938416815292909116602083015201620001e8565b348015620002a557600080fd5b5062000216620002b736600462002429565b620006e2565b348015620002ca57600080fd5b5062000216620002dc36600462002449565b620007ec565b620001c7620002f336600462002654565b62000987565b3480156200030657600080fd5b50620002166200031836600462002707565b62000bcf565b3480156200032b57600080fd5b50620002166200033d36600462002429565b62000f60565b620001c7620003543660046200273a565b620011c9565b3480156200036757600080fd5b50620001c762000379366004620027b9565b620013ea565b3480156200038c57600080fd5b50620002166200039e36600462002449565b6200145c565b348015620003b157600080fd5b50620003bc60045481565b604051908152602001620001e8565b348015620003d857600080fd5b50600054620001c79073ffffffffffffffffffffffffffffffffffffffff1681565b3480156200040757600080fd5b50620001c7620004193660046200280e565b6200151e565b3480156200042c57600080fd5b50600454620003bc565b620001c76200044736600462002899565b62001595565b3480156200045a57600080fd5b50620004726200046c36600462002916565b620017d8565b604051620001e8919062002a0f565b3480156200048e57600080fd5b50620003bc60035481565b348015620004a657600080fd5b50620001c7620004b836600462002a93565b62001965565b348015620004cb57600080fd5b5062000216620004dd36600462002ae9565b62001973565b348015620004f057600080fd5b506200021662001a7d565b3480156200050857600080fd5b50620002166200051a36600462002429565b62001b54565b60005473ffffffffffffffffffffffffffffffffffffffff163314620005a7576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064015b60405180910390fd5b6005546040517f70a0823100000000000000000000000000000000000000000000000000000000815230600482015273ffffffffffffffffffffffffffffffffffffffff8381169263a9059cbb9291169083906370a0823190602401602060405180830381865afa15801562000621573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019062000647919062002b1c565b6040517fffffffff0000000000000000000000000000000000000000000000000000000060e085901b16815273ffffffffffffffffffffffffffffffffffffffff909216600483015260248201526044016020604051808303816000875af1158015620006b8573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190620006de919062002b36565b5050565b60005473ffffffffffffffffffffffffffffffffffffffff16331462000765576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064016200059e565b6005805473ffffffffffffffffffffffffffffffffffffffff8381167fffffffffffffffffffffffff000000000000000000000000000000000000000083168117909355604080519190921680825260208201939093527f82b35d45c357f923889a214ea247bfd97c31805b21391e139b94c750134b29bc91015b60405180910390a15050565b60005473ffffffffffffffffffffffffffffffffffffffff1633146200086f576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064016200059e565b6000818152600160208181526040928390208351808501909452805473ffffffffffffffffffffffffffffffffffffffff9081168086529190930154909216908301526200091a576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601160248201527f466163746f72792f4e6f6e2d457869737400000000000000000000000000000060448201526064016200059e565b600082815260016020819052604080832080547fffffffffffffffffffffffff00000000000000000000000000000000000000009081168255920180549092169091555183917fc233a96b1b7f2a646d88a34a3e9e07e9e248940119cee10ae5386bec04099a0e91a25050565b600034600454111580620009b2575060005473ffffffffffffffffffffffffffffffffffffffff1633145b62000a1a576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601960248201527f466163746f72792f496e636f72726563742d616d6f756e74730000000000000060448201526064016200059e565b60055462000a3f9073ffffffffffffffffffffffffffffffffffffffff163462001c64565b506000848152600160208181526040928390208351808501909452805473ffffffffffffffffffffffffffffffffffffffff9081168552920154909116908201528562000a9d5762000a978782600001518662001c83565b62000aae565b62000aae8782602001518662001ced565b83519092501562000b77576040517fac9650d800000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff83169063ac9650d89062000b0d90869060040162002a0f565b6000604051808303816000875af115801562000b2d573d6000803e3d6000fd5b505050506040513d6000823e601f3d9081017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe016820160405262000b75919081019062002b8c565b505b6040805173ffffffffffffffffffffffffffffffffffffffff841681523360208201527f09e48df7857bd0c1e0d31bb8a85d42cf1874817895f171c917f6ee2cea73ec20910160405180910390a15095945050505050565b60005473ffffffffffffffffffffffffffffffffffffffff16331462000c52576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064016200059e565b73ffffffffffffffffffffffffffffffffffffffff811662000cd1576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601160248201527f466163746f72792f4e6f6e2d56616c696400000000000000000000000000000060448201526064016200059e565b73ffffffffffffffffffffffffffffffffffffffff81166000908152600260205260409020541562000d60576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601960248201527f466163746f72792f726567697374657265642d6265666f72650000000000000060448201526064016200059e565b73ffffffffffffffffffffffffffffffffffffffff81163b62000de0576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601760248201527f466163746f72792f69732d6e6f742d436f6e747261637400000000000000000060448201526064016200059e565b60008281526001602081815260408084208151808301835293015473ffffffffffffffffffffffffffffffffffffffff9081168484018190529086168085528251938401529293929101604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08184030181529082905262000e649162002c5f565b6000604051808303816000865af19150503d806000811462000ea3576040519150601f19603f3d011682016040523d82523d6000602084013e62000ea8565b606091505b505090508062000ebc5762000ebc62002c7d565b6000848152600160208181526040928390208551815473ffffffffffffffffffffffffffffffffffffffff9182167fffffffffffffffffffffffff00000000000000000000000000000000000000009182168117845588850151939095018054939092169216919091179055915190815285917f6d2d843e6cb2e8436f702cf2f8caf57b41ae30910bda687881574260c2b84a65910160405180910390a250505050565b60005473ffffffffffffffffffffffffffffffffffffffff16331462000fe3576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064016200059e565b73ffffffffffffffffffffffffffffffffffffffff81166000908152600260205260409020541562001072576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601160248201527f466163746f72792f4e6f6e2d56616c696400000000000000000000000000000060448201526064016200059e565b6003546040805173ffffffffffffffffffffffffffffffffffffffff84166020820152908101919091526000906060016040516020818303038152906040528051906020012090506000620010c78362001cfc565b60408051808201825273ffffffffffffffffffffffffffffffffffffffff808716825280841660208084019182526000888152600191829052948520935184549084167fffffffffffffffffffffffff00000000000000000000000000000000000000009182161785559151930180549390921692169190911790556003805492935090620011568362002cac565b9091555073ffffffffffffffffffffffffffffffffffffffff8481166000818152600260209081526040918290209490945580519182529184169281019290925283917f51219b79f68b0887bcfa321d00a5bcbb9e5d1b914df144771313c817fea80e99910160405180910390a2505050565b73ffffffffffffffffffffffffffffffffffffffff83166000908152600260205260408120541562001258576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601b60248201527f466163746f72792f526567697374657265642d54656d706c617465000000000060448201526064016200059e565b34600454148062001280575060005473ffffffffffffffffffffffffffffffffffffffff1633145b620012e8576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601960248201527f466163746f72792f496e636f72726563742d616d6f756e74730000000000000060448201526064016200059e565b6005546200130d9073ffffffffffffffffffffffffffffffffffffffff163462001c64565b506200131a848462001d92565b825190915015620013e3576040517fac9650d800000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff82169063ac9650d8906200137990859060040162002a0f565b6000604051808303816000875af115801562001399573d6000803e3d6000fd5b505050506040513d6000823e601f3d9081017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0168201604052620013e1919081019062002b8c565b505b9392505050565b60008281526001602081815260408084208151808301909252805473ffffffffffffffffffffffffffffffffffffffff90811683529301549092169082015284620014435780516200143d908462001ddc565b62001453565b6200145381602001518462001df8565b95945050505050565b60005473ffffffffffffffffffffffffffffffffffffffff163314620014df576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064016200059e565b600480549082905560408051828152602081018490527f5fc463da23c1b063e66f9e352006a7fbe8db7223c455dc429e881a2dfe2f94f19101620007e0565b60008281526001602081815260408084208151808301909252805473ffffffffffffffffffffffffffffffffffffffff908116835293015490921690820152846200157a57620015748682600001518562001e14565b6200158b565b6200158b8682602001518562001e31565b9695505050505050565b600034600454111580620015c0575060005473ffffffffffffffffffffffffffffffffffffffff1633145b62001628576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601960248201527f466163746f72792f496e636f72726563742d616d6f756e74730000000000000060448201526064016200059e565b6005546200164d9073ffffffffffffffffffffffffffffffffffffffff163462001c64565b506000848152600160208181526040928390208351808501909452805473ffffffffffffffffffffffffffffffffffffffff90811685529201549091169082015285620016a8578051620016a2908562001d92565b620016b8565b620016b881602001518562001e40565b83519092501562001781576040517fac9650d800000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff83169063ac9650d8906200171790869060040162002a0f565b6000604051808303816000875af115801562001737573d6000803e3d6000fd5b505050506040513d6000823e601f3d9081017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe01682016040526200177f919081019062002b8c565b505b6040805173ffffffffffffffffffffffffffffffffffffffff841681523360208201527f09e48df7857bd0c1e0d31bb8a85d42cf1874817895f171c917f6ee2cea73ec20910160405180910390a150949350505050565b60608167ffffffffffffffff811115620017f657620017f662002463565b6040519080825280602002602001820160405280156200182b57816020015b6060815260200190600190039081620018155790505b50905060005b828110156200195e576000803086868581811062001853576200185362002d0d565b905060200281019062001867919062002d3c565b6040516200187792919062002dab565b600060405180830381855af49150503d8060008114620018b4576040519150601f19603f3d011682016040523d82523d6000602084013e620018b9565b606091505b5091509150816200192557604481511015620018d457600080fd5b60048101905080806020019051810190620018f0919062002dbb565b6040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016200059e919062002e11565b808484815181106200193b576200193b62002d0d565b602002602001018190525050508080620019559062002cac565b91505062001831565b5092915050565b6000620013e3838362001ddc565b60005473ffffffffffffffffffffffffffffffffffffffff163314620019f6576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064016200059e565b6040517ff2fde38b00000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff828116600483015283169063f2fde38b90602401600060405180830381600087803b15801562001a6057600080fd5b505af115801562001a75573d6000803e3d6000fd5b505050505050565b60005473ffffffffffffffffffffffffffffffffffffffff16331462001b00576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064016200059e565b600080547fffffffffffffffffffffffff000000000000000000000000000000000000000016815560405133907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908390a3565b60005473ffffffffffffffffffffffffffffffffffffffff16331462001bd7576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064016200059e565b73ffffffffffffffffffffffffffffffffffffffff811662001c56576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601a60248201527f4f776e6572736869702f4e6f742d416c6c6f7765642d5a65726f00000000000060448201526064016200059e565b62001c618162001e5e565b50565b600080600080600085875af190503d816200195e57806000803e806000fd5b60008062001c92848462001ed3565b90506000338660405160200162001cab92919062002e26565b6040516020818303038152906040528051906020012090508160200182518281836000f594505050823b62001ce4573d6000803e3d6000fd5b50509392505050565b60008062001c9284846200203d565b6040805173ffffffffffffffffffffffffffffffffffffffff83166020820152600091829101604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08184030181529082905262001d5f9160200162002e73565b60405160208183030381529060405290508051602082016000f09150813b62001d8c573d6000803e3d6000fd5b50919050565b60008062001da1848462001ed3565b9050600062001db0826200206b565b5090508160200182518281836000f594505050823b62001dd4573d6000803e3d6000fd5b505092915050565b60008062001deb848462001ed3565b905062001453816200206b565b60008062001e0784846200203d565b90506200145381620021b5565b60008062001e23848462001ed3565b9050620014538186620022f7565b60008062001e2384846200203d565b60008062001e4f84846200203d565b9050600062001db082620021b5565b6000805473ffffffffffffffffffffffffffffffffffffffff8381167fffffffffffffffffffffffff0000000000000000000000000000000000000000831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b6060600082511162001f935760405162001ef060208201620023d0565b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe082820381018352601f90910116604081815273ffffffffffffffffffffffffffffffffffffffff8616602083015201604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08184030181529082905262001f7e929160200162002f2d565b604051602081830303815290604052620013e3565b60405162001fa460208201620023dd565b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe082820381018352601f90910116604081905262001fe9908590859060200162002f60565b604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08184030181529082905262002027929160200162002f2d565b6040516020818303038152906040529392505050565b606060008251116200205a5760405162001ef060208201620023eb565b60405162001fa460208201620023f8565b80516020820120600090819081805b6040517fffffffffffffffffffffffffffffffffffffffff0000000000000000000000003360601b16602082015260348101839052605401604080518083037fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe00181529082905280516020918201207fff00000000000000000000000000000000000000000000000000000000000000918301919091527fffffffffffffffffffffffffffffffffffffffff0000000000000000000000003060601b16602183015260358201819052605582018590529550607501604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08184030181529190528051602090910120935050823b1515806200219857620021ad565b81620021a48162002cac565b9250506200207a565b505050915091565b80516020820120600090819081805b6040517fffffffffffffffffffffffffffffffffffffffff0000000000000000000000003360601b16602082015260348101839052605401604080518083037fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe00181529082905280516020918201207fff00000000000000000000000000000000000000000000000000000000000000918301919091527fffffffffffffffffffffffffffffffffffffffff0000000000000000000000003060601b16602183015260358201819052605582018590529550607501604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08184030181529190528051602090910120935050823b151580620022e257620021ad565b81620022ee8162002cac565b925050620021c4565b60008083805190602001209050600033846040516020016200231b92919062002e26565b604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe081840301815282825280516020918201207fff00000000000000000000000000000000000000000000000000000000000000828501523060601b7fffffffffffffffffffffffffffffffffffffffff000000000000000000000000166021850152603584015260558084019590955281518084039095018552607590920190528251920191909120949350505050565b608a8062002f9283390190565b6101fd806200301c83390190565b609f806200321983390190565b6102aa80620032b883390190565b73ffffffffffffffffffffffffffffffffffffffff8116811462001c6157600080fd5b6000602082840312156200243c57600080fd5b8135620013e38162002406565b6000602082840312156200245c57600080fd5b5035919050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b604051601f82017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe016810167ffffffffffffffff81118282101715620024dc57620024dc62002463565b604052919050565b600067ffffffffffffffff82111562002501576200250162002463565b50601f017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe01660200190565b600082601f8301126200253f57600080fd5b8135620025566200255082620024e4565b62002492565b8181528460208386010111156200256c57600080fd5b816020850160208301376000918101602001919091529392505050565b801515811462001c6157600080fd5b600067ffffffffffffffff821115620025b557620025b562002463565b5060051b60200190565b600082601f830112620025d157600080fd5b81356020620025e4620025508362002598565b82815260059290921b840181019181810190868411156200260457600080fd5b8286015b848110156200264957803567ffffffffffffffff8111156200262a5760008081fd5b6200263a8986838b01016200252d565b84525091830191830162002608565b509695505050505050565b600080600080600060a086880312156200266d57600080fd5b853567ffffffffffffffff808211156200268657600080fd5b6200269489838a016200252d565b965060208801359150620026a88262002589565b9094506040870135935060608701359080821115620026c657600080fd5b620026d489838a016200252d565b93506080880135915080821115620026eb57600080fd5b50620026fa88828901620025bf565b9150509295509295909350565b600080604083850312156200271b57600080fd5b8235915060208301356200272f8162002406565b809150509250929050565b6000806000606084860312156200275057600080fd5b83356200275d8162002406565b9250602084013567ffffffffffffffff808211156200277b57600080fd5b62002789878388016200252d565b93506040860135915080821115620027a057600080fd5b50620027af86828701620025bf565b9150509250925092565b600080600060608486031215620027cf57600080fd5b8335620027dc8162002589565b925060208401359150604084013567ffffffffffffffff8111156200280057600080fd5b620027af868287016200252d565b600080600080608085870312156200282557600080fd5b843567ffffffffffffffff808211156200283e57600080fd5b6200284c888389016200252d565b955060208701359150620028608262002589565b90935060408601359250606086013590808211156200287e57600080fd5b506200288d878288016200252d565b91505092959194509250565b60008060008060808587031215620028b057600080fd5b8435620028bd8162002589565b935060208501359250604085013567ffffffffffffffff80821115620028e257600080fd5b620028f0888389016200252d565b935060608701359150808211156200290757600080fd5b506200288d87828801620025bf565b600080602083850312156200292a57600080fd5b823567ffffffffffffffff808211156200294357600080fd5b818501915085601f8301126200295857600080fd5b8135818111156200296857600080fd5b8660208260051b85010111156200297e57600080fd5b60209290920196919550909350505050565b60005b83811015620029ad57818101518382015260200162002993565b83811115620029bd576000848401525b50505050565b60008151808452620029dd81602086016020860162002990565b601f017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0169290920160200192915050565b6000602080830181845280855180835260408601915060408160051b870101925083870160005b8281101562002a86577fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc088860301845262002a73858351620029c3565b9450928501929085019060010162002a36565b5092979650505050505050565b6000806040838503121562002aa757600080fd5b823562002ab48162002406565b9150602083013567ffffffffffffffff81111562002ad157600080fd5b62002adf858286016200252d565b9150509250929050565b6000806040838503121562002afd57600080fd5b823562002b0a8162002406565b915060208301356200272f8162002406565b60006020828403121562002b2f57600080fd5b5051919050565b60006020828403121562002b4957600080fd5b8151620013e38162002589565b600062002b676200255084620024e4565b905082815283838301111562002b7c57600080fd5b620013e383602083018462002990565b6000602080838503121562002ba057600080fd5b825167ffffffffffffffff8082111562002bb957600080fd5b818501915085601f83011262002bce57600080fd5b815162002bdf620025508262002598565b81815260059190911b8301840190848101908883111562002bff57600080fd5b8585015b8381101562002c525780518581111562002c1d5760008081fd5b8601603f81018b1362002c305760008081fd5b62002c438b898301516040840162002b56565b84525091860191860162002c03565b5098975050505050505050565b6000825162002c7381846020870162002990565b9190910192915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052600160045260246000fd5b60007fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff82141562002d06577f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b5060010190565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b60008083357fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe184360301811262002d7257600080fd5b83018035915067ffffffffffffffff82111562002d8e57600080fd5b60200191503681900382131562002da457600080fd5b9250929050565b8183823760009101908152919050565b60006020828403121562002dce57600080fd5b815167ffffffffffffffff81111562002de657600080fd5b8201601f8101841362002df857600080fd5b62002e098482516020840162002b56565b949350505050565b602081526000620013e36020830184620029c3565b7fffffffffffffffffffffffffffffffffffffffff0000000000000000000000008360601b1681526000825162002e6581601485016020870162002990565b919091016014019392505050565b7f606161002960003933600081816002015260310152602080380360803960805181527f60005560616000f3fe337f0000000000000000000000000000000000000000006020820152741415602e57600035600055005b337f00000000000060408201526514606057600060608201527f5460005260206000f35b0000000000000000000000000000000000000000000060808201526000825162002f2081608a85016020870162002990565b91909101608a0192915050565b6000835162002f4181846020880162002990565b83519083019062002f5781836020880162002990565b01949350505050565b73ffffffffffffffffffffffffffffffffffffffff8316815260406020820152600062002e096040830184620029c356fe6080604052604051608a380380608a833981016040819052601e91605b565b60405169363d3d373d3d3d363d7360b01b8152606082901b600a82018190526e5af43d82803e903d91602b57fd5bf360881b601e83015290602d81f35b600060208284031215606c57600080fd5b81516001600160a01b0381168114608257600080fd5b939250505056fe60806040526040516101fd3803806101fd83398101604081905261002291610112565b6000826001600160a01b03168260405161003c91906101e0565b600060405180830381855af49150503d8060008114610077576040519150601f19603f3d011682016040523d82523d6000602084013e61007c565b606091505b505090508061008f573d6000803e3d6000fd5b60405169363d3d373d3d3d363d7360b01b8152606084901b600a82018190526e5af43d82803e903d91602b57fd5bf360881b601e83015290602d81f35b634e487b7160e01b600052604160045260246000fd5b60005b838110156100fd5781810151838201526020016100e5565b8381111561010c576000848401525b50505050565b6000806040838503121561012557600080fd5b82516001600160a01b038116811461013c57600080fd5b60208401519092506001600160401b038082111561015957600080fd5b818501915085601f83011261016d57600080fd5b81518181111561017f5761017f6100cc565b604051601f8201601f19908116603f011681019083821181831017156101a7576101a76100cc565b816040528281528860208487010111156101c057600080fd5b6101d18360208301602088016100e2565b80955050505050509250929050565b600082516101f28184602087016100e2565b919091019291505056fe6080604052604051609f380380609f833981016040819052601e916070565b604051653d3d3d3d3d7360d01b8152606082901b600682018190527f5afa3d82803e368260203750808036602082515af43d82803e903d91603a57fd601a830152615bf360f01b603a83015290603c81f35b600060208284031215608157600080fd5b81516001600160a01b0381168114609757600080fd5b939250505056fe60806040526040516102aa3803806102aa833981016040819052610022916101a7565b6040516000906001600160a01b0384169082818181855afa9150503d8060008114610069576040519150601f19603f3d011682016040523d82523d6000602084013e61006e565b606091505b509150506000818060200190518101906100889190610269565b90506000816001600160a01b0316846040516100a4919061028d565b600060405180830381855af49150503d80600081146100df576040519150601f19603f3d011682016040523d82523d6000602084013e6100e4565b606091505b50509050806100f7573d6000803e3d6000fd5b604051653d3d3d3d3d7360d01b8152606086901b600682018190527f5afa3d82803e368260203750808036602082515af43d82803e903d91603a57fd601a830152615bf360f01b603a83015290603c81f35b6001600160a01b038116811461015e57600080fd5b50565b634e487b7160e01b600052604160045260246000fd5b60005b8381101561019257818101518382015260200161017a565b838111156101a1576000848401525b50505050565b600080604083850312156101ba57600080fd5b82516101c581610149565b60208401519092506001600160401b03808211156101e257600080fd5b818501915085601f8301126101f657600080fd5b81518181111561020857610208610161565b604051601f8201601f19908116603f0116810190838211818310171561023057610230610161565b8160405282815288602084870101111561024957600080fd5b61025a836020830160208801610177565b80955050505050509250929050565b60006020828403121561027b57600080fd5b815161028681610149565b9392505050565b6000825161029f818460208701610177565b919091019291505056fea2646970667358221220cf700d741ec17b81a9cd412a255e60e875e0ce5611be2b853e00ddb9c5f15ecf64736f6c634300080b0033",
+  "deployedBytecode": "0x608060405260043610620001935760003560e01c80636ef25c3a11620000db578063ac9650d81162000089578063e7274c2b1162000060578063e7274c2b14620004be578063ed0c709114620004e3578063f2fde38b14620004fb57600080fd5b8063ac9650d8146200044d578063affed0e01462000481578063bdcf41ee146200049957600080fd5b8063973388b311620000be578063973388b314620003fa57806398d5fdca146200041f578063a7d5eb82146200043657600080fd5b80636ef25c3a14620003a45780638da5cb5b14620003cb57600080fd5b80635046da821162000145578063569f52e5116200011c578063569f52e514620003435780635950222b146200035a5780636a1db1bf146200037f57600080fd5b80635046da8214620002e25780635313992b14620002f957806355b30266146200031e57600080fd5b80630a631576116200017a5780630a631576146200021857806323b1cde4146200029857806347e09a0b14620002bd57600080fd5b8063017e7e58146200019857806306ec16f814620001f1575b600080fd5b348015620001a557600080fd5b50600554620001c79073ffffffffffffffffffffffffffffffffffffffff1681565b60405173ffffffffffffffffffffffffffffffffffffffff90911681526020015b60405180910390f35b348015620001fe57600080fd5b50620002166200021036600462002429565b62000520565b005b3480156200022557600080fd5b506200026a6200023736600462002449565b6001602081905260009182526040909120805491015473ffffffffffffffffffffffffffffffffffffffff918216911682565b6040805173ffffffffffffffffffffffffffffffffffffffff938416815292909116602083015201620001e8565b348015620002a557600080fd5b5062000216620002b736600462002429565b620006e2565b348015620002ca57600080fd5b5062000216620002dc36600462002449565b620007ec565b620001c7620002f336600462002654565b62000987565b3480156200030657600080fd5b50620002166200031836600462002707565b62000bcf565b3480156200032b57600080fd5b50620002166200033d36600462002429565b62000f60565b620001c7620003543660046200273a565b620011c9565b3480156200036757600080fd5b50620001c762000379366004620027b9565b620013ea565b3480156200038c57600080fd5b50620002166200039e36600462002449565b6200145c565b348015620003b157600080fd5b50620003bc60045481565b604051908152602001620001e8565b348015620003d857600080fd5b50600054620001c79073ffffffffffffffffffffffffffffffffffffffff1681565b3480156200040757600080fd5b50620001c7620004193660046200280e565b6200151e565b3480156200042c57600080fd5b50600454620003bc565b620001c76200044736600462002899565b62001595565b3480156200045a57600080fd5b50620004726200046c36600462002916565b620017d8565b604051620001e8919062002a0f565b3480156200048e57600080fd5b50620003bc60035481565b348015620004a657600080fd5b50620001c7620004b836600462002a93565b62001965565b348015620004cb57600080fd5b5062000216620004dd36600462002ae9565b62001973565b348015620004f057600080fd5b506200021662001a7d565b3480156200050857600080fd5b50620002166200051a36600462002429565b62001b54565b60005473ffffffffffffffffffffffffffffffffffffffff163314620005a7576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064015b60405180910390fd5b6005546040517f70a0823100000000000000000000000000000000000000000000000000000000815230600482015273ffffffffffffffffffffffffffffffffffffffff8381169263a9059cbb9291169083906370a0823190602401602060405180830381865afa15801562000621573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019062000647919062002b1c565b6040517fffffffff0000000000000000000000000000000000000000000000000000000060e085901b16815273ffffffffffffffffffffffffffffffffffffffff909216600483015260248201526044016020604051808303816000875af1158015620006b8573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190620006de919062002b36565b5050565b60005473ffffffffffffffffffffffffffffffffffffffff16331462000765576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064016200059e565b6005805473ffffffffffffffffffffffffffffffffffffffff8381167fffffffffffffffffffffffff000000000000000000000000000000000000000083168117909355604080519190921680825260208201939093527f82b35d45c357f923889a214ea247bfd97c31805b21391e139b94c750134b29bc91015b60405180910390a15050565b60005473ffffffffffffffffffffffffffffffffffffffff1633146200086f576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064016200059e565b6000818152600160208181526040928390208351808501909452805473ffffffffffffffffffffffffffffffffffffffff9081168086529190930154909216908301526200091a576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601160248201527f466163746f72792f4e6f6e2d457869737400000000000000000000000000000060448201526064016200059e565b600082815260016020819052604080832080547fffffffffffffffffffffffff00000000000000000000000000000000000000009081168255920180549092169091555183917fc233a96b1b7f2a646d88a34a3e9e07e9e248940119cee10ae5386bec04099a0e91a25050565b600034600454111580620009b2575060005473ffffffffffffffffffffffffffffffffffffffff1633145b62000a1a576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601960248201527f466163746f72792f496e636f72726563742d616d6f756e74730000000000000060448201526064016200059e565b60055462000a3f9073ffffffffffffffffffffffffffffffffffffffff163462001c64565b506000848152600160208181526040928390208351808501909452805473ffffffffffffffffffffffffffffffffffffffff9081168552920154909116908201528562000a9d5762000a978782600001518662001c83565b62000aae565b62000aae8782602001518662001ced565b83519092501562000b77576040517fac9650d800000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff83169063ac9650d89062000b0d90869060040162002a0f565b6000604051808303816000875af115801562000b2d573d6000803e3d6000fd5b505050506040513d6000823e601f3d9081017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe016820160405262000b75919081019062002b8c565b505b6040805173ffffffffffffffffffffffffffffffffffffffff841681523360208201527f09e48df7857bd0c1e0d31bb8a85d42cf1874817895f171c917f6ee2cea73ec20910160405180910390a15095945050505050565b60005473ffffffffffffffffffffffffffffffffffffffff16331462000c52576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064016200059e565b73ffffffffffffffffffffffffffffffffffffffff811662000cd1576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601160248201527f466163746f72792f4e6f6e2d56616c696400000000000000000000000000000060448201526064016200059e565b73ffffffffffffffffffffffffffffffffffffffff81166000908152600260205260409020541562000d60576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601960248201527f466163746f72792f726567697374657265642d6265666f72650000000000000060448201526064016200059e565b73ffffffffffffffffffffffffffffffffffffffff81163b62000de0576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601760248201527f466163746f72792f69732d6e6f742d436f6e747261637400000000000000000060448201526064016200059e565b60008281526001602081815260408084208151808301835293015473ffffffffffffffffffffffffffffffffffffffff9081168484018190529086168085528251938401529293929101604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08184030181529082905262000e649162002c5f565b6000604051808303816000865af19150503d806000811462000ea3576040519150601f19603f3d011682016040523d82523d6000602084013e62000ea8565b606091505b505090508062000ebc5762000ebc62002c7d565b6000848152600160208181526040928390208551815473ffffffffffffffffffffffffffffffffffffffff9182167fffffffffffffffffffffffff00000000000000000000000000000000000000009182168117845588850151939095018054939092169216919091179055915190815285917f6d2d843e6cb2e8436f702cf2f8caf57b41ae30910bda687881574260c2b84a65910160405180910390a250505050565b60005473ffffffffffffffffffffffffffffffffffffffff16331462000fe3576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064016200059e565b73ffffffffffffffffffffffffffffffffffffffff81166000908152600260205260409020541562001072576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601160248201527f466163746f72792f4e6f6e2d56616c696400000000000000000000000000000060448201526064016200059e565b6003546040805173ffffffffffffffffffffffffffffffffffffffff84166020820152908101919091526000906060016040516020818303038152906040528051906020012090506000620010c78362001cfc565b60408051808201825273ffffffffffffffffffffffffffffffffffffffff808716825280841660208084019182526000888152600191829052948520935184549084167fffffffffffffffffffffffff00000000000000000000000000000000000000009182161785559151930180549390921692169190911790556003805492935090620011568362002cac565b9091555073ffffffffffffffffffffffffffffffffffffffff8481166000818152600260209081526040918290209490945580519182529184169281019290925283917f51219b79f68b0887bcfa321d00a5bcbb9e5d1b914df144771313c817fea80e99910160405180910390a2505050565b73ffffffffffffffffffffffffffffffffffffffff83166000908152600260205260408120541562001258576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601b60248201527f466163746f72792f526567697374657265642d54656d706c617465000000000060448201526064016200059e565b34600454148062001280575060005473ffffffffffffffffffffffffffffffffffffffff1633145b620012e8576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601960248201527f466163746f72792f496e636f72726563742d616d6f756e74730000000000000060448201526064016200059e565b6005546200130d9073ffffffffffffffffffffffffffffffffffffffff163462001c64565b506200131a848462001d92565b825190915015620013e3576040517fac9650d800000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff82169063ac9650d8906200137990859060040162002a0f565b6000604051808303816000875af115801562001399573d6000803e3d6000fd5b505050506040513d6000823e601f3d9081017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0168201604052620013e1919081019062002b8c565b505b9392505050565b60008281526001602081815260408084208151808301909252805473ffffffffffffffffffffffffffffffffffffffff90811683529301549092169082015284620014435780516200143d908462001ddc565b62001453565b6200145381602001518462001df8565b95945050505050565b60005473ffffffffffffffffffffffffffffffffffffffff163314620014df576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064016200059e565b600480549082905560408051828152602081018490527f5fc463da23c1b063e66f9e352006a7fbe8db7223c455dc429e881a2dfe2f94f19101620007e0565b60008281526001602081815260408084208151808301909252805473ffffffffffffffffffffffffffffffffffffffff908116835293015490921690820152846200157a57620015748682600001518562001e14565b6200158b565b6200158b8682602001518562001e31565b9695505050505050565b600034600454111580620015c0575060005473ffffffffffffffffffffffffffffffffffffffff1633145b62001628576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601960248201527f466163746f72792f496e636f72726563742d616d6f756e74730000000000000060448201526064016200059e565b6005546200164d9073ffffffffffffffffffffffffffffffffffffffff163462001c64565b506000848152600160208181526040928390208351808501909452805473ffffffffffffffffffffffffffffffffffffffff90811685529201549091169082015285620016a8578051620016a2908562001d92565b620016b8565b620016b881602001518562001e40565b83519092501562001781576040517fac9650d800000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff83169063ac9650d8906200171790869060040162002a0f565b6000604051808303816000875af115801562001737573d6000803e3d6000fd5b505050506040513d6000823e601f3d9081017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe01682016040526200177f919081019062002b8c565b505b6040805173ffffffffffffffffffffffffffffffffffffffff841681523360208201527f09e48df7857bd0c1e0d31bb8a85d42cf1874817895f171c917f6ee2cea73ec20910160405180910390a150949350505050565b60608167ffffffffffffffff811115620017f657620017f662002463565b6040519080825280602002602001820160405280156200182b57816020015b6060815260200190600190039081620018155790505b50905060005b828110156200195e576000803086868581811062001853576200185362002d0d565b905060200281019062001867919062002d3c565b6040516200187792919062002dab565b600060405180830381855af49150503d8060008114620018b4576040519150601f19603f3d011682016040523d82523d6000602084013e620018b9565b606091505b5091509150816200192557604481511015620018d457600080fd5b60048101905080806020019051810190620018f0919062002dbb565b6040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016200059e919062002e11565b808484815181106200193b576200193b62002d0d565b602002602001018190525050508080620019559062002cac565b91505062001831565b5092915050565b6000620013e3838362001ddc565b60005473ffffffffffffffffffffffffffffffffffffffff163314620019f6576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064016200059e565b6040517ff2fde38b00000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff828116600483015283169063f2fde38b90602401600060405180830381600087803b15801562001a6057600080fd5b505af115801562001a75573d6000803e3d6000fd5b505050505050565b60005473ffffffffffffffffffffffffffffffffffffffff16331462001b00576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064016200059e565b600080547fffffffffffffffffffffffff000000000000000000000000000000000000000016815560405133907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908390a3565b60005473ffffffffffffffffffffffffffffffffffffffff16331462001bd7576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f4f776e6572736869702f4e6f742d417574686f72697a6564000000000000000060448201526064016200059e565b73ffffffffffffffffffffffffffffffffffffffff811662001c56576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601a60248201527f4f776e6572736869702f4e6f742d416c6c6f7765642d5a65726f00000000000060448201526064016200059e565b62001c618162001e5e565b50565b600080600080600085875af190503d816200195e57806000803e806000fd5b60008062001c92848462001ed3565b90506000338660405160200162001cab92919062002e26565b6040516020818303038152906040528051906020012090508160200182518281836000f594505050823b62001ce4573d6000803e3d6000fd5b50509392505050565b60008062001c9284846200203d565b6040805173ffffffffffffffffffffffffffffffffffffffff83166020820152600091829101604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08184030181529082905262001d5f9160200162002e73565b60405160208183030381529060405290508051602082016000f09150813b62001d8c573d6000803e3d6000fd5b50919050565b60008062001da1848462001ed3565b9050600062001db0826200206b565b5090508160200182518281836000f594505050823b62001dd4573d6000803e3d6000fd5b505092915050565b60008062001deb848462001ed3565b905062001453816200206b565b60008062001e0784846200203d565b90506200145381620021b5565b60008062001e23848462001ed3565b9050620014538186620022f7565b60008062001e2384846200203d565b60008062001e4f84846200203d565b9050600062001db082620021b5565b6000805473ffffffffffffffffffffffffffffffffffffffff8381167fffffffffffffffffffffffff0000000000000000000000000000000000000000831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b6060600082511162001f935760405162001ef060208201620023d0565b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe082820381018352601f90910116604081815273ffffffffffffffffffffffffffffffffffffffff8616602083015201604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08184030181529082905262001f7e929160200162002f2d565b604051602081830303815290604052620013e3565b60405162001fa460208201620023dd565b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe082820381018352601f90910116604081905262001fe9908590859060200162002f60565b604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08184030181529082905262002027929160200162002f2d565b6040516020818303038152906040529392505050565b606060008251116200205a5760405162001ef060208201620023eb565b60405162001fa460208201620023f8565b80516020820120600090819081805b6040517fffffffffffffffffffffffffffffffffffffffff0000000000000000000000003360601b16602082015260348101839052605401604080518083037fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe00181529082905280516020918201207fff00000000000000000000000000000000000000000000000000000000000000918301919091527fffffffffffffffffffffffffffffffffffffffff0000000000000000000000003060601b16602183015260358201819052605582018590529550607501604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08184030181529190528051602090910120935050823b1515806200219857620021ad565b81620021a48162002cac565b9250506200207a565b505050915091565b80516020820120600090819081805b6040517fffffffffffffffffffffffffffffffffffffffff0000000000000000000000003360601b16602082015260348101839052605401604080518083037fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe00181529082905280516020918201207fff00000000000000000000000000000000000000000000000000000000000000918301919091527fffffffffffffffffffffffffffffffffffffffff0000000000000000000000003060601b16602183015260358201819052605582018590529550607501604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08184030181529190528051602090910120935050823b151580620022e257620021ad565b81620022ee8162002cac565b925050620021c4565b60008083805190602001209050600033846040516020016200231b92919062002e26565b604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe081840301815282825280516020918201207fff00000000000000000000000000000000000000000000000000000000000000828501523060601b7fffffffffffffffffffffffffffffffffffffffff000000000000000000000000166021850152603584015260558084019590955281518084039095018552607590920190528251920191909120949350505050565b608a8062002f9283390190565b6101fd806200301c83390190565b609f806200321983390190565b6102aa80620032b883390190565b73ffffffffffffffffffffffffffffffffffffffff8116811462001c6157600080fd5b6000602082840312156200243c57600080fd5b8135620013e38162002406565b6000602082840312156200245c57600080fd5b5035919050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b604051601f82017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe016810167ffffffffffffffff81118282101715620024dc57620024dc62002463565b604052919050565b600067ffffffffffffffff82111562002501576200250162002463565b50601f017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe01660200190565b600082601f8301126200253f57600080fd5b8135620025566200255082620024e4565b62002492565b8181528460208386010111156200256c57600080fd5b816020850160208301376000918101602001919091529392505050565b801515811462001c6157600080fd5b600067ffffffffffffffff821115620025b557620025b562002463565b5060051b60200190565b600082601f830112620025d157600080fd5b81356020620025e4620025508362002598565b82815260059290921b840181019181810190868411156200260457600080fd5b8286015b848110156200264957803567ffffffffffffffff8111156200262a5760008081fd5b6200263a8986838b01016200252d565b84525091830191830162002608565b509695505050505050565b600080600080600060a086880312156200266d57600080fd5b853567ffffffffffffffff808211156200268657600080fd5b6200269489838a016200252d565b965060208801359150620026a88262002589565b9094506040870135935060608701359080821115620026c657600080fd5b620026d489838a016200252d565b93506080880135915080821115620026eb57600080fd5b50620026fa88828901620025bf565b9150509295509295909350565b600080604083850312156200271b57600080fd5b8235915060208301356200272f8162002406565b809150509250929050565b6000806000606084860312156200275057600080fd5b83356200275d8162002406565b9250602084013567ffffffffffffffff808211156200277b57600080fd5b62002789878388016200252d565b93506040860135915080821115620027a057600080fd5b50620027af86828701620025bf565b9150509250925092565b600080600060608486031215620027cf57600080fd5b8335620027dc8162002589565b925060208401359150604084013567ffffffffffffffff8111156200280057600080fd5b620027af868287016200252d565b600080600080608085870312156200282557600080fd5b843567ffffffffffffffff808211156200283e57600080fd5b6200284c888389016200252d565b955060208701359150620028608262002589565b90935060408601359250606086013590808211156200287e57600080fd5b506200288d878288016200252d565b91505092959194509250565b60008060008060808587031215620028b057600080fd5b8435620028bd8162002589565b935060208501359250604085013567ffffffffffffffff80821115620028e257600080fd5b620028f0888389016200252d565b935060608701359150808211156200290757600080fd5b506200288d87828801620025bf565b600080602083850312156200292a57600080fd5b823567ffffffffffffffff808211156200294357600080fd5b818501915085601f8301126200295857600080fd5b8135818111156200296857600080fd5b8660208260051b85010111156200297e57600080fd5b60209290920196919550909350505050565b60005b83811015620029ad57818101518382015260200162002993565b83811115620029bd576000848401525b50505050565b60008151808452620029dd81602086016020860162002990565b601f017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0169290920160200192915050565b6000602080830181845280855180835260408601915060408160051b870101925083870160005b8281101562002a86577fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc088860301845262002a73858351620029c3565b9450928501929085019060010162002a36565b5092979650505050505050565b6000806040838503121562002aa757600080fd5b823562002ab48162002406565b9150602083013567ffffffffffffffff81111562002ad157600080fd5b62002adf858286016200252d565b9150509250929050565b6000806040838503121562002afd57600080fd5b823562002b0a8162002406565b915060208301356200272f8162002406565b60006020828403121562002b2f57600080fd5b5051919050565b60006020828403121562002b4957600080fd5b8151620013e38162002589565b600062002b676200255084620024e4565b905082815283838301111562002b7c57600080fd5b620013e383602083018462002990565b6000602080838503121562002ba057600080fd5b825167ffffffffffffffff8082111562002bb957600080fd5b818501915085601f83011262002bce57600080fd5b815162002bdf620025508262002598565b81815260059190911b8301840190848101908883111562002bff57600080fd5b8585015b8381101562002c525780518581111562002c1d5760008081fd5b8601603f81018b1362002c305760008081fd5b62002c438b898301516040840162002b56565b84525091860191860162002c03565b5098975050505050505050565b6000825162002c7381846020870162002990565b9190910192915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052600160045260246000fd5b60007fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff82141562002d06577f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b5060010190565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b60008083357fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe184360301811262002d7257600080fd5b83018035915067ffffffffffffffff82111562002d8e57600080fd5b60200191503681900382131562002da457600080fd5b9250929050565b8183823760009101908152919050565b60006020828403121562002dce57600080fd5b815167ffffffffffffffff81111562002de657600080fd5b8201601f8101841362002df857600080fd5b62002e098482516020840162002b56565b949350505050565b602081526000620013e36020830184620029c3565b7fffffffffffffffffffffffffffffffffffffffff0000000000000000000000008360601b1681526000825162002e6581601485016020870162002990565b919091016014019392505050565b7f606161002960003933600081816002015260310152602080380360803960805181527f60005560616000f3fe337f0000000000000000000000000000000000000000006020820152741415602e57600035600055005b337f00000000000060408201526514606057600060608201527f5460005260206000f35b0000000000000000000000000000000000000000000060808201526000825162002f2081608a85016020870162002990565b91909101608a0192915050565b6000835162002f4181846020880162002990565b83519083019062002f5781836020880162002990565b01949350505050565b73ffffffffffffffffffffffffffffffffffffffff8316815260406020820152600062002e096040830184620029c356fe6080604052604051608a380380608a833981016040819052601e91605b565b60405169363d3d373d3d3d363d7360b01b8152606082901b600a82018190526e5af43d82803e903d91602b57fd5bf360881b601e83015290602d81f35b600060208284031215606c57600080fd5b81516001600160a01b0381168114608257600080fd5b939250505056fe60806040526040516101fd3803806101fd83398101604081905261002291610112565b6000826001600160a01b03168260405161003c91906101e0565b600060405180830381855af49150503d8060008114610077576040519150601f19603f3d011682016040523d82523d6000602084013e61007c565b606091505b505090508061008f573d6000803e3d6000fd5b60405169363d3d373d3d3d363d7360b01b8152606084901b600a82018190526e5af43d82803e903d91602b57fd5bf360881b601e83015290602d81f35b634e487b7160e01b600052604160045260246000fd5b60005b838110156100fd5781810151838201526020016100e5565b8381111561010c576000848401525b50505050565b6000806040838503121561012557600080fd5b82516001600160a01b038116811461013c57600080fd5b60208401519092506001600160401b038082111561015957600080fd5b818501915085601f83011261016d57600080fd5b81518181111561017f5761017f6100cc565b604051601f8201601f19908116603f011681019083821181831017156101a7576101a76100cc565b816040528281528860208487010111156101c057600080fd5b6101d18360208301602088016100e2565b80955050505050509250929050565b600082516101f28184602087016100e2565b919091019291505056fe6080604052604051609f380380609f833981016040819052601e916070565b604051653d3d3d3d3d7360d01b8152606082901b600682018190527f5afa3d82803e368260203750808036602082515af43d82803e903d91603a57fd601a830152615bf360f01b603a83015290603c81f35b600060208284031215608157600080fd5b81516001600160a01b0381168114609757600080fd5b939250505056fe60806040526040516102aa3803806102aa833981016040819052610022916101a7565b6040516000906001600160a01b0384169082818181855afa9150503d8060008114610069576040519150601f19603f3d011682016040523d82523d6000602084013e61006e565b606091505b509150506000818060200190518101906100889190610269565b90506000816001600160a01b0316846040516100a4919061028d565b600060405180830381855af49150503d80600081146100df576040519150601f19603f3d011682016040523d82523d6000602084013e6100e4565b606091505b50509050806100f7573d6000803e3d6000fd5b604051653d3d3d3d3d7360d01b8152606086901b600682018190527f5afa3d82803e368260203750808036602082515af43d82803e903d91603a57fd601a830152615bf360f01b603a83015290603c81f35b6001600160a01b038116811461015e57600080fd5b50565b634e487b7160e01b600052604160045260246000fd5b60005b8381101561019257818101518382015260200161017a565b838111156101a1576000848401525b50505050565b600080604083850312156101ba57600080fd5b82516101c581610149565b60208401519092506001600160401b03808211156101e257600080fd5b818501915085601f8301126101f657600080fd5b81518181111561020857610208610161565b604051601f8201601f19908116603f0116810190838211818310171561023057610230610161565b8160405282815288602084870101111561024957600080fd5b61025a836020830160208801610177565b80955050505050509250929050565b60006020828403121561027b57600080fd5b815161028681610149565b9392505050565b6000825161029f818460208701610177565b919091019291505056fea2646970667358221220cf700d741ec17b81a9cd412a255e60e875e0ce5611be2b853e00ddb9c5f15ecf64736f6c634300080b0033",
+  "devdoc": {
+    "author": "yoonsung.eth",
+    "details": "The template to be registered may or may not have an `initialize` function. However, at least a ERC173 and multicall for directed at self must be implemented.",
+    "kind": "dev",
+    "methods": {
+      "addTemplate(address)": {
+        "details": "같은 템플릿이 비콘과, 일반적인 템플릿으로 등록될 수 있습니다. 따라서 선택적으로 사용 가능합니다.",
+        "params": {
+          "templateAddr": "템플릿으로 사용될 컨트랙트의 주소"
+        }
+      },
+      "changeFee(uint256)": {
+        "params": {
+          "newFee": "변경된 수수료"
+        }
+      },
+      "changeFeeTo(address)": {
+        "params": {
+          "newFeeTo": "수취할 대상 주소"
+        }
+      },
+      "clone(address,bytes,bytes[])": {
+        "params": {
+          "calls": "초기화 함수 이외에, 호출되어야 하는 함수들의 배열",
+          "initializationCallData": "배포되면서 호출되어야 하는 초기화 함수",
+          "templateAddr": "템플릿으로 사용할 이미 배포된 컨트랙트 주소"
+        }
+      },
+      "collect(address)": {
+        "params": {
+          "tokenAddr": "수취할 토큰 주소"
+        }
+      },
+      "compute(bool,bytes32,bytes)": {
+        "details": "연결된 지갑 주소에 따라 생성될 지갑 주소가 변경되므로, 연결되어 있는 주소를 필수로 확인하여야 합니다.",
+        "params": {
+          "initializationCallData": "컨트랙트가 생성될 때 호출할 직렬화된 초기화 함수 정보",
+          "isBeacon": "비콘으로 배포해야 할 것인지 결정하는 인자.",
+          "templateId": "배포할 컨트랙트의 template id"
+        }
+      },
+      "computeClone(address,bytes)": {
+        "details": "연결된 지갑 주소에 따라 생성될 지갑 주소가 변경되므로, 연결되어 있는 주소를 필수로 확인하여야 합니다.",
+        "params": {
+          "initializationCallData": "컨트랙트가 생성될 때 호출할 직렬화된 초기화 함수 정보",
+          "templateAddr": "배포할 컨트랙트의 template id"
+        }
+      },
+      "computeWithSeed(string,bool,bytes32,bytes)": {
+        "details": "연결된 지갑 주소에 따라 생성될 지갑 주소가 변경되므로, 연결되어 있는 주소를 필수로 확인하여야 합니다.",
+        "params": {
+          "initializationCallData": "컨트랙트가 생성될 때 호출할 직렬화된 초기화 함수 정보",
+          "isBeacon": "비콘으로 배포해야 할 것인지 결정하는 인자.",
+          "seed": "컨트랙트에 사용할 seed 문자열",
+          "templateId": "배포할 컨트랙트의 template id"
+        }
+      },
+      "constructor": {
+        "params": {
+          "feeAmount": "basic fee for ether amount",
+          "feeToAddr": "fee collector address"
+        }
+      },
+      "deploy(bool,bytes32,bytes,bytes[])": {
+        "details": "일반적으로 배포되는 컨트랙트와 같이 컨트랙트가 생성될 때 초기화 함수를 실행해야 한다면, initializationCallData에 호출할 함수를 serialize하여 주입하여야 합니다. 컨트랙트 소유권을 별도로 관리해야하는 경우 multicall을 통해서 명시적인 소유권 이전이 되어야 합니다.",
+        "params": {
+          "calls": "컨트랙트가 배포된 이후, 필요한 일련의 함수 호출 정보",
+          "initializationCallData": "컨트랙트가 생성될 때 호출할 직렬화된 초기화 함수 정보",
+          "isBeacon": "비콘으로 배포해야 할 것인지 결정하는 인자.",
+          "templateId": "배포할 컨트랙트의 template id"
+        }
+      },
+      "deployWithSeed(string,bool,bytes32,bytes,bytes[])": {
+        "details": "일반적으로 배포되는 컨트랙트와 같이 컨트랙트가 생성될 때 초기화 함수를 실행해야 한다면, initializationCallData에 호출할 함수를 serialize하여 주입하여야 합니다. 컨트랙트 소유권을 별도로 관리해야하는 경우 multicall을 통해서 명시적인 소유권 이전이 되어야 합니다.",
+        "params": {
+          "calls": "컨트랙트가 배포된 이후, 필요한 일련의 함수 호출 정보",
+          "initializationCallData": "컨트랙트가 생성될 때 호출할 직렬화된 초기화 함수 정보",
+          "isBeacon": "비콘으로 배포해야 할 것인지 결정하는 인자.",
+          "seed": "컨트랙트 주소 확정에 필요한 외부 seed",
+          "templateId": "배포할 컨트랙트의 template id"
+        }
+      },
+      "getPrice()": {
+        "details": "연결된 지갑 주소에 따라 생성될 지갑 주소가 변경되므로, 연결되어 있는 주소를 필수로 확인하여야 합니다.",
+        "returns": {
+          "price": "이더리움으로 구성된 값을 가짐."
+        }
+      },
+      "removeTemplate(bytes32)": {
+        "params": {
+          "key": "삭제될 템플릿의 아이디"
+        }
+      },
+      "transferOwnership(address)": {
+        "params": {
+          "newOwner": "The address of the new owner of the contract"
+        }
+      },
+      "updateTemplate(bytes32,address)": {
+        "params": {
+          "key": "업데이트 될 템플릿의 아이디",
+          "templateAddr": "비콘일 경우 템플릿 주소, 템플릿 소유주 주소를 순서대로 인코딩"
+        }
+      }
+    },
+    "title": "Factory V1",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "addTemplate(address)": {
+        "notice": "템플릿으로 사용되기 적합한 인터페이스가 구현된 컨트랙트를 템플릿으로 가격과 함께 등록함."
+      },
+      "baseFee()": {
+        "notice": "base fee"
+      },
+      "changeFee(uint256)": {
+        "notice": "고정 수수료를 변경"
+      },
+      "changeFeeTo(address)": {
+        "notice": "수수료를 수취할 대상 변경"
+      },
+      "clone(address,bytes,bytes[])": {
+        "notice": "Factori.eth에 등록되지 않은 컨트랙트를 Template로 하여 Minimal Proxy로 배포합니다."
+      },
+      "collect(address)": {
+        "notice": "Factori.eth에 쌓여있는 ETH와 토큰을 호출하여, 수수료 수취 주소에 전송함"
+      },
+      "compute(bool,bytes32,bytes)": {
+        "notice": "template id와 초기화 데이터 통해서 minimal proxy와 minimal beacon proxy로 배포할 주소를 미리 파악하는 함수"
+      },
+      "computeClone(address,bytes)": {
+        "notice": "Factori.eth에 등록되지 않은 컨트랙트를 Template로 하여 minimal proxy로 배포할 주소를 미리 파악하는 함수"
+      },
+      "computeWithSeed(string,bool,bytes32,bytes)": {
+        "notice": "template id와 Seed 문자열, 초기화 데이터 통해서 minimal proxy와 minimal beacon proxy로 배포할 주소를 미리 파악하는 함수"
+      },
+      "constructor": {
+        "notice": "requiring on deploy, allowlist contract."
+      },
+      "deploy(bool,bytes32,bytes,bytes[])": {
+        "notice": "template id를 통해서 minimal proxy와 minimal beacon proxy를 배포하는 함수."
+      },
+      "deployWithSeed(string,bool,bytes32,bytes,bytes[])": {
+        "notice": "template id와 외부에서 관리되는 seed를 통해서 minimal proxy와 minimal beacon proxy를 배포하는 함수."
+      },
+      "feeTo()": {
+        "notice": "fee collector"
+      },
+      "getPrice()": {
+        "notice": "template id에 따라서 컨트랙트를 배포하기 위한 필요 가격을 가져오는 함"
+      },
+      "nonce()": {
+        "notice": "template count."
+      },
+      "owner()": {
+        "notice": "Get the address of the owner"
+      },
+      "removeTemplate(bytes32)": {
+        "notice": "등록된 템플릿을 삭제하는 함수"
+      },
+      "templates(bytes32)": {
+        "notice": "template key for template info."
+      },
+      "transferOwnership(address)": {
+        "notice": "Set the address of the new owner of the contract"
+      },
+      "updateTemplate(bytes32,address)": {
+        "notice": "등록된 템플릿의 정보를 변경하는 함수, 비콘인 경우에는 템플릿을 업데이트 할 수 있으나 비콘이 아니라면 업데이트 불가능."
+      }
+    },
+    "notice": "Abstract reusable contract into template and deploy them in small sizes `minimal proxy` and `beacon proxy`. This contract can receive a fee lower than the deploy cost, and registered addresses do not have to pay the fee. Beacon is managed in this contract, it can be useful if you need a scalable upgrade through the `beacon proxy`.",
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 2286,
+        "contract": "contracts/FactoryV1.sol:FactoryV1",
+        "label": "owner",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_address"
+      },
+      {
+        "astId": 2498,
+        "contract": "contracts/FactoryV1.sol:FactoryV1",
+        "label": "templates",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_mapping(t_bytes32,t_struct(TemplateInfo)3146_storage)"
+      },
+      {
+        "astId": 2503,
+        "contract": "contracts/FactoryV1.sol:FactoryV1",
+        "label": "nonceForTemplate",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_mapping(t_address,t_uint256)"
+      },
+      {
+        "astId": 2507,
+        "contract": "contracts/FactoryV1.sol:FactoryV1",
+        "label": "nonce",
+        "offset": 0,
+        "slot": "3",
+        "type": "t_uint256"
+      },
+      {
+        "astId": 2510,
+        "contract": "contracts/FactoryV1.sol:FactoryV1",
+        "label": "baseFee",
+        "offset": 0,
+        "slot": "4",
+        "type": "t_uint256"
+      },
+      {
+        "astId": 2513,
+        "contract": "contracts/FactoryV1.sol:FactoryV1",
+        "label": "feeTo",
+        "offset": 0,
+        "slot": "5",
+        "type": "t_address_payable"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_address_payable": {
+        "encoding": "inplace",
+        "label": "address payable",
+        "numberOfBytes": "20"
+      },
+      "t_bytes32": {
+        "encoding": "inplace",
+        "label": "bytes32",
+        "numberOfBytes": "32"
+      },
+      "t_mapping(t_address,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_mapping(t_bytes32,t_struct(TemplateInfo)3146_storage)": {
+        "encoding": "mapping",
+        "key": "t_bytes32",
+        "label": "mapping(bytes32 => struct IFactory.TemplateInfo)",
+        "numberOfBytes": "32",
+        "value": "t_struct(TemplateInfo)3146_storage"
+      },
+      "t_struct(TemplateInfo)3146_storage": {
+        "encoding": "inplace",
+        "label": "struct IFactory.TemplateInfo",
+        "members": [
+          {
+            "astId": 3143,
+            "contract": "contracts/FactoryV1.sol:FactoryV1",
+            "label": "template",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_address"
+          },
+          {
+            "astId": 3145,
+            "contract": "contracts/FactoryV1.sol:FactoryV1",
+            "label": "btemplate",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_address"
+          }
+        ],
+        "numberOfBytes": "64"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}

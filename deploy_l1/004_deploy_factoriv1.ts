@@ -14,13 +14,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy('FactoryV1', {
     from: deployer,
     args: [parseEther('0.01'), deployer],
-    maxFeePerGas: parseEther('0.000000070'),
+    maxFeePerGas: parseEther('0.000000060'),
     maxPriorityFeePerGas: parseEther('0.000000002'),
     log: true,
   });
 
   const op: TxOptions = {
-    maxFeePerGas: parseEther('0.000000070'),
+    maxFeePerGas: parseEther('0.000000060'),
     maxPriorityFeePerGas: parseEther('0.000000002'),
     from: deployer,
     gasLimit: '265492',

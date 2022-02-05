@@ -5,17 +5,19 @@
 ## Deployed
 
 ### Mainnet
-* FactoriV1: 
-    - StandardERC20 key: 
-    - MerkleDistributor key: 
-    - VestingEscrow key: 
+* FactoryV1: 0x7906743465F43fe72Ced0986D62037920929dDC7
+    - Price: 0.01 ETH
+    - StandardERC20 key: 0xd84f5b1df9c4fd84edcba18d9eec1e0598f898a9d84025ffcd437e0b828fbbe5
+    - MerkleDistributor key: 0x27b7cec299fe3e6f5913fa9a95be3169fde20709807359cbdd0a76849bcbe97d
+    - VestingEscrow key: 0x8c5d5e4f2902234c981bd69bbfb6bf4cc9e4adbd704d340671dac44dcad3f0d8
 
 ### Optimism
-* FactoriV1: 
-    - StandardERC20 key: 
-    - L2StandardERC20 key: 
-    - MerkleDistributor key: 
-    - VestingEscrow key: 
+* FactoryV1: 0x677ef2B01493e235fE2271AFcd01d7e22975Ce5b
+    - Price: 0.001 ETH
+    - StandardERC20 key: 0x7f24bd37566ed112a5fd314170e33c8e40c7d269e0edb6191c4bdbb2abe55315
+    - L2StandardERC20 key: 0x2aa4348ea67f2b4fb341743986c38b48067fd815ea436e08a922b298733b5442
+    - MerkleDistributor key: 0xfe6535b0627e8568ef1eafa214039fd7c90acacd1dc934553a060683d6180097
+    - VestingEscrow key: 0x1e568a0b6523217334b8ae190af264b89824c9b23402a2ae782fb93bf6e99ad9
 
 ### Goerli
 * FactoryV1: 0x131bC833b5857A74466ce61b0A2EE4CFc2436002

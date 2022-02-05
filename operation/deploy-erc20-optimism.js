@@ -1,6 +1,6 @@
 const hre = require('hardhat');
 const ethers = hre.ethers;
-const factoryABI = require('../deployments/optimism-kovan/FactoryV1.json').abi;
+const factoryABI = require('../deployments/optimism/FactoryV1.json').abi;
 
 async function main() {
   const ABI = ['function initialize(bytes calldata data)'];
@@ -18,15 +18,15 @@ async function main() {
   const initdata = interfaces.encodeFunctionData('initialize', [
     ethers.utils.defaultAbiCoder.encode(
       ['string', 'string', 'uint8', 'address'],
-      [tokenName, tokenSymbol, tokenDecimals, '0xd7ff83c09e317188cb9f1053ba3fca3df23aeae7'],
+      [tokenName, tokenSymbol, tokenDecimals, '0x259AB9b9EAB62b0fD98729B97BE121073D5B3479'],
     ),
   ]);
 
-  const Factory = await ethers.getContractAt(factoryABI, '0xd5ac3B857177A0081e2BcF4CAd803e4FE2B5F366');
+  const Factory = await ethers.getContractAt(factoryABI, '0x677ef2B01493e235fE2271AFcd01d7e22975Ce5b');
 
   await Factory['deploy(bool,bytes32,bytes,bytes[])'](
     false,
-    '0x7086e604b2f6abf7cd6acd06ac7185589800477c125dccfec0ea104159c12786',
+    '0x2aa4348ea67f2b4fb341743986c38b48067fd815ea436e08a922b298733b5442',
     initdata,
     [],
     { value: ethers.utils.parseEther('0.001') },

@@ -1,6 +1,6 @@
 const hre = require('hardhat');
 const ethers = hre.ethers;
-const factoryABI = require('../deployments/kovan/FactoryV1.json').abi;
+const factoryABI = require('../deployments/mainnet/FactoryV1.json').abi;
 
 async function main() {
   const ABI = [
@@ -27,20 +27,20 @@ async function main() {
   // 토큰 생성 데이터
   // 토큰 수령 주소, 토큰 수량
   const mintCallData = interfaces.encodeFunctionData('mintTo', [
-    '0x2e6bE9855A3bF02C73Ba74B7d756a63DB7762238',
+    '0x54B5E06c82f0d3d91377E5827BFb2381Ef1CC2b7',
     initialToken,
   ]);
   // 토큰 소유권 데이터
   // 토큰 소유권 수령 주소
   const ownerCallData = interfaces.encodeFunctionData('transferOwnership', [
-    '0x2e6bE9855A3bF02C73Ba74B7d756a63DB7762238',
+    '0x54B5E06c82f0d3d91377E5827BFb2381Ef1CC2b7',
   ]);
 
-  const Factory = await ethers.getContractAt(factoryABI, '0x43ccFa6D2E5cB209a4764Ad1DA46e5B5B32C644D');
+  const Factory = await ethers.getContractAt(factoryABI, '0x7906743465F43fe72Ced0986D62037920929dDC7');
 
   await Factory['deploy(bool,bytes32,bytes,bytes[])'](
     false,
-    '0x9826236a1bc4fc40f2cca879bc5ed99015ca0427eba794e5e6445427acd5055d',
+    '0xd84f5b1df9c4fd84edcba18d9eec1e0598f898a9d84025ffcd437e0b828fbbe5',
     initdata,
     [mintCallData, ownerCallData],
     {
