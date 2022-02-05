@@ -30,26 +30,20 @@ contract IntegrationMock {
         callData[1] = abi.encodeWithSelector(IERC173.transferOwnership.selector, msg.sender);
 
         bytes memory init = abi.encodeWithSelector(
-            bytes4(keccak256("initialize(string,string,string,uint8)")),
-            "1",
-            name,
-            symbol,
-            uint8(18)
+            bytes4(keccak256("initialize(bytes)")),
+            abi.encode(name, symbol, uint8(18))
         );
-        deployed = Factory.deploy{value: msg.value}(TOKEN_KEY, init, callData);
+        deployed = Factory.deploy{value: msg.value}(false, TOKEN_KEY, init, callData);
 
         emit Sample(deployed);
     }
 
     function calculateAddress(string calldata name, string calldata symbol) external view returns (address calculated) {
         bytes memory init = abi.encodeWithSelector(
-            bytes4(keccak256("initialize(string,string,string,uint8)")),
-            "1",
-            name,
-            symbol,
-            uint8(18)
+            bytes4(keccak256("initialize(bytes)")),
+            abi.encode(name, symbol, uint8(18))
         );
-        calculated = Factory.calculateDeployableAddress(TOKEN_KEY, init);
+        calculated = Factory.compute(false, TOKEN_KEY, init);
     }
 }
 
@@ -80,25 +74,19 @@ contract IntegrationSeedMock {
         callData[1] = abi.encodeWithSelector(IERC173.transferOwnership.selector, msg.sender);
 
         bytes memory init = abi.encodeWithSelector(
-            bytes4(keccak256("initialize(string,string,string,uint8)")),
-            "1",
-            name,
-            symbol,
-            uint8(18)
+            bytes4(keccak256("initialize(bytes)")),
+            abi.encode(name, symbol, uint8(18))
         );
-        deployed = Factory.deploy{value: msg.value}(seed, TOKEN_KEY, init, callData);
+        deployed = Factory.deployWithSeed{value: msg.value}(seed, false, TOKEN_KEY, init, callData);
 
         emit Sample(deployed);
     }
 
     function calculateAddress(string calldata name, string calldata symbol) external view returns (address calculated) {
         bytes memory init = abi.encodeWithSelector(
-            bytes4(keccak256("initialize(string,string,string,uint8)")),
-            "1",
-            name,
-            symbol,
-            uint8(18)
+            bytes4(keccak256("initialize(bytes)")),
+            abi.encode(name, symbol, uint8(18))
         );
-        calculated = Factory.calculateDeployableAddress(seed, TOKEN_KEY, init);
+        calculated = Factory.computeWithSeed(seed, false, TOKEN_KEY, init);
     }
 }

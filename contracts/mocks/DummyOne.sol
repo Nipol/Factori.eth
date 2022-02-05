@@ -9,8 +9,8 @@ import "@beandao/contracts/library/Initializer.sol";
 contract DummyOne is Initializer {
     string public name;
 
-    function initialize(string memory _name) external initializer {
-        name = _name;
+    function initialize(bytes calldata data) external initializer {
+        name = abi.decode(data, (string));
     }
 
     function checkName() external view returns (string memory) {

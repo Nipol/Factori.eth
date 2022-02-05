@@ -1,14 +1,13 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { Contract, BigNumber, constants, Signer } from 'ethers';
-import { splitSignature, arrayify, joinSignature, SigningKey } from 'ethers/lib/utils';
+import { splitSignature, arrayify, joinSignature, SigningKey, recoverAddress, defaultAbiCoder } from 'ethers/lib/utils';
 
 import { getApprovalDigest } from './util';
 
-describe('StandardToken/ERC2612', () => {
-  let StandardToken: Contract;
+describe('Standard/ERC2612', () => {
+  let StandardERC20: Contract;
 
-  const contractVersion = '1';
   const tokenName = 'template';
   const tokenSymbol = 'TEMP';
   const tokenDecimals = BigNumber.from('18');
@@ -22,15 +21,17 @@ describe('StandardToken/ERC2612', () => {
     const accounts = await ethers.getSigners();
     [wallet, walletTo, Dummy] = accounts;
 
-    const StandardTokenTemplate = await ethers.getContractFactory(
-      'contracts/templates/StandardToken.sol:StandardToken',
+    const StandardERC20Template = await ethers.getContractFactory(
+      'contracts/tokens/StandardERC20.sol:StandardERC20',
       wallet,
     );
-    StandardToken = await StandardTokenTemplate.deploy();
+    StandardERC20 = await StandardERC20Template.deploy();
 
-    await StandardToken.deployed();
-    await StandardToken.initialize(contractVersion, tokenName, tokenSymbol, tokenDecimals);
-    await StandardToken.mint(initialToken);
+    await StandardERC20.deployed();
+    await StandardERC20.initialize(
+      defaultAbiCoder.encode(['string', 'string', 'uint8'], [tokenName, tokenSymbol, tokenDecimals]),
+    );
+    await StandardERC20.mint(initialToken);
   });
 
   describe('#permit()', () => {
@@ -41,11 +42,11 @@ describe('StandardToken/ERC2612', () => {
       const value = constants.MaxUint256;
       const chainId = await wallet.getChainId();
       const deadline = constants.MaxUint256;
-      const nonce = await StandardToken.nonces(walletAddress);
+      const nonce = await StandardERC20.nonces(walletAddress);
 
       const digest = await getApprovalDigest(
         chainId,
-        StandardToken,
+        StandardERC20,
         { owner: walletAddress, spender: walletToAddress, value },
         nonce,
         deadline,
@@ -58,25 +59,25 @@ describe('StandardToken/ERC2612', () => {
       );
       const { v, r, s } = splitSignature(sig);
 
-      StandardToken = StandardToken.connect(walletTo);
+      StandardERC20 = StandardERC20.connect(walletTo);
 
-      await expect(StandardToken.permit(walletAddress, walletToAddress, value, deadline, v, r, s))
-        .to.emit(StandardToken, 'Approval')
+      await expect(StandardERC20.permit(walletAddress, walletToAddress, value, deadline, v, r, s))
+        .to.emit(StandardERC20, 'Approval')
         .withArgs(walletAddress, walletToAddress, value);
-      expect(await StandardToken.allowance(walletAddress, walletToAddress)).to.be.equal(value);
+      expect(await StandardERC20.allowance(walletAddress, walletToAddress)).to.be.equal(value);
     });
 
     it('should be reverted when expired deadline', async () => {
       const walletAddress = await wallet.getAddress();
       const walletToAddress = await walletTo.getAddress();
       const value = constants.MaxUint256;
-      const chainId = 1;
+      const chainId = await wallet.getChainId();
       const deadline = BigNumber.from('1');
-      const nonce = await StandardToken.nonces(walletAddress);
+      const nonce = await StandardERC20.nonces(walletAddress);
 
       const digest = await getApprovalDigest(
         chainId,
-        StandardToken,
+        StandardERC20,
         { owner: walletAddress, spender: walletToAddress, value },
         nonce,
         deadline,
@@ -89,9 +90,9 @@ describe('StandardToken/ERC2612', () => {
       );
       const { r, s, v } = splitSignature(sig);
 
-      StandardToken = StandardToken.connect(walletTo);
+      StandardERC20 = StandardERC20.connect(walletTo);
 
-      await expect(StandardToken.permit(walletAddress, walletToAddress, value, deadline, v, r, s)).to.be.revertedWith(
+      await expect(StandardERC20.permit(walletAddress, walletToAddress, value, deadline, v, r, s)).to.be.revertedWith(
         'ERC2612/Expired-time',
       );
     });
@@ -100,13 +101,13 @@ describe('StandardToken/ERC2612', () => {
       const walletAddress = await wallet.getAddress();
       const walletToAddress = await walletTo.getAddress();
       const value = constants.MaxUint256;
-      const chainId = 1;
+      const chainId = await wallet.getChainId();
       const deadline = constants.MaxUint256;
-      const nonce = await StandardToken.nonces(walletAddress);
+      const nonce = await StandardERC20.nonces(walletAddress);
 
       const digest = await getApprovalDigest(
         chainId,
-        StandardToken,
+        StandardERC20,
         { owner: walletAddress, spender: walletToAddress, value },
         nonce,
         deadline,
@@ -119,10 +120,10 @@ describe('StandardToken/ERC2612', () => {
       );
       const { r, s, v } = splitSignature(sig);
 
-      StandardToken = StandardToken.connect(walletTo);
+      StandardERC20 = StandardERC20.connect(walletTo);
 
       await expect(
-        StandardToken.permit(constants.AddressZero, walletToAddress, value, deadline, v, r, s),
+        StandardERC20.permit(constants.AddressZero, walletToAddress, value, deadline, v, r, s),
       ).to.be.revertedWith('ERC2612/Invalid-address-0');
     });
 
@@ -130,13 +131,13 @@ describe('StandardToken/ERC2612', () => {
       const walletAddress = await wallet.getAddress();
       const walletToAddress = await walletTo.getAddress();
       const value = constants.MaxUint256;
-      const chainId = 1;
+      const chainId = await wallet.getChainId();
       const deadline = constants.MaxUint256;
-      const nonce = await StandardToken.nonces(walletAddress);
+      const nonce = await StandardERC20.nonces(walletAddress);
 
       const digest = await getApprovalDigest(
         chainId,
-        StandardToken,
+        StandardERC20,
         { owner: walletAddress, spender: walletToAddress, value },
         nonce,
         deadline,
@@ -150,10 +151,10 @@ describe('StandardToken/ERC2612', () => {
       const { r, s, v } = splitSignature(sig);
       const fakeR = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
-      StandardToken = StandardToken.connect(walletTo);
+      StandardERC20 = StandardERC20.connect(walletTo);
 
       await expect(
-        StandardToken.permit(walletAddress, walletToAddress, value, deadline, v, fakeR, s),
+        StandardERC20.permit(walletAddress, walletToAddress, value, deadline, v, fakeR, s),
       ).to.be.revertedWith('ERC2612/Invalid-Signature');
     });
   });

@@ -6,10 +6,11 @@
     "dockerfile": "Dockerfile",
     // Update 'VARIANT' to pick a Node version: 10, 12, 14
     "args": {
-      "VARIANT": "14",
-      "SOLC_VERSION": "0.8.7"
+      "VARIANT": "16-bullseye",
+      "SOLC_VERSION": "0.8.11"
     }
   },
+
   // Set *default* container specific settings.json values on container create.
   "settings": {
     "terminal.integrated.profiles.linux": {
@@ -26,11 +27,9 @@
     "solidity.compileUsingRemoteVersion": "latest",
     "solidity.enableLocalNodeCompiler": false,
     "git.ignoreLimitWarning": true,
-    "editor.rulers": [
-      120
-    ],
+    "editor.rulers": [120],
     "workbench.colorCustomizations": {
-      "editorRuler.foreground": "#ff408042",
+      "editorRuler.foreground": "#ff408042"
     },
     "editor.formatOnSave": true,
     "[javascript]": {
@@ -48,6 +47,10 @@
     "[solidity]": {
       "editor.defaultFormatter": "JuanBlanco.solidity"
     },
+    "files.associations": {
+      "*.yul": "solidity",
+      "*.yulp": "solidity"
+    },
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": true
     }
@@ -63,10 +66,13 @@
     "ms-vscode.vscode-typescript-tslint-plugin",
     "github.vscode-pull-request-github"
   ],
+
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
+
   // Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
   "remoteUser": "node",
+
   // Use 'postCreateCommand' to run commands after the container is created.
   "postCreateCommand": "sudo mkdir -p /home/node/.ssh && sudo cp -r /home/node/.ssh-localhost/* /home/node/.ssh && sudo chmod 707 /home/node/.ssh && sudo chmod 606 /home/node/.ssh/* && npm install",
   "runArgs": ["-v", "${env:HOME}${env:USERPROFILE}/.ssh:/home/node/.ssh-localhost:ro"]
