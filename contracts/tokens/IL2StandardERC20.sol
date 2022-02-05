@@ -1,6 +1,5 @@
 /**
- * SPDX-License-Identifier: GPL-3.0-or-later
- * Origin by https://github.com/Uniswap/merkle-distributor
+ * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 pragma solidity ^0.8.0;
 

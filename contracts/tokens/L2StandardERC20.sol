@@ -14,7 +14,7 @@ import "./IL2StandardERC20.sol";
 /**
  * @title L2StandardERC20
  * @author yoonsung.eth
- * @notice ERC20과 ERC2612를 기본으로, ERC165, ERC173 명세를 구현하고 있습니다.
+ * @notice ERC20과 ERC2612를 기본으로, ERC165 명세를 구현하고 있습니다.
  */
 contract L2StandardERC20 is ERC20, ERC2612, Multicall, Initializer, IL2StandardERC20, IERC165 {
     address public immutable l2Bridge = 0x4200000000000000000000000000000000000010;
@@ -28,7 +28,7 @@ contract L2StandardERC20 is ERC20, ERC2612, Multicall, Initializer, IL2StandardE
     /**
      * @notice ERC20을 초기화 합니다. 토큰의 이름, 심볼, 소수점 정보를 필요로 합니다. 이 함수는 실행될 때 단 한번만 실행됩니다.
      * 이 함수가 실행될 때 이 함수를 실행한 당사자가 해당 컨트랙트의 소유권을 받게됩니다.
-     * @param data 토큰 이름, 토큰 심볼, 소수점 정보, L2 브릿지, L1 토큰 주소를 abi encode 하여, bytes 형태로 전달하여야 합니다.
+     * @param data 토큰 이름, 토큰 심볼, 소수점 정보, L1 토큰 주소를 abi encode 하여, bytes 형태로 전달하여야 합니다.
      */
     function initialize(bytes calldata data) external initializer {
         (name, symbol, decimals, l1Token) = abi.decode(data, (string, string, uint8, address));
